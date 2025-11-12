@@ -107,15 +107,19 @@ After approval:
   - Click **Merge Pull Request**
   - Click **Confirm Merge**
   - Delete branch after merging (GitHub will suggest this)
+  - Delete local branch 
+      - Move to `main` branch: `git checkout main`
+      - Delete local branch: `git branch -d <branch name>`
 
 ---
 
 ## 9 Update Local Main After Merge
 
-```
-git checkout main
-git pull
-```
+Make sure on main: `git branch`
+
+If not, move to main: `git checkout main`
+
+Update Local main: `git pull`
 
 ---
 

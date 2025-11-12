@@ -42,11 +42,11 @@
 
 ---
 
-## 3 Next 48-Hour Goals
+## 3 Immediate Next Goals  (TO-DO)
 
-| Task | Person | Due |
-|------|--------|-----|
-|      |        |     |
+| NAME | ACTION | DATE |
+|--------|-------|----------|
+|        |       |          |
 
 ---
 
@@ -56,7 +56,7 @@
 
 ---
 
-## 5 Action Items
+## 5 New Action Items
 
 | Action | Owner | Deadline |
 |--------|-------|----------|
