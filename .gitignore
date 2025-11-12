@@ -1,0 +1,17 @@
+# Ignore RStudio junk
+.Rproj.user/
+*.Rhistory
+*.RData
+*.Rapp.history
+
+# Ignore temporary or generated data
+*.csv
+*.tsv
+*.parquet
+
+# Keep project parquet files
+!/Project/data/*.parquet
+
+# OS junk
+.DS_Store
+Thumbs.db
