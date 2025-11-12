@@ -25,6 +25,13 @@ git checkout -b your-name/task-description
 git push -u origin your-name/task-description
 ```
 
+**NOTES:** 
+  
+  - `checkout -b` creates new branch and *switches* to it
+  - `push -u origin` pushes your branch to GitHub and sets upstream for future `git push` commands
+  - Replace `your-name/task-description` with something short and meaningful.
+  
+
 Example:
 ```
 git checkout -b esther/add-eda-section
