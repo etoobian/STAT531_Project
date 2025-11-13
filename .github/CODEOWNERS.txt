@@ -1,0 +1,6 @@
+# CODEOWNERS — restrict edits for critical project files
+# Each line: <path> <GitHub username(s)>
+
+# Core project config
+/EnP_2025Labs.Rproj  @etoobian
+/.gitignore          @etoobian
