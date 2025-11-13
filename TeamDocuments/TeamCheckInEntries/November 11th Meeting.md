@@ -27,7 +27,7 @@
 
 
 **Esther:**
-- Completed: Finalized lab report and team charter; answered section 7 individual questions; finished script that imports parquet along with appropriate documentation.
+- Completed: Finalized lab report and team charter; answered section 7 individual questions; finished script that imports parquet along with appropriate documentation; authored and shared team setup docs (Team Charter, Git Workflow, pre-PR checklist, Team Meeting Notes Template)
 - In progress: Script that imports parquet file is *in review*; edit workflow document to account for error; add Chris' responses to section 7.
 - Blockers: N/A
 - Need from team: N/A
