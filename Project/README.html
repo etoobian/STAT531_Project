@@ -353,7 +353,7 @@ display: none;
 
 
 <div id="project-overview-oregon-ad-bidding" class="section level1">
-<h1>Project Overview: Oregon Ad Bidding</h1>
+<h1><strong>Project Overview: Oregon Ad Bidding</strong></h1>
 <p><em>STAT 531 — Ethics &amp; Practice of Data Science, Portland State
 University</em></p>
 <p>This repository contains all code, documentation, and analysis for
@@ -374,7 +374,7 @@ should be altered to reflect the repo’s current functionality.</p>
 <hr />
 </div>
 <div id="repository-structure" class="section level1">
-<h1>Repository Structure</h1>
+<h1><strong>Repository Structure</strong></h1>
 <pre><code>Project/
 │
 ├── data/
@@ -392,8 +392,8 @@ should be altered to reflect the repo’s current functionality.</p>
 │   └── ...                           # Figures, tables, summaries
 │
 ├── reports/
-|   └── ...                           # Final written deliverables
-|
+│   └── ...                           # Final written deliverables
+│
 └── README.md                         # Currently a working document
 
 
@@ -418,7 +418,7 @@ discussion on <strong>Discord</strong>.</p>
 <hr />
 </div>
 <div id="setup-instructions" class="section level1">
-<h1>Setup Instructions</h1>
+<h1><strong>Setup Instructions</strong></h1>
 <div id="clone-the-repository" class="section level2">
 <h2>Clone the Repository</h2>
 <pre><code>git clone https://github.com/etoobian/EnP_2025Labs.git
@@ -440,9 +440,10 @@ this list.</p>
 </div>
 </div>
 <div id="data-io-loading-summarizing-and-exporting-data" class="section level1">
-<h1>Data I/O: Loading, Summarizing, and Exporting Data</h1>
+<h1><strong>Data I/O:</strong> Loading, Summarizing, and Exporting
+Data</h1>
 <p>Dataset I/O-related functions live in:</p>
-<p><code>Project/scripts/data_io.R</code></p>
+<pre><code>Project/scripts/data_io.R</code></pre>
 <p>When you source this file, the dataset is automatically loaded and
 made available as <code>ad_data</code>.</p>
 <div id="load-dataset-auto-load" class="section level2">
@@ -452,7 +453,117 @@ head(ad_data)</code></pre>
 <p>This: - Validates the raw data exists - Loads it using
 <code>arrow::read_parquet()</code> - Prints a preview - Stores it as
 <code>ad_data</code> in your R session</p>
+<p><strong>NOTE:</strong> Once sourced, <code>load_ad_data()</code> can
+be run for other datasets as needed.</p>
 </div>
+<div id="load-dataset-from-function" class="section level2">
+<h2>Load Dataset (From function)</h2>
+<p>Once sourced (shown above):
+<code>load_ad_data(    data_folder = &quot;Project/data/processed&quot;,  # Location of data file    data_file   = &quot;Data_filename.parquet&quot;    # Name of .parquet data file to load  )</code></p>
+</div>
+<div id="summarize-dataset" class="section level2">
+<h2>Summarize Dataset</h2>
+<p>Use this to inspect column types, missingness, and unique values:</p>
+<pre><code>summary_tbl &lt;- summarize_ad_data(ad_data)
+View(summary_tbl)
+</code></pre>
+<p>This is helpful before beginning cleaning tasks.</p>
+</div>
+<div id="export-processed-data" class="section level2">
+<h2>Export Processed Data</h2>
+<p>All processed datasets should be exported using:</p>
+<pre><code>export_ad_data(
+  df        = cleaned_df,                # df to export to .parquet
+  version   = &quot;clean_v1_description&quot;,    # char description / version number
+  out_dir   = &quot;Project/data/processed&quot;,  # omit to leave as default
+  base_name = &quot;bids_data&quot;                # omit to leave as default
+  overwrite = FALSE
+)</code></pre>
+<ul>
+<li><code>version</code> MUST be provided</li>
+<li>existing files are NOT overwritten unless
+<code>overwrite = TRUE</code></li>
+</ul>
+<p>Exports are written to:</p>
+<pre><code>Project/data/processed/</code></pre>
+<p>as:</p>
+<pre><code>&lt;base_name&gt;_&lt;version&gt;.parquet</code></pre>
+</div>
+</div>
+<div id="script-index-add-here-when-creating-new-scripts" class="section level1">
+<h1><strong>Script Index</strong> (Add Here When Creating New
+Scripts)</h1>
+<p>Every new script added to the project should be briefly documented
+here.</p>
+<p>Use this template exactly so our README stays cohesive:</p>
+<p><strong>Template for Adding a Script</strong></p>
+<p>Copy/paste and fill in:</p>
+<pre><code>### &lt;script_name&gt;.R 
+
+**Purpose:** One-sentence description  
+
+**Location:** Project/scripts/&lt;script_name&gt;.R  
+
+**Functions Provided:**  
+  - func1() – what it does  
+  - func2() – what it does  
+
+**Example Usage:**  
+  # example usage commands here</code></pre>
+<hr />
+<div id="existing-scripts" class="section level2">
+<h2>Existing Scripts</h2>
+<div id="data_io.r" class="section level3">
+<h3><code>data_io.R</code></h3>
+<p><strong>Purpose:</strong> Utilities for loading the raw dataset,
+summarizing columns, and exporting cleaned datasets.</p>
+<p><strong>Location:</strong> <code>Project/scripts/data_io.R</code></p>
+<p><strong>Functions Provided:</strong><br />
+- <code>load_ad_data()</code> — loads the main dataset<br />
+- <code>summarize_ad_data()</code> — creates a summary table<br />
+- <code>export_ad_data()</code> — saves processed data safely</p>
+<p><strong>Example Usage:</strong></p>
+<pre><code>source(&quot;Project/scripts/data_io.R&quot;)
+head(ad_data)
+summary_tbl &lt;- summarize_ad_data(ad_data)
+export_ad_data(cleaned_df, version = &quot;clean_v1&quot;)</code></pre>
+<!-- NOTE TO TEAM:
+Add new scripts below using the template. -->
+</div>
+</div>
+</div>
+<div id="adding-new-work-to-the-codebase" class="section level1">
+<h1><strong>Adding New Work to the Codebase</strong></h1>
+<p><strong>Where to put new files</strong></p>
+<p>|—————————————–|—————————| | Type of File | Folder |
+|—————————————–|—————————| | Data cleaning / transformation scripts |
+<code>Project/scripts/</code> | | Helpers / utilities |
+<code>Project/scripts/</code> | | EDA notebooks |
+<code>Project/notebooks/</code> | | Plots / visualizations |
+<code>Project/results/</code> | | Processed datasets |
+<code>Project/data/processed/</code> | | Report sections |
+<code>Project/reports/</code> | |—————————————–|—————————|</p>
+<p>When adding a new script:</p>
+<ul>
+<li>Place it in <code>Project/scripts/</code></li>
+<li>Use the <strong>script index template</strong> above 5 to document
+it</li>
+<li>Keep function names descriptive and consistent</li>
+<li>Include example usage where possible</li>
+</ul>
+</div>
+<div id="notes-for-completion-will-be-removed-later" class="section level1">
+<h1><strong>Notes for Completion</strong> (Will Be Removed Later)</h1>
+<!-- NOTE TO TEAM:
+This section should NOT appear in the final deliverable.
+It is only guidance during development. -->
+<ul>
+<li>Keep this README updated as scripts are added</li>
+<li>Maintain consistent naming patterns</li>
+<li>Keep examples short and copy/paste friendly</li>
+<li>Do NOT add EDA results or report content here</li>
+<li>Before final submission, we will prune placeholder notes</li>
+</ul>
 </div>
 
 

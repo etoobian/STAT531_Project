@@ -1,4 +1,4 @@
-# Project Overview: Oregon Ad Bidding  
+# **Project Overview: Oregon Ad Bidding**
 *STAT 531 — Ethics & Practice of Data Science, Portland State University*
 
 This repository contains all code, documentation, and analysis for the **Oregon Ad Bidding** project.  
@@ -12,12 +12,12 @@ Our goals:
   - Produce cleaned / processed datasets
   - Generate visualizations, reports, and a final presentation
   
-**NOTE TO TEAM:** This is a *working document* which will be competed as we go. 
+**NOTE TO TEAM:** This is a *working document* which will be completed as we go. 
 When you add to the repo, the README should be altered to reflect the repo's current functionality.
 
 ---
 
-# Repository Structure
+# **Repository Structure**
 
 
 ```
@@ -64,12 +64,12 @@ Do **not** rename or reorganize top-level folders without discussion on **Discor
 
 ---
 
-# Setup Instructions
+# **Setup Instructions**
 
 ## Clone the Repository
 ```
 git clone https://github.com/etoobian/EnP_2025Labs.git
-cd ENP_2025Labs
+cd EnP_2025Labs
 ```
 
 ## Open the R Project
@@ -92,7 +92,7 @@ install.packages(c("arrow", "tibble", "dplyr"))
 **TEAM TO-DO:** Add required packages for this script to this list.
 
 
-# Data I/O: Loading, Summarizing, and Exporting Data
+# **Data I/O: Loading, Summarizing, and Exporting Data**
 
 Dataset I/O-related functions live in:
 
@@ -146,7 +146,7 @@ export_ad_data(
   df        = cleaned_df,                # df to export to .parquet
   version   = "clean_v1_description",    # char description / version number
   out_dir   = "Project/data/processed",  # omit to leave as default
-  base_name = "bids_data"                # omit to leave as default
+  base_name = "bids_data",               # omit to leave as default
   overwrite = FALSE
 )
 ```
@@ -166,32 +166,87 @@ as:
 
 
 
+# **Script Index** (Add Here When Creating New Scripts)
+
+Every new script added to the project should be briefly documented here.
+
+Use this template exactly so our README stays cohesive:
+
+**Template for Adding a Script**
+
+Copy/paste and fill in:
+
+```
+### <script_name>.R 
+
+**Purpose:** One-sentence description  
+
+**Location:** Project/scripts/<script_name>.R  
+
+**Functions Provided:**  
+  - func1() – what it does  
+  - func2() – what it does  
+
+**Example Usage:**  
+  # example usage commands here
+```
+
+---
+
+## Existing Scripts
 
 
-# Adding New Work to the Codebase
+### `data_io.R`  
+
+**Purpose:** Utilities for loading the raw dataset, summarizing columns, 
+and exporting cleaned datasets. 
+
+**Location:** `Project/scripts/data_io.R`  
+
+**Functions Provided:**  
+  - `load_ad_data()` — loads the main dataset  
+  - `summarize_ad_data()` — creates a summary table  
+  - `export_ad_data()` — saves processed data safely  
+
+**Example Usage:**  
+
+  ```
+  source("Project/scripts/data_io.R")
+  head(ad_data)
+  summary_tbl <- summarize_ad_data(ad_data)
+  export_ad_data(cleaned_df, version = "clean_v1")
+  ```
+  
+  
+  
+<!-- NOTE TO TEAM:
+Add new scripts below using the template. -->
+
+
+
+# **Adding New Work to the Codebase**
 
 **Where to put new files**
 
-|-----------------------------------------|---------------------------|
-|  Type of File                           |  Folder                   |
-|-----------------------------------------|---------------------------|
-| Data cleaning / transformation scripts  | `Project/scripts/`        | 
-| Helpers / utilities	                    | `Project/scripts/`        |
-| EDA notebooks	                          | `Project/notebooks/`      |
-| Plots / visualizations	                | `Project/results/`        |
-| Processed datasets	                    | `Project/data/processed/` |
-| Report sections	                        | `Project/reports/`        |
-|-----------------------------------------|---------------------------|
+| Type of File                           | Folder                    |
+| -------------------------------------- | ------------------------- |
+| Data cleaning / transformation scripts | `Project/scripts/`        |
+| Helpers / utilities                    | `Project/scripts/`        |
+| EDA notebooks                          | `Project/notebooks/`      |
+| Plots / visualizations                 | `Project/results/`        |
+| Processed datasets                     | `Project/data/processed/` |
+| Report sections                        | `Project/reports/`        |
+
 
 When adding a new script:
 
   - Place it in `Project/scripts/`
-  - Use the **script index template** above 5 to document it
+  - Use the **script index template** above to document it
   - Keep function names descriptive and consistent
   - Include example usage where possible
   
 
-# Notes for Completion (Will Be Removed Later)
+# **Notes for Completion** (Will Be Removed Later)
 <!-- NOTE TO TEAM:
 This section should NOT appear in the final deliverable.
 It is only guidance during development. -->
