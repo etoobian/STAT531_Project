@@ -56,7 +56,7 @@
 #          ```
 #          export_ad_data(
 #            ad_data,
-#            version   = "clean_v1_ET",         # choose a unique version name
+#            version   = "clean_v1",             # choose a unique version name
 #            out_dir   = "Project/data/processed",  # omit to leave as default
 #            base_name = "bids_data"                # omit to leave as default
 #          )
@@ -65,7 +65,7 @@
 #          ```
 #          export_ad_data(
 #            ad_data,
-#            version   = "clean_v1_ET",        
+#            version   = "clean_v1",        
 #            overwrite = TRUE
 #          )
 #          ```
@@ -220,7 +220,7 @@ load_ad_data <- function(data_folder = default_data_folder,
 
 
 # ----------------------------------------------
-# HELPER FUNCTION: SUMMARIZE DATAFRAME COLUMNS
+# FUNCTION: SUMMARIZE DATAFRAME COLUMNS
 # ----------------------------------------------
 
 summarize_ad_data <- function(df) {

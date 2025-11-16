@@ -126,8 +126,43 @@ This:
  )
  ```
 
+## Summarize Dataset
 
+Use this to inspect column types, missingness, and unique values:
 
+```
+summary_tbl <- summarize_ad_data(ad_data)
+View(summary_tbl)
+
+```
+
+This is helpful before beginning cleaning tasks.
+
+## Export Processed Data
+
+All processed datasets should be exported using:
+```
+export_ad_data(
+  df        = cleaned_df,                # df to export to .parquet
+  version   = "clean_v1_description",    # char description / version number
+  out_dir   = "Project/data/processed",  # omit to leave as default
+  base_name = "bids_data"                # omit to leave as default
+  overwrite = FALSE
+)
+```
+
+  - `version` MUST be provided
+  - existing files are NOT overwritten unless `overwrite = TRUE`
+
+Exports are written to:
+
+```
+Project/data/processed/
+```
+as:
+```
+<base_name>_<version>.parquet
+```
 
 
 
