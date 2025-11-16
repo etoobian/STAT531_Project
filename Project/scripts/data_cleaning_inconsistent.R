@@ -93,3 +93,13 @@
 #   + Establishing correct SIZE values along with converting REQUESTED_SIZE back into an character array would allow us to establish select parameters like Price Per Pixel (price / width * height).
 # ------------------------------------------------------------------
 
+# ------------------------------------------------------------------
+#  FINAL DECISIONS REGARDING THE FATE OF ERRORS/INCONSISTENCIES (KAN-20/KAN-21)
+# ------------------------------------------------------------------
+#
+#  Template:
+#   - [KEY(S)] <DATATYPE(S)>
+#   + Decision
+#   + Code
+#
+
