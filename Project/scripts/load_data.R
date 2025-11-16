@@ -2,28 +2,49 @@
 # ------------------------------------------------------------------
 #  PROJECT DATA LOADER
 # ------------------------------------------------------------------
-# Purpose:
-#   - Loads project dataset (single file) into CURRENT R session
-#   - Stores data in variable -> `ad_data`
-# 
-# Usage (from repo root in R / RStudio):
-#   ```
-#   source("Project/scripts/load_data.r")
-#   head(ad_data)
-#   ```
+# PURPOSE:
+#   - Defines function `load_ad_data() for loading project dataset.
+#   - Automatically loads the dataset when this file is sourced.
+#   - Stores the loaded dataframe in the global environment as `ad_data`.
+#   - Helper Functions:
+#        - `summarize_ad_data()`: 
+#             summarizes columns (type, missingness, uniqueness)
+#
+#
+# USAGE (from repo root in R / RStudio):
+#   - Sourcing script (loads data into `ad_data`):
+#        `source("Project/scripts/load_data.r")`
+#   - Options:
+#       - Inspect or work with data:  
+#           `head(ad_data)`
+#       - Get column-wise summary:  
+#           ```
+#           summary_tbl <- summary_tbl(ad_data)
+#           View(summary_tbl)                   # or print(summary_tbl)
+#           ```
 #
 # NOTES:
-#  - Does NOT persist data across R sessions. 
+#   - Does NOT persist data across R sessions. 
 #       (Restart R -> must run `source()` again.)
-#  - Expected file: `Project/data/bids_data_vDTR.parquet`
-#       If filename / folder changes, edit `data_folder` / `data_file` below.
+#   - Default expected file:  
+#       `Project/data/bids_data_vDTR.parquet`
+#        - Update `default_data_folder` or `default_input_data_file`
+#          if the project data location changes.
+#
+#   - Working directory matters:
+#       Use getwd() to confirm you are at the repo root.
 # ------------------------------------------------------------------
+
 
 # ---------------------------
 # Install packages if missing
 # ---------------------------
-if (!requireNamespace("arrow", quietly = TRUE)) {
-  install.packages("arrow")
+needed_pkgs < c("arrow", "tibble", "dplyr")
+
+for (pkg in needed_pkgs) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg)
+  }
 }
 
 library(arrow)
@@ -97,6 +118,28 @@ load_ad_data <- function(data_folder = default_data_folder,
   
   return(df)
 }
+
+
+# ------------------
+# HELPER FUNCTIONS
+# ------------------
+
+# ----- SUMMARIZE DATAFRAME COLUMNS -----
+
+summarize_ad_data <- function(df) {
+  tibble::tibble(
+    column        = names(df),
+    type          = vapply(df, function(x) class(x)[1], character(1)),
+    n_missing     = vapply(df, function(x) sum(is.na(x)), integer(1)),
+    n_non_missing = vapply(df, function(x) sum(!is.na(x)), integer(1)),
+    n_unique      = vapply(df, function(x) dplyr::n_distinct(x), integer(1))
+  )
+}
+
+# Example usage (after sourcing this file):
+#   summary_tbl <- summarize_ad_data(ad_data)
+#   View(summary_tbl)
+
 
 # ----- Make available in interactive session -----
 df <- load_ad_data()
