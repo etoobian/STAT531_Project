@@ -54,3 +54,13 @@
 #   - Noted that some cities encompass more than 20 zip codes in DEVICE_GEO_ZIP and DEVICE_GEO_ZIP
 #   - Noted that at least some AUCTION_ID values are encompassed purely by one bider in PUBLISHER_ID (one bider bidding multiple times).
 #   + For further exploration, we can potentially re-order these instances in chronological order potentially by ordering by RESPONSE_TIME
+# ------------------------------------------------------------------
+
+# ------------------------------------------------------------------
+#  DETERMINATION OF IMPORTANCE FOR ERRORS/INCONSISTENCIES
+# ------------------------------------------------------------------
+#   
+#  Template:
+#   - [KEY(S)] <DATATYPE(S)>
+#   + Notes on importance.
+#
