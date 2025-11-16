@@ -61,6 +61,6 @@
 # ------------------------------------------------------------------
 #   
 #  Template:
-#   - [KEY(S)] <DATATYPE(S)>
+#   - [KEY(S)] <DATATYPE(S)> <IMPORTANCE LEVEL in *'s>
 #   + Notes on importance.
 #
