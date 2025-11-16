@@ -41,6 +41,8 @@
 #   - DEVICE_GEO_ZIP <chr>: There exists a negative ZIP code (-999).
 #   - RESPONSE_TIME <chr>: Should be of type integer.
 #   + The last three-four characters should contain the desired information.
+#   - RESPONSE_TIME <chr>: Inconsistent formatting.
+#   + There exists at least one RESPONSE_TIME value that has the following delimiter RESSPONSE_TIME (as opposed to RESPONSE_TIME).
 #
 #  Tested for:
 #   - Multiple time entries for distinct AUCTION_ID.
