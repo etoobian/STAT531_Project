@@ -36,3 +36,10 @@ na_pct <- (na_by_col / nrow(ad_data)) * 100
 
 # Percentage of NA values by KEYS that have NA values. 
 na_pct[c("DEVICE_GEO_CITY", "DEVICE_GEO_ZIP")]
+
+# ------------------------------------------------------------------
+#  DETERMINATION OF IMPORTANCE FOR NA VALUES (KAN-15)
+# ------------------------------------------------------------------
+#
+#
+#
