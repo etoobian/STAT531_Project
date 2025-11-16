@@ -1,4 +1,5 @@
 # Project/scripts/data_io.R
+<<<<<<< HEAD
 # ----------------------------------------------------------------------------
 #  PROJECT DATA I/O UTILITIES
 # ----------------------------------------------------------------------------
@@ -74,6 +75,44 @@
 #   - Working directory matters:
 #       * Use `getwd()` to confirm you are at the repo root before sourcing.
 # ----------------------------------------------------------------------------
+=======
+# ------------------------------------------------------------------
+#  PROJECT DATA LOADER
+# ------------------------------------------------------------------
+# PURPOSE:
+#   - Defines function `load_ad_data() for loading project dataset.
+#   - Automatically loads the dataset when this file is sourced.
+#   - Stores the loaded dataframe in the global environment as `ad_data`.
+#   - Helper Functions:
+#        - `summarize_ad_data()`: 
+#             summarizes columns (type, missingness, uniqueness)
+#
+#
+# USAGE (from repo root in R / RStudio):
+#   - Sourcing script (loads data into `ad_data`):
+#        `source("Project/scripts/load_data.r")`
+#   - Options:
+#       - Inspect or work with data:  
+#           `head(ad_data)`
+#       - Get column-wise summary:  
+#           ```
+#           summary_tbl <- summary_tbl(ad_data)
+#           View(summary_tbl)                   # or print(summary_tbl)
+#           ```
+#
+# NOTES:
+#   - Does NOT persist data across R sessions. 
+#       (Restart R -> must run `source()` again.)
+#   - Default expected file:  
+#       `Project/data/bids_data_vDTR.parquet`
+#        - Update `default_data_folder` or `default_input_data_file`
+#          if the project data location changes.
+#
+#   - Working directory matters:
+#       Use getwd() to confirm you are at the repo root.
+# ------------------------------------------------------------------
+
+>>>>>>> a95a7b8 (Scripts (`load_data.R`): Introduced `export_ad_data()` as helper to safely save new parquet files with common naming conventions and without unwanted overrides. -> KAN 1- 38.)
 
 
 # -----------------------------
@@ -92,10 +131,17 @@ library(arrow) # Only need to attach arrow, use tibble:: and dplyr:: explicitly
 # -------------------------------------
 # CONFIG: DEFAULTS (Change as needed)
 # -------------------------------------
+<<<<<<< HEAD
 default_data_folder      <- "Project/data"       # Folder relative to repo root
 default_input_data_file  <- "bids_data_vDTR.parquet"     # Initial project data
 default_out_dir          <- "Project/data/processed" # Dir for clean data files
 default_out_base_name    <- "bids_data"            # Base of new file filenames
+=======
+default_data_folder      <- "Project/data"      # Folder relative to repo root
+default_input_data_file  <- "bids_data_vDTR.parquet"    # Initial project data
+default_out_dir          <- "Project/data/results"   # Loc. for new data files
+default_out_base_name    <- "bids_data"           # Base of new file filenames
+>>>>>>> a95a7b8 (Scripts (`load_data.R`): Introduced `export_ad_data()` as helper to safely save new parquet files with common naming conventions and without unwanted overrides. -> KAN 1- 38.)
 
 # ------------------------------------------------
 # HELPFUL CHECK: Set WD to repo root (if needed)
@@ -113,7 +159,11 @@ default_out_base_name    <- "bids_data"            # Base of new file filenames
 
 load_ad_data <- function(data_folder = default_data_folder,
                          data_file   = default_input_data_file) {
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> a95a7b8 (Scripts (`load_data.R`): Introduced `export_ad_data()` as helper to safely save new parquet files with common naming conventions and without unwanted overrides. -> KAN 1- 38.)
   data_path <- file.path(data_folder, data_file)
   
   
@@ -214,7 +264,11 @@ export_ad_data <- function(df,
     stop(
       "\nExport aborted: file already exists:\n  ", out_path,
       "\n\nOptions:\n",
+<<<<<<< HEAD
       "  - Choose a new `version` name (recommended), e.g. \"clean_NA_v1\"\n",
+=======
+      "  - Choose a new `version` name (recommended), e.g. \"clean_NA_v1\"`",
+>>>>>>> a95a7b8 (Scripts (`load_data.R`): Introduced `export_ad_data()` as helper to safely save new parquet files with common naming conventions and without unwanted overrides. -> KAN 1- 38.)
       "  - Call again with `overwrite = TRUE` if intentionally replacing.\n"
     )
   }
