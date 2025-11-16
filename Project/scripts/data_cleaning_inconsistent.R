@@ -94,6 +94,12 @@
 # ------------------------------------------------------------------
 
 # ------------------------------------------------------------------
+# Install base unmodified bid data as ad_data.
+# ------------------------------------------------------------------
+base_data_path = file.path(getwd(), "Project/scripts/load_data.R")
+source(base_data_path)
+
+# ------------------------------------------------------------------
 #  FINAL DECISIONS REGARDING THE FATE OF ERRORS/INCONSISTENCIES (KAN-20/KAN-21)
 # ------------------------------------------------------------------
 #
@@ -102,4 +108,13 @@
 #   + Decision
 #   + Code
 #
+#  Decision:
+#   - PRICE <chr> 
+#   + After accounting for the all values that would not easily convert to doubles, PRICE shall take on the double type.
+ad_data$PRICE[which(substr(ad_data$PRICE, 1, 1)=="O")]
+idx <- which(substr(ad_data$PRICE, 1, 1)=="O")
+ad_data$PRICE[idx] <- "0"
+altered_price_data <- mutate(.data=select(.data=ad_data, PRICE), PRICE=as.double(PRICE))
+#
+
 
