@@ -114,8 +114,17 @@ This:
   - Prints a preview
   - Stores it as `ad_data` in your R session
 
-## 
+**NOTE:** Once sourced, `load_ad_data()` can be run for other datasets as needed.
 
+## Load Dataset (From function)
+ 
+ Once sourced (shown above):
+ ```
+ load_ad_data(
+   data_folder = "Project/data/processed",  # Location of data file
+   data_file   = "Data_filename.parquet"    # Name of .parquet data file to load
+ )
+ ```
 
 
 

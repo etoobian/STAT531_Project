@@ -11,6 +11,7 @@
 #        - Loads the main project dataset from a parquet file.
 #        - When you source this file, the data is loaded automatically
 #          and stored as `ad_data` in your R session.
+#        - `load_ad_data` can now be called to lad other datasets.
 #
 #   2. `summarize_ad_data()`
 #        - Creates a quick summary table of each column:
@@ -41,7 +42,15 @@
 #          View(summary_tbl) # or print(summary_tbl)
 #          ```
 #
-#   4. Export a cleaned / processed dataset
+#   4. Load other datasets (if needed)
+#          ```
+#          load_ad_data()
+#            data_folder = "Project/data/processed",  # Data directory 
+#            data_file   = "file_to_load.parquet    # Name of data file to load
+#          )
+#          ```
+#
+#   5. Export a cleaned / processed dataset
 #       - `version` MUST be provided
 #       - existing files are NOT overwritten unless overwrite = TRUE
 #          ```
