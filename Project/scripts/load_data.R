@@ -25,12 +25,8 @@
 if (!requireNamespace("arrow", quietly = TRUE)) {
   install.packages("arrow")
 }
-if (!requireNamespace("dplyr", quietly = TRUE)) {
-  install.packages("dplyr")
-} 
 
 library(arrow)
-library(dplyr)
 
 # ------------------------
 # CONFIG: Change if needed
