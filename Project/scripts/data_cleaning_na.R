@@ -40,6 +40,20 @@ na_pct[c("DEVICE_GEO_CITY", "DEVICE_GEO_ZIP")]
 # ------------------------------------------------------------------
 #  DETERMINATION OF IMPORTANCE FOR NA VALUES (KAN-15)
 # ------------------------------------------------------------------
-#
-#
-#
+# KAN-15: Determining the importance of NA columns
+importance_summary <- tibble(
+  column = cols_with_na,
+  na_percent = na_pct[cols_with_na],
+  importance = case_when(
+    na_pct[cols_with_na] < 5 ~ "Low impact, safe to keep",
+    na_pct[cols_with_na] < 20 ~ "Moderate impact, consider imputation",
+    TRUE ~ "High impact, consider removal"
+  )
+)
+
+importance_summary
+# Summary:
+# DEVICE_GEO_CITY and DEVICE_GEO_ZIP both have ~4.77% missing values.
+# Since the percentage is low, these columns are considered low impact.
+# Recommendation: Keep the columns. If needed, use simple imputation
+# such as replacing missing values with the mode or "Unknown".
