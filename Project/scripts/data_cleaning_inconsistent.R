@@ -107,14 +107,39 @@ source(base_data_path)
 #   - [KEY(S)] <DATATYPE(S)>
 #   + Decision
 #   + Code
+#   + Return Type
 #
 #  Decision:
 #   - PRICE <chr> 
-#   + After accounting for the all values that would not easily convert to doubles, PRICE shall take on the double type.
-ad_data$PRICE[which(substr(ad_data$PRICE, 1, 1)=="O")]
+#   + After accounting for the all values that would result in NA when converting to doubles, PRICE shall now take on the double type.
 idx <- which(substr(ad_data$PRICE, 1, 1)=="O")
-ad_data$PRICE[idx] <- "0"
-altered_price_data <- mutate(.data=select(.data=ad_data, PRICE), PRICE=as.double(PRICE))
+ad_data$PRICE[idx][1] <- "0"
+altered_price_data <- mutate(.data=ad_data, PRICE=as.double(PRICE))
+#   + tibble of size n by 15
+# 
+#   - PRICE <double>
+#   + Removing nonpositive nonzero values as there is no meaningful way of retrieving the original data.
+altered_price_data <- filter(.data=altered_price_data, PRICE > 0)
+#   + tibble of size n by 15
 #
-
-
+#   - DEVICE_GEO_ZIP <chr>
+#   + DEVICE_GEO_ZIP shall now take on the integer type. We must note that NA values for DEVICE_GEO_ZIP are irretrievable given by:
+#     print(summarize(.data=group_by(.data=ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG, DEVICE_GEO_CITY, DEVICE_GEO_ZIP), count=n()), n=320)
+altered_device_geo_zip_data <- mutate(.data=ad_data, DEVICE_GEO_ZIP=as.integer(DEVICE_GEO_ZIP))
+#   + tibble of size n by 15
+#
+#   - DEVICE_GEO_ZIP <int>
+#   + ZIPS with negative values (or values that exist below 9000 (doesn't exist)) are irretrievable given by:
+#     print(summarize(.data=group_by(.data=ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG, DEVICE_GEO_CITY, DEVICE_GEO_ZIP), count=n()), n=320)
+altered_device_geo_zip_data <- filter(.data=altered_device_geo_zip_data, DEVICE_GEO_ZIP > 9000)
+#   + tibble of size n by 15
+#
+#   - RESPONSE_TIME <chr>
+#   + Reformating entries to have values given by the last characters of the initial values, then converted such that RESPONSE_TIME shall now take on type integer.
+#     Utilizing regex: ^ = start of string, .*? = any characters, \\d = instance of a digit (extra \ to account for the fact that \ is a special character), 
+#     + = continue whatever match case until it no longer matches (in this case, match digits until next character isn't a digit).
+#     () = capturing group (what we want to capture),
+#     .* = discard rest of string.
+altered_response_time <- mutate(.data=ad_data, RESPONSE_TIME = sub("^.*?(\\d+).*", "\\1", ad_data$RESPONSE_TIME)) # Removes all but the numeric characters.
+altered_response_time <- mutate(.data=altered_response_time, RESPONSE_TIME=as.integer(RESPONSE_TIME)) # Swaps the datatype over to integers.
+#   + tibble of size n by 15
