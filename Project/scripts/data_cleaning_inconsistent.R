@@ -73,7 +73,7 @@
 #   + The more numerical values we have, the easier it would be for us to find patterns we otherwise couldn't see.
 #   - DEVICE_GEO_ZIP <chr> <*****> ✔️
 #   + Removing outliers (negative values) will improve accuracy. We could not effectively deduce what value of DEVICE_GEO_ZIP based on DEVICE_GEO_CITY (Portland contains multiple ZIP codes, majority if not all -999 ZIP code values are from Portland).
-#   - TIMESTAMP <chr> <****>
+#   - TIMESTAMP <chr> <****> ✔️
 #   + Providing a consistent formating for TIMESTAMP would allow for ease of conversion into numerical representation.
 #   - TIMESTAMP <chr> <***>
 #   + Sorting TIMESTAMP into chronological order would allow for the creation of parameters that are typically seen in time-series data (moving averages, lag, etc.). However given we have 400k+ rows of data (~100k+ rows if you collapse by AUCTION_ID and BID_WON), it will take a while to sort.
@@ -92,6 +92,12 @@
 #   - REQUESTED_SIZE, SIZE <chr, chr> <*****>
 #   + Establishing correct SIZE values along with converting REQUESTED_SIZE back into an character array would allow us to establish select parameters like Price Per Pixel (price / width * height).
 # ------------------------------------------------------------------
+
+# ------------------------------------------------------------------
+# Import additional dependencies.
+# ------------------------------------------------------------------
+library(stringr)
+library(jsonlite)
 
 # ------------------------------------------------------------------
 # Install base unmodified bid data as ad_data.
@@ -143,3 +149,29 @@ altered_device_geo_zip_data <- filter(.data=altered_device_geo_zip_data, DEVICE_
 altered_response_time <- mutate(.data=ad_data, RESPONSE_TIME = sub("^.*?(\\d+).*", "\\1", ad_data$RESPONSE_TIME)) # Removes all but the numeric characters.
 altered_response_time <- mutate(.data=altered_response_time, RESPONSE_TIME=as.integer(RESPONSE_TIME)) # Swaps the datatype over to integers.
 #   + tibble of size n by 15
+#
+#   - TIMESTAMP, DATE_UTC <chr, chr>
+#   + Providing a single format for which there will be better utilization later.
+#   Utilizing regex: "^.*\\s(\\S+)$" looks for the first non-whitespace string starting from the back.
+altered_timestamp <- mutate(.data=ad_data, TIMESTAMP = sub("^.*\\s(\\S+)$", "\\1", ad_data$TIMESTAMP))
+# Verifies that all resulting values are of DD:DD:DD where D is a digit. 
+# sanity_check <- str_extract(altered_timestamp$TIMESTAMP, "\\b\\d{1,2}:\\d{1,2}:\\d{1,2}\\b")
+# Verifies that all resulting values are a valid time format given HH:MM:SS
+# time_parts <- str_split(sanity_check, ":", simplify=TRUE)
+# hours <- as.numeric(time_parts[,1])
+# minutes <- as.numeric(time_parts[,2])
+# seconds <- as.numeric(time_parts[,3])
+# valid_time <- hours < 24 & hours >= 0 &
+#              minutes < 60 & minutes >= 0 &
+#              seconds < 60 & seconds >= 0
+# unique(valid_time)
+altered_timestamp <- mutate(.data=altered_timestamp, TIMESTAMP=paste(DATE_UTC, TIMESTAMP, sep="~"))
+#   + tibble of size n x 15
+#
+#   - REQUESTED_SIZE, SIZE <chr, chr>
+#   + Changing all instances of "0x0" and "1x1" to intended size after converting REQUESTED_SIZES back into an array of character vectors.
+#     This turns all "0x0" and "1x1" SIZE values into corresponding REQUESTED_SIZES value if REQUESTED_SIZES is of length 1. If not, it provides an NA value as there is no method of obtaining the actual size.
+altered_req_size_size <- mutate(.data=rowwise(ad_data), REQUESTED_SIZES=list(fromJSON(REQUESTED_SIZES)))
+incorrect_sizes <- c("1x1", "0x0")
+altered_req_size_size <- mutate(.data=rowwise(altered_req_size_size), SIZE=if(SIZE %in% incorrect_sizes) { if (length(REQUESTED_SIZES) == 1) { REQUESTED_SIZES[[1]] } else { NA } } else { SIZE })
+#   + tibble of size n x 15
