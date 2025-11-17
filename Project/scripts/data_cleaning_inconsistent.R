@@ -65,13 +65,13 @@
 #   + Notes on importance.
 #
 #  Importance:
-#   - PRICE <chr> <*****>
+#   - PRICE <chr> <*****> ✔️
 #   + For ease of data processing, I believe that converting the column price in type double (after ensuring that all values follow a double type (i.e. no "five point eight" values)) will be highly beneficial.
-#   - PRICE <chr> <*****>
+#   - PRICE <chr> <*****> ✔️
 #   + Removing outliers (negative values) will improve accuracy, therefore we should look to remove negative values as there is appears to be no pattern that would allow us to recover the underlying data without introducing error.
-#   - DEVICE_GEO_ZIP <chr> <*****> 
+#   - DEVICE_GEO_ZIP <chr> <*****> ✔️
 #   + The more numerical values we have, the easier it would be for us to find patterns we otherwise couldn't see.
-#   - DEVICE_GEO_ZIP <chr> <*****>
+#   - DEVICE_GEO_ZIP <chr> <*****> ✔️
 #   + Removing outliers (negative values) will improve accuracy. We could not effectively deduce what value of DEVICE_GEO_ZIP based on DEVICE_GEO_CITY (Portland contains multiple ZIP codes, majority if not all -999 ZIP code values are from Portland).
 #   - TIMESTAMP <chr> <****>
 #   + Providing a consistent formating for TIMESTAMP would allow for ease of conversion into numerical representation.
@@ -87,7 +87,7 @@
 #   + We know that this data exclusively comes from Oregon, therefore we can just set all values to Oregon (or OR).
 #   - DEVICE_GEO_CITY <chr> <>
 #   + I don't see why we would remove non-cities from DEVICE_GEO_CITY. Maybe a name change for the column would better reflect the data.
-#   - RESPONSE_TIME <chr> <*****>
+#   - RESPONSE_TIME <chr> <*****> ✔️
 #   + Formatting then converting RESPONSE_TIME into type integer would improve accuracy.
 #   - REQUESTED_SIZE, SIZE <chr, chr> <*****>
 #   + Establishing correct SIZE values along with converting REQUESTED_SIZE back into an character array would allow us to establish select parameters like Price Per Pixel (price / width * height).
