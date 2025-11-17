@@ -79,7 +79,7 @@
 #   + Sorting TIMESTAMP into chronological order would allow for the creation of parameters that are typically seen in time-series data (moving averages, lag, etc.). However given we have 400k+ rows of data (~100k+ rows if you collapse by AUCTION_ID and BID_WON), it will take a while to sort.
 #   - BID_WON <chr> <*>
 #   + Converting BID_WON into type logical would not really make a difference as we can easily query through the three existing unique values of TRUE, true, and FALSE.
-#   - DEVICE_GEO_LONG <dbl> <***>
+#   - DEVICE_GEO_LONG <dbl> <***> ✔️
 #   + Given that only 100 data points out of the 400k+ contain invalid longitudinal points, these points can be thrown out. It is also easily deducible that these 100 points are exactly 10 degrees further to the west than their respective counterparts (when sorted by DEVICE_GEO_CITY, DEVICE_GEO_ZIP and DEVICE_GEO_LONG).
 #   - AUCTION_ID, BID_WON <chr, chr> <****>
 #   + Deducing whether or not it's possible for an auction to have multiple winners is going to be relatively important. If we deduce it is not important, there is no effective way of determining which bid actually won, and therefore we can throw them out.
@@ -125,7 +125,7 @@ altered_price_data <- mutate(.data=ad_data, PRICE=as.double(PRICE))
 # 
 #   - PRICE <double>
 #   + Removing nonpositive nonzero values as there is no meaningful way of retrieving the original data.
-altered_price_data <- filter(.data=altered_price_data, PRICE > 0)
+altered_price_data <- mutate(.data=ad_data, PRICE=if_else(PRICE < 0, NA, PRICE))
 #   + tibble of size n by 15
 #
 #   - DEVICE_GEO_ZIP <chr>
@@ -137,23 +137,23 @@ altered_device_geo_zip_data <- mutate(.data=ad_data, DEVICE_GEO_ZIP=as.integer(D
 #   - DEVICE_GEO_ZIP <int>
 #   + ZIPS with negative values (or values that exist below 9000 (doesn't exist)) are irretrievable given by:
 #     print(summarize(.data=group_by(.data=ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG, DEVICE_GEO_CITY, DEVICE_GEO_ZIP), count=n()), n=320)
-altered_device_geo_zip_data <- filter(.data=altered_device_geo_zip_data, DEVICE_GEO_ZIP > 9000)
+altered_device_geo_zip_data <- mutate(.data=altered_device_geo_zip_data, DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, NA, DEVICE_GEO_ZIP))
 #   + tibble of size n by 15
 #
 #   - RESPONSE_TIME <chr>
-#   + Reformating entries to have values given by the last characters of the initial values, then converted such that RESPONSE_TIME shall now take on type integer.
+#   + Reformating entries to have values given by the digits characters of the initial values, then converted such that RESPONSE_TIME shall now take on type integer.
 #     Utilizing regex: ^ = start of string, .*? = any characters, \\d = instance of a digit (extra \ to account for the fact that \ is a special character), 
 #     + = continue whatever match case until it no longer matches (in this case, match digits until next character isn't a digit).
 #     () = capturing group (what we want to capture),
 #     .* = discard rest of string.
-altered_response_time <- mutate(.data=ad_data, RESPONSE_TIME = sub("^.*?(\\d+).*", "\\1", ad_data$RESPONSE_TIME)) # Removes all but the numeric characters.
-altered_response_time <- mutate(.data=altered_response_time, RESPONSE_TIME=as.integer(RESPONSE_TIME)) # Swaps the datatype over to integers.
+altered_response_time_data <- mutate(.data=ad_data, RESPONSE_TIME = sub("^.*?(\\d+).*", "\\1", ad_data$RESPONSE_TIME)) # Removes all but the numeric characters.
+altered_response_time_data <- mutate(.data=altered_response_time, RESPONSE_TIME=as.integer(RESPONSE_TIME)) # Swaps the datatype over to integers.
 #   + tibble of size n by 15
 #
 #   - TIMESTAMP, DATE_UTC <chr, chr>
 #   + Providing a single format for which there will be better utilization later.
 #   Utilizing regex: "^.*\\s(\\S+)$" looks for the first non-whitespace string starting from the back.
-altered_timestamp <- mutate(.data=ad_data, TIMESTAMP = sub("^.*\\s(\\S+)$", "\\1", ad_data$TIMESTAMP))
+altered_timestamp_data <- mutate(.data=ad_data, TIMESTAMP = sub("^.*\\s(\\S+)$", "\\1", ad_data$TIMESTAMP))
 # Verifies that all resulting values are of DD:DD:DD where D is a digit. 
 # sanity_check <- str_extract(altered_timestamp$TIMESTAMP, "\\b\\d{1,2}:\\d{1,2}:\\d{1,2}\\b")
 # Verifies that all resulting values are a valid time format given HH:MM:SS
@@ -165,14 +165,19 @@ altered_timestamp <- mutate(.data=ad_data, TIMESTAMP = sub("^.*\\s(\\S+)$", "\\1
 #              minutes < 60 & minutes >= 0 &
 #              seconds < 60 & seconds >= 0
 # unique(valid_time)
-altered_timestamp <- mutate(.data=altered_timestamp, TIMESTAMP=paste(DATE_UTC, TIMESTAMP, sep="~"))
+altered_timestamp_data <- mutate(.data=altered_timestamp, TIMESTAMP=paste(DATE_UTC, TIMESTAMP, sep="~"))
 #   + tibble of size n x 15
 #
 #   - REQUESTED_SIZE, SIZE <chr, chr>
 #   + Changing all instances of "0x0" and "1x1" to intended size after converting REQUESTED_SIZES back into an array of character vectors.
 #     This turns all "0x0" and "1x1" SIZE values into corresponding REQUESTED_SIZES value if REQUESTED_SIZES is of length 1. If not, it provides an NA value as there is no method of obtaining the actual size.
 #     It is good to note that the form in which REQUESTED_SIZES value takes is that of a JSON string.
-altered_req_size_size <- mutate(.data=rowwise(ad_data), REQUESTED_SIZES=list(fromJSON(REQUESTED_SIZES)))
+altered_req_size_size_data <- mutate(.data=rowwise(ad_data), REQUESTED_SIZES=list(fromJSON(REQUESTED_SIZES)))
 incorrect_sizes <- c("1x1", "0x0")
-altered_req_size_size <- mutate(.data=rowwise(altered_req_size_size), SIZE=if(SIZE %in% incorrect_sizes) { if (length(REQUESTED_SIZES) == 1) { REQUESTED_SIZES[[1]] } else { NA } } else { SIZE })
+altered_req_size_size_data <- mutate(.data=rowwise(altered_req_size_size), SIZE=if(SIZE %in% incorrect_sizes) { if (length(REQUESTED_SIZES) == 1) { REQUESTED_SIZES[[1]] } else { NA } } else { SIZE })
+#   + tibble of size n x 15
+#
+#   - DEVICE_GEO_LONG <dbl>
+#   + Modifying the invalid values in DEVICE_GEO_LONG.
+altered_device_geo_long_data <- mutate(.data=ad_data, DEVICE_GEO_LONG=if_else(DEVICE_GEO_LONG < -130, DEVICE_GEO_LONG + 10, DEVICE_GEO_LONG))
 #   + tibble of size n x 15
