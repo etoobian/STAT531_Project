@@ -89,7 +89,7 @@
 #   + I don't see why we would remove non-cities from DEVICE_GEO_CITY. Maybe a name change for the column would better reflect the data.
 #   - RESPONSE_TIME <chr> <*****> ✔️
 #   + Formatting then converting RESPONSE_TIME into type integer would improve accuracy.
-#   - REQUESTED_SIZE, SIZE <chr, chr> <*****>
+#   - REQUESTED_SIZE, SIZE <chr, chr> <*****> ✔️
 #   + Establishing correct SIZE values along with converting REQUESTED_SIZE back into an character array would allow us to establish select parameters like Price Per Pixel (price / width * height).
 # ------------------------------------------------------------------
 
@@ -171,6 +171,7 @@ altered_timestamp <- mutate(.data=altered_timestamp, TIMESTAMP=paste(DATE_UTC, T
 #   - REQUESTED_SIZE, SIZE <chr, chr>
 #   + Changing all instances of "0x0" and "1x1" to intended size after converting REQUESTED_SIZES back into an array of character vectors.
 #     This turns all "0x0" and "1x1" SIZE values into corresponding REQUESTED_SIZES value if REQUESTED_SIZES is of length 1. If not, it provides an NA value as there is no method of obtaining the actual size.
+#     It is good to note that the form in which REQUESTED_SIZES value takes is that of a JSON string.
 altered_req_size_size <- mutate(.data=rowwise(ad_data), REQUESTED_SIZES=list(fromJSON(REQUESTED_SIZES)))
 incorrect_sizes <- c("1x1", "0x0")
 altered_req_size_size <- mutate(.data=rowwise(altered_req_size_size), SIZE=if(SIZE %in% incorrect_sizes) { if (length(REQUESTED_SIZES) == 1) { REQUESTED_SIZES[[1]] } else { NA } } else { SIZE })
