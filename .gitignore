@@ -1,17 +1,25 @@
-# Ignore RStudio junk
+###################################################
+# R / RStudio files
+###################################################
 .Rproj.user/
 *.Rhistory
 *.RData
 *.Rapp.history
 
-# Ignore temporary or generated data
+###################################################
+# OS-generated files
+###################################################
+.DS_Store
+Thumbs.db
+
+###################################################
+# Data files — DO NOT COMMIT RAW OR PROCESSED DATA
+###################################################
+
+# Ignore all CSV / TSV / PARQUET files by default
 *.csv
 *.tsv
 *.parquet
 
-# Keep project parquet files
-!/Project/data/*.parquet
-
-# OS junk
-.DS_Store
-Thumbs.db
+# Ignore any data stored inside the Project/data folder
+Project/data/*
