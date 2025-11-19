@@ -19,6 +19,51 @@ When you add to the repo, the README should be altered to reflect the repo's cur
 
 # **Repository Structure**
 
+**Important:**  
+This repo does **NOT** contain datasets, nor should any data files be committed.  
+All data must be stored **locally** by team members following the structure described below.
+
+## **Remote Structure**
+```
+Project/
+│
+├── scripts/
+│   ├── data_io.R                     # Data loading/export utilities
+│   └── ...                           # (future scripts here)
+│
+├── notebooks/
+│   └── ...                           # Rmd files for EDA / analysis
+│
+├── results/
+│   └── ...                           # Figures, tables, summaries
+│
+├── reports/
+│   └── ...                           # Final written deliverables
+│
+└── README.md                         # Currently a working document
+
+
+TeamDocuments/
+│
+├── TeamCharter.md              # Copy of team charter for reference
+│
+├── GitWorkflow.md              # Detailed instructions & notes on Git Workflow
+│
+├── PR_Checklist.md             # List of checks prior to each pull request
+│
+├── TeamCheckInTeamplate.md     # Template for team check-in meeeting notetaker
+│
+└── TeamCheckInEntries/    
+    └── ...                     # Dated .md files from each meeting
+```
+
+
+## **Expected Local Structure**
+
+**DO NOT COMMIT DATA TO THIS REPO**
+
+Instead, create a local directory. 
+Please copy the data files from the team's Canvas page and add locally, structured as shown below:
 
 ```
 Project/
