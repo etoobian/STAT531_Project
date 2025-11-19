@@ -2,6 +2,6 @@
 # Each line: <path> <GitHub username(s)>
 
 # Core project config
-/EnP_2025Labs.Rproj  @etoobian
-/.gitignore          @etoobian
+/STAT531_Project.Rproj  @etoobian
+/.gitignore             @etoobian
 
