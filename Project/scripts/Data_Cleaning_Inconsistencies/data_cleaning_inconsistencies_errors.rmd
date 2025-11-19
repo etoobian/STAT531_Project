@@ -28,8 +28,9 @@ library(dplyr)
 #---- Code you would use under normal conditions.
 # base_data_path = file.path(getwd(), "Project/scripts/load_data.R")
 # source(base_data_path)
-#---- Newer code that you use for this R-markdown file.
-base_data_path = file.path(dirname(getwd()), "data/bids_data_vDTR.parquet")
+#---- Newer code that you use for this R-markdown file.a
+base_data_path = file.path(dirname(dirname(getwd())), "data/bids_data_vDTR.parquet")
+base_data_path # Verify that the file path.
 ad_data = arrow::read_parquet(base_data_path)
 ```
 
@@ -178,11 +179,21 @@ select(.data=filter(.data=ad_data, (SIZE=="0x0" | SIZE=="1x1"), BID_WON=="TRUE")
 |:-------------------------:|
 | Tested for / other notes: |
 
--   Multiple time entries for distinct AUCTION_ID.\
--   Pattern in inconsistent formatting for TIMESTAMP\
--   Could be an issue with it being not in chronological order (error applied before scrambling).\
--   Noted that some cities encompass more than 20 zip codes in DEVICE_GEO_ZIP and DEVICE_GEO_ZIP - Noted that at least some AUCTION_ID values are encompassed purely by one bider in PUBLISHER_ID (one bider bidding multiple times).\
+-   Multiple time entries for distinct AUCTION_ID.
+
+-   Pattern in inconsistent formatting for TIMESTAMP
+
+-   Could be an issue with it being not in chronological order (error applied before scrambling).
+
+-   Noted that some cities encompass more than 20 zip codes in DEVICE_GEO_ZIP and DEVICE_GEO_ZIP - Noted that at least some AUCTION_ID values are encompassed purely by one bidder in PUBLISHER_ID (one bidder bidding multiple times).
+
 -   For further exploration, we can potentially re-order these instances in chronological order by RESPONSE_TIME
+
+-   **There are rows that aren't unique (potential duplicates/multiple requests sent at once)**
+
+    ```{r}
+    unique(ad_data)
+    ```
 
 |                                                                 |
 |:---------------------------------------------------------------:|
@@ -247,3 +258,6 @@ Maybe a name change for the column would better reflect the data.\
 \
 - REQUESTED_SIZE, SIZE \<chr, chr\> \<\*\*\*\*\*\> ✔️\
 **Note:** Establishing correct SIZE values along with converting REQUESTED_SIZE back into an character array would allow us to establish select parameters like Price Per Pixel (price / width \* height).
+
+\- No key \<no data type\> \<\*\*\*\*\>\
+**Note:** It would be quite important to determine whether or not duplicates are natural part of the dataset or if it needs to be removed.
