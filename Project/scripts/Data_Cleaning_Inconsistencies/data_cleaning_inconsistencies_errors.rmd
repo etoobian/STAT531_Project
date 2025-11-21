@@ -22,16 +22,9 @@ Run:
 # Dependencies
 library(arrow)
 library(dplyr)
-
-# Initializes and defines ad_data file.
-# You will run into an error retrieving the data through this way since running code in an Rmd file changes what getwd() returns.
-#---- Code you would use under normal conditions.
-# base_data_path = file.path(getwd(), "Project/scripts/load_data.R")
-# source(base_data_path)
-#---- Newer code that you use for this R-markdown file.a
-base_data_path = file.path(dirname(dirname(getwd())), "data/bids_data_vDTR.parquet")
-base_data_path # Verify that the file path.
-ad_data = arrow::read_parquet(base_data_path)
+setwd(dirname(dirname(dirname(getwd()))))
+base_data_path = file.path(getwd(), "Project/scripts/load_data.R")
+source(base_data_path)
 ```
 
 |                                        |
