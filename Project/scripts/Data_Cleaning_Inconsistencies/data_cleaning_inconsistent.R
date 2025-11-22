@@ -12,7 +12,7 @@
 # ------------------------------------------------------------------
 
 # ------------------------------------------------------------------
-# Import additional dependencies.
+# Import additional dependencies (if they are not already loaded in).
 # ------------------------------------------------------------------
 library(stringr)
 library(jsonlite)
@@ -28,7 +28,7 @@ cumulative_ad_data <- ad_data
 rm(ad_data, base_data_path, data_file, data_folder, data_path, df)
 
 # ------------------------------------------------------------------
-#  FINAL DECISIONS REGARDING THE FATE OF ERRORS/INCONSISTENCIES (KAN-20/KAN-21)
+#  FINAL DECISIONS REGARDING THE FATE OF ERRORS/INCONSISTENCIES
 # ------------------------------------------------------------------
 #
 #  Template:
@@ -83,7 +83,7 @@ message("Cleaning DEVICE_GEO_ZIP [2]...")
 #   + ZIPS with negative values (or values that exist below 9000 (doesn't exist)) are irretrievable given by:
 #     print(summarize(.data=group_by(.data=ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG, DEVICE_GEO_CITY, DEVICE_GEO_ZIP), count=n()), n=320)
 ###altered_device_geo_zip_data <- mutate(.data=group_by(.data=altered_device_geo_zip_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, first(DEVICE_GEO_ZIP[DEVICE_GEO_ZIP>9000]), DEVICE_GEO_ZIP))
-cumulative_ad_data <- mutate(.data=group_by(.data=cumulative_ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, first(DEVICE_GEO_ZIP[DEVICE_GEO_ZIP>9000]), DEVICE_GEO_ZIP)) 
+cumulative_ad_data <- ungroup(mutate(.data=group_by(.data=cumulative_ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, first(DEVICE_GEO_ZIP[DEVICE_GEO_ZIP>9000]), DEVICE_GEO_ZIP)))
 #   + tibble of size n by 15
 message("Finished cleaning DEVICE_GEO_ZIP.")
 #

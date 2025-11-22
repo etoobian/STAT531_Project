@@ -31,13 +31,13 @@ source(base_data_path)
 |:--------------------------------------:|
 | PROJECT DATA CLEANER (inconsistencies) |
 
-Purpose: - Document noticeable errors/inconsistency with data types, formatting, prior data modifications (confirmed 10/12 bombs caught), and spelling mistakes to name a few.
+Purpose: Document noticeable errors/inconsistency with data types, formatting, prior data modifications (confirmed 10/12 bombs caught), and spelling mistakes to name a few.
 
 **Note:** May otherwise miss some errors/inconsistencies.
 
-|                                      |
-|:------------------------------------:|
-| NOTED ERRORS/INCONSITENCIES (KAN-18) |
+|                             |
+|:---------------------------:|
+| NOTED ERRORS/INCONSITENCIES |
 
 Template: - [KEY(S)] \<DATATYPE(S)\>: Error\
 + Code\
@@ -188,9 +188,9 @@ select(.data=filter(.data=ad_data, (SIZE=="0x0" | SIZE=="1x1"), BID_WON=="TRUE")
     unique(ad_data)
     ```
 
-|                                                                 |
-|:---------------------------------------------------------------:|
-| DETERMINATION OF IMPORTANCE FOR ERRORS/INCONSISTENCIES (KAN-19) |
+|                                                        |
+|:------------------------------------------------------:|
+| DETERMINATION OF IMPORTANCE FOR ERRORS/INCONSISTENCIES |
 
 Template: - [KEY(S)] \<DATATYPE(S)\> \<IMPORTANCE LEVEL in \*'s\> \<✔️ if implemented\>\
 + Notes on importance.
