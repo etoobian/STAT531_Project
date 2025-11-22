@@ -8,6 +8,7 @@
 # NOTES:
 #   - May otherwise miss some errors/inconsistencies.
 #   - Code with three pound signs are for individual alterations to the data.
+#   - Any new NA's are put in place where data is otherwise irretrievable.
 # ------------------------------------------------------------------
 
 # ------------------------------------------------------------------
@@ -62,7 +63,10 @@ message("Cleaning PRICE [2]...")
 #   - PRICE <double>
 #   + Removing nonpositive nonzero values as there is no meaningful way of retrieving the original data.
 ###altered_price_data <- mutate(.data=ad_data, PRICE=if_else(PRICE < 0, NA, PRICE))
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, PRICE=if_else(PRICE < 0, NA, PRICE))
+cumulative_ad_data <- mutate(.data=cumulative_ad_data, PRICE=if_else(PRICE==-999, NA, PRICE))
+message("Cleaning PRICE [3]...")
+###altered_price_data <- mutate(.data=altered_price_data, PRICE=if_else(PRICE < 0, -PRICE, PRICE))
+cumulative_ad_data <- mutate(.data=cumulative_ad_data, PRICE=if_else(PRICE < 0, -PRICE, PRICE))
 #   + tibble of size n by 15
 message("Finished cleaning PRICE.")
 #
@@ -78,8 +82,8 @@ message("Cleaning DEVICE_GEO_ZIP [2]...")
 #   - DEVICE_GEO_ZIP <int>
 #   + ZIPS with negative values (or values that exist below 9000 (doesn't exist)) are irretrievable given by:
 #     print(summarize(.data=group_by(.data=ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG, DEVICE_GEO_CITY, DEVICE_GEO_ZIP), count=n()), n=320)
-###altered_device_geo_zip_data <- mutate(.data=altered_device_geo_zip_data, DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, NA, DEVICE_GEO_ZIP))
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, NA, DEVICE_GEO_ZIP))
+###altered_device_geo_zip_data <- mutate(.data=group_by(.data=altered_device_geo_zip_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, first(DEVICE_GEO_ZIP[DEVICE_GEO_ZIP>9000]), DEVICE_GEO_ZIP))
+cumulative_ad_data <- mutate(.data=group_by(.data=cumulative_ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, first(DEVICE_GEO_ZIP[DEVICE_GEO_ZIP>9000]), DEVICE_GEO_ZIP)) 
 #   + tibble of size n by 15
 message("Finished cleaning DEVICE_GEO_ZIP.")
 #

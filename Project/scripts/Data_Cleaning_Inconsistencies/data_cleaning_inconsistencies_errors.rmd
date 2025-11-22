@@ -31,7 +31,7 @@ source(base_data_path)
 |:--------------------------------------:|
 | PROJECT DATA CLEANER (inconsistencies) |
 
-Purpose: - Document noticeable errors/inconsistency with data types, formatting, prior data modifications (some of the 12 bombs), and spelling mistakes to name a few.
+Purpose: - Document noticeable errors/inconsistency with data types, formatting, prior data modifications (confirmed 10/12 bombs caught), and spelling mistakes to name a few.
 
 **Note:** May otherwise miss some errors/inconsistencies.
 
@@ -108,7 +108,7 @@ typeof(ad_data$BID_WON)
 filter(.data=summarise(.data=group_by(.data=ad_data, AUCTION_ID), won=sum(BID_WON=="TRUE"), lost=sum(BID_WON=="FALSE"), total=n()), won > 1)
 ```
 
-**Note:** The existence of an auction have 6 winners can indicate that no shifting of columns occurred.
+**Note:** The existence of an auction have 3+ winners can indicate that no shifting of columns occurred.
 Furthermore, row with AUCTION_ID 188ce80a-9440-4a14-8c6f-00d7b9142bdd has 43 winning bids all priced at the same value.\
 
 \
@@ -192,7 +192,7 @@ select(.data=filter(.data=ad_data, (SIZE=="0x0" | SIZE=="1x1"), BID_WON=="TRUE")
 |:---------------------------------------------------------------:|
 | DETERMINATION OF IMPORTANCE FOR ERRORS/INCONSISTENCIES (KAN-19) |
 
-Template: - [KEY(S)] \<DATATYPE(S)\> \<IMPORTANCE LEVEL in \*'s\> \<✔️ if implemented fix\>\
+Template: - [KEY(S)] \<DATATYPE(S)\> \<IMPORTANCE LEVEL in \*'s\> \<✔️ if implemented\>\
 + Notes on importance.
 
 Importance:\
@@ -209,26 +209,25 @@ Importance:\
 
 \
 - DEVICE_GEO_ZIP <chr> \<\*\*\*\*\*\> ✔️\
-**Note:** Removing outliers (negative values) will improve accuracy.
-We could not effectively deduce what value of DEVICE_GEO_ZIP based on DEVICE_GEO_CITY (Portland contains multiple ZIP codes, majority if not all -999 ZIP code values are from Portland).\
+**Note:** Searching for like latitudinal and longitudinal coordinates to deduce DEVICE_GEO_ZIP will improve accuracy and make the rows usable again.\
 
 \
 - TIMESTAMP <chr> \<\*\*\*\*\> ✔️\
 **Note:** Providing a consistent formating for TIMESTAMP would allow for ease of conversion into numerical representation.\
 
 \
-- TIMESTAMP <chr> \<\*\*\*\>\
+- TIMESTAMP <chr> \<\*\*\*\> ✔️\
 **Note:** Sorting TIMESTAMP into chronological order would allow for the creation of parameters that are typically seen in time-series data (moving averages, lag, etc.).
 However given we have 400k+ rows of data (\~100k+ rows if you collapse by AUCTION_ID and BID_WON), it will take a while to sort.\
 
 \
-- BID_WON <chr> \<\*\>\
+- BID_WON <chr> \<\*\> ✔️\
 **Note:** Converting BID_WON into type logical would not really make a difference as we can easily query through the three existing unique values of TRUE, true, and FALSE.\
 
 \
 - DEVICE_GEO_LONG <dbl> \<\*\*\*\> ✔️\
 **Note:** Given that only 100 data points out of the 400k+ contain invalid longitudinal points, these points can be thrown out.
-It is also easily deducible that these 100 points are exactly 10 degrees further to the west than their respective counterparts (when sorted by DEVICE_GEO_CITY, DEVICE_GEO_ZIP and DEVICE_GEO_LONG).\
+It is also easily deducible that these 100 points are exactly 10 degrees further to the west than their respective counterparts (when sorted by DEVICE_GEO_CITY, DEVICE_GEO_ZIP and DEVICE_GEO_LONG) and can be returned to their original position for further use.\
 
 \
 - AUCTION_ID, BID_WON \<chr, chr\> \<\*\*\*\*\>\
@@ -252,5 +251,5 @@ Maybe a name change for the column would better reflect the data.\
 - REQUESTED_SIZE, SIZE \<chr, chr\> \<\*\*\*\*\*\> ✔️\
 **Note:** Establishing correct SIZE values along with converting REQUESTED_SIZE back into an character array would allow us to establish select parameters like Price Per Pixel (price / width \* height).
 
-\- No key \<no data type\> \<\*\*\*\*\>\
+\- No key \<no data type\> \<\*\*\*\*\> ✔️\
 **Note:** It would be quite important to determine whether or not duplicates are natural part of the dataset or if it needs to be removed.
