@@ -1,4 +1,4 @@
-# Project/scripts/data_cleaning_inconsistent.R
+# Project/scripts/Data_Cleaning_Inconsistencies/data_cleaning_inconsistent.R
 # ------------------------------------------------------------------
 #  PROJECT DATA CLEANER (inconsistencies)
 # ------------------------------------------------------------------

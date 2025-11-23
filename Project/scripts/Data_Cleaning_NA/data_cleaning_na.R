@@ -1,4 +1,4 @@
-# Project/scripts/data_cleaning_na.R
+# Project/scripts/Data_Cleaning_NA/data_cleaning_na.R
 # ------------------------------------------------------------------
 #  PROJECT DATA CLEANER (NA)
 # ------------------------------------------------------------------
@@ -19,7 +19,7 @@ base_data_path = file.path(getwd(), "Project/scripts/load_data.R")
 source(base_data_path)
 
 # ------------------------------------------------------------------
-#  NOTED NA VALUES (KAN-14)
+#  NOTED NA VALUES
 # ------------------------------------------------------------------
 # List of KEYS with respective NA value count.
 na_by_col <- colSums(is.na(ad_data))
@@ -38,9 +38,8 @@ na_pct <- (na_by_col / nrow(ad_data)) * 100
 na_pct[c("DEVICE_GEO_CITY", "DEVICE_GEO_ZIP")]
 
 # ------------------------------------------------------------------
-#  DETERMINATION OF IMPORTANCE FOR NA VALUES (KAN-15)
+#  DETERMINATION OF IMPORTANCE FOR NA VALUES
 # ------------------------------------------------------------------
-# KAN-15: Determining the importance of NA columns
 importance_summary <- tibble(
   column = cols_with_na,
   na_percent = na_pct[cols_with_na],

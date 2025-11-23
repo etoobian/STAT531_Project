@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 |                                           |
 |:-----------------------------------------:|
-| **Project/scripts/data_cleaning_final.R** |
+| **Project/scripts/Final_Data_Cleaning/data_cleaning_final.R** |
 
 Run:
 

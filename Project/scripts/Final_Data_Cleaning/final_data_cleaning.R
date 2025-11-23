@@ -1,4 +1,4 @@
-# Project/scripts/final_data_cleaning_script
+# Project/scripts/Final_Data_Cleaning/data_cleaning_final.R
 # ------------------------------------------------------------------
 #  PROJECT DATA CLEANER (inconsistencies and NA)
 # ------------------------------------------------------------------
@@ -28,7 +28,7 @@ library(arrow)
 base_data_path = file.path(getwd(), "Project/scripts/data_io.R")
 source(base_data_path)
 cumulative_ad_data <- ad_data
-rm(base_data_path, data_file, data_folder, data_path, df)
+rm(base_data_path, default_data_folder, default_input_data_file, default_out_base_name, df, pkg, needed_pkgs, default_out_dir, export_ad_data, load_ad_data, summarize_ad_data)
 
 # ------------------------------------------------------------------
 #  FINAL DECISIONS REGARDING THE FATE OF ERRORS/INCONSISTENCIES
