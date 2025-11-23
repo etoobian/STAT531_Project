@@ -1,5 +1,4 @@
 # Project/scripts/data_io.R
-
 # ----------------------------------------------------------------------------
 #  PROJECT DATA I/O UTILITIES
 # ----------------------------------------------------------------------------
@@ -85,6 +84,7 @@
 #       * Use `getwd()` to confirm you are at the repo root before sourcing.
 # ----------------------------------------------------------------------------
 
+
 # -----------------------------
 # Install packages if missing
 # -----------------------------
@@ -101,11 +101,10 @@ library(arrow) # Only need to attach arrow, use tibble:: and dplyr:: explicitly
 # -------------------------------------
 # CONFIG: DEFAULTS (Change as needed)
 # -------------------------------------
-
-default_data_folder      <- "Project/data"      # Folder relative to repo root
-default_input_data_file  <- "bids_data_vDTR.parquet"    # Initial project data
-default_out_dir          <- "Project/data/results"   # Loc. for new data files
-default_out_base_name    <- "bids_data"           # Base of new file filenames
+default_data_folder      <- "Project/data"       # Folder relative to repo root
+default_input_data_file  <- "bids_data_vDTR.parquet"     # Initial project data
+default_out_dir          <- "Project/data/processed" # Dir for clean data files
+default_out_base_name    <- "bids_data"            # Base of new file filenames
 
 # ------------------------------------------------
 # HELPFUL CHECK: Set WD to repo root (if needed)
@@ -123,6 +122,9 @@ default_out_base_name    <- "bids_data"           # Base of new file filenames
 
 load_ad_data <- function(data_folder = default_data_folder,
                          data_file   = default_input_data_file) {
+  
+  data_path <- file.path(data_folder, data_file)
+  
   
   # ----- Validate data folder and file paths-----
   
@@ -221,8 +223,7 @@ export_ad_data <- function(df,
     stop(
       "\nExport aborted: file already exists:\n  ", out_path,
       "\n\nOptions:\n",
-
-      "  - Choose a new `version` name (recommended), e.g. \"clean_NA_v1\"`",
+      "  - Choose a new `version` name (recommended), e.g. \"clean_NA_v1\"\n",
       "  - Call again with `overwrite = TRUE` if intentionally replacing.\n"
     )
   }

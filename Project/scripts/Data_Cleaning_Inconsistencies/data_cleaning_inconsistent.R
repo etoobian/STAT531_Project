@@ -8,10 +8,7 @@
 # NOTES:
 #   - May otherwise miss some errors/inconsistencies.
 #   - Code with three pound signs are for individual alterations to the data.
-<<<<<<< HEAD
 #   - Any new NA's are put in place where data is otherwise irretrievable.
-=======
->>>>>>> 8a3cc67 (Added all updates during repository limbo.)
 # ------------------------------------------------------------------
 
 # ------------------------------------------------------------------
@@ -66,14 +63,10 @@ message("Cleaning PRICE [2]...")
 #   - PRICE <double>
 #   + Removing nonpositive nonzero values as there is no meaningful way of retrieving the original data.
 ###altered_price_data <- mutate(.data=ad_data, PRICE=if_else(PRICE < 0, NA, PRICE))
-<<<<<<< HEAD
 cumulative_ad_data <- mutate(.data=cumulative_ad_data, PRICE=if_else(PRICE==-999, NA, PRICE))
 message("Cleaning PRICE [3]...")
 ###altered_price_data <- mutate(.data=altered_price_data, PRICE=if_else(PRICE < 0, -PRICE, PRICE))
 cumulative_ad_data <- mutate(.data=cumulative_ad_data, PRICE=if_else(PRICE < 0, -PRICE, PRICE))
-=======
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, PRICE=if_else(PRICE < 0, NA, PRICE))
->>>>>>> 8a3cc67 (Added all updates during repository limbo.)
 #   + tibble of size n by 15
 message("Finished cleaning PRICE.")
 #
@@ -89,17 +82,9 @@ message("Cleaning DEVICE_GEO_ZIP [2]...")
 #   - DEVICE_GEO_ZIP <int>
 #   + ZIPS with negative values (or values that exist below 9000 (doesn't exist)) are retrievable given by:
 #     print(summarize(.data=group_by(.data=ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG, DEVICE_GEO_CITY, DEVICE_GEO_ZIP), count=n()), n=320)
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 #     where DEVICE_GEO_LONG and DEVICE_GEO_LAT can be utilized to match zip codes.
->>>>>>> 141aa06 (Consolidated and provided ammendments to NA values seen in the data. Furthermore, provided Rmd file to allow for ease of documenting all errors/inconsistencies and missing values.)
 ###altered_device_geo_zip_data <- mutate(.data=group_by(.data=altered_device_geo_zip_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, first(DEVICE_GEO_ZIP[DEVICE_GEO_ZIP>9000]), DEVICE_GEO_ZIP))
 cumulative_ad_data <- ungroup(mutate(.data=group_by(.data=cumulative_ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, first(DEVICE_GEO_ZIP[DEVICE_GEO_ZIP>9000]), DEVICE_GEO_ZIP)))
-=======
-###altered_device_geo_zip_data <- mutate(.data=altered_device_geo_zip_data, DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, NA, DEVICE_GEO_ZIP))
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, NA, DEVICE_GEO_ZIP))
->>>>>>> 8a3cc67 (Added all updates during repository limbo.)
 #   + tibble of size n by 15
 message("Finished cleaning DEVICE_GEO_ZIP.")
 #
