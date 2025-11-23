@@ -9,11 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Takeshi Stormer" />
+<meta name="author" content="Takeshi Stormer &amp; Khloud Zamzami" />
 
-<meta name="date" content="2025-11-17" />
+<meta name="date" content="2025-11-23" />
 
-<title>data_cleaning_inconsistencies_errors</title>
+<title>Final Data Cleaning</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,9 +350,9 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">data_cleaning_inconsistencies_errors</h1>
-<h4 class="author">Takeshi Stormer</h4>
-<h4 class="date">2025-11-17</h4>
+<h1 class="title toc-ignore">Final Data Cleaning</h1>
+<h4 class="author">Takeshi Stormer &amp; Khloud Zamzami</h4>
+<h4 class="date">2025-11-23</h4>
 
 </div>
 
@@ -360,11 +360,12 @@ display: none;
 <table>
 <tbody>
 <tr class="odd">
-<td align="center">Project/scripts/data_cleaning_inconsistent.R</td>
+<td align="center"><strong>Project/scripts/data_cleaning_final.R</strong></td>
 </tr>
 </tbody>
 </table>
 <p>Run:</p>
+<p>load_ad_data()</p>
 <pre class="r"><code># Dependencies
 library(arrow)</code></pre>
 <pre><code>## 
@@ -401,10 +402,13 @@ source(base_data_path)</code></pre>
 ## #   DEVICE_GEO_LONG &lt;dbl&gt;, DEVICE_GEO_REGION &lt;chr&gt;</code></pre>
 <pre><code>## 
 ## Data is now available as `ad_data` in this R session.</code></pre>
+<pre class="r"><code># Setting options
+options(pillar.sigfig = 7)</code></pre>
 <table>
 <tbody>
 <tr class="odd">
-<td align="center">PROJECT DATA CLEANER (inconsistencies)</td>
+<td align="center"><strong>PROJECT DATA CLEANER (inconsistencies and
+NAs)</strong></td>
 </tr>
 </tbody>
 </table>
@@ -416,7 +420,7 @@ errors/inconsistencies.</p>
 <table>
 <tbody>
 <tr class="odd">
-<td align="center">NOTED ERRORS/INCONSITENCIES</td>
+<td align="center"><strong>NOTED ERRORS/INCONSITENCIES</strong></td>
 </tr>
 </tbody>
 </table>
@@ -489,18 +493,18 @@ west of corresponding city longitudinal values.<br />
 BID_WON==TRUE.</p>
 <pre class="r"><code>select(.data=filter(mutate(.data=ad_data, PRICE=ifelse(substr(PRICE, 1, 1) == &quot;O&quot;, sub(&quot;^O&quot;, &quot;0&quot;, PRICE), PRICE), PRICE=as.double(PRICE)), PRICE &lt; 0), PRICE, BID_WON)</code></pre>
 <pre><code>## # A tibble: 112 × 2
-##        PRICE BID_WON
-##        &lt;dbl&gt; &lt;chr&gt;  
-##  1   -0.0532 TRUE   
-##  2   -0.6    FALSE  
-##  3   -0.18   FALSE  
-##  4   -0.154  FALSE  
-##  5   -0.566  FALSE  
-##  6   -0.711  TRUE   
-##  7   -0.0752 FALSE  
-##  8   -1.12   TRUE   
-##  9 -999      FALSE  
-## 10   -0.318  FALSE  
+##           PRICE BID_WON
+##           &lt;dbl&gt; &lt;chr&gt;  
+##  1   -0.05317   TRUE   
+##  2   -0.6       FALSE  
+##  3   -0.18      FALSE  
+##  4   -0.1535450 FALSE  
+##  5   -0.566     FALSE  
+##  6   -0.7106974 TRUE   
+##  7   -0.075184  FALSE  
+##  8   -1.125     TRUE   
+##  9 -999         FALSE  
+## 10   -0.31838   FALSE  
 ## # ℹ 102 more rows</code></pre>
 <p>- PRICE <chr>: There exist prices that are close to -1000 (-999).</p>
 <pre class="r"><code>select(.data=filter(mutate(.data=ad_data, PRICE=ifelse(substr(PRICE, 1, 1) == &quot;O&quot;, sub(&quot;^O&quot;, &quot;0&quot;, PRICE), PRICE), PRICE=as.double(PRICE)), PRICE &lt; 0), PRICE, BID_WON)$PRICE[9]</code></pre>
@@ -677,7 +681,24 @@ than 2 requested sizes.</p>
 <table>
 <tbody>
 <tr class="odd">
-<td align="center">Tested for / other notes:</td>
+<td align="center"><strong>NOTED PRE-EXISTING NA VALUES</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Template: - [KEY(S)] &lt;DATATYPE(S)&gt;: Error<br />
++ Code<br />
++ [Optional: Note]</p>
+<p>NA Values:<br />
+- DEVICE_GEO_ZIP &lt;CHR&gt;: Contains NA values.</p>
+<pre class="r"><code>any(is.na(ad_data$DEVICE_GEO_ZIP))</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<p>- DEVICE_GEO_CITY &lt;CHR&gt;: Contains NA values.</p>
+<pre class="r"><code>any(is.na(ad_data$DEVICE_GEO_CITY))</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<table>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>Tested for / other notes:</strong></td>
 </tr>
 </tbody>
 </table>
@@ -693,7 +714,8 @@ bidding multiple times).</p></li>
 <li><p>For further exploration, we can potentially re-order these
 instances in chronological order by RESPONSE_TIME</p></li>
 <li><p><strong>There are rows that aren’t unique (potential
-duplicates/multiple requests sent at once)</strong></p>
+duplicates/multiple requests sent at once) (confirmed intentional
+errors)</strong></p>
 <pre class="r"><code>unique(ad_data)</code></pre>
 <pre><code>## # A tibble: 441,535 × 15
 ##    AUCTION_ID        TIMESTAMP DATE_UTC PUBLISHER_ID DEVICE_TYPE DEVICE_GEO_CITY
@@ -712,12 +734,19 @@ duplicates/multiple requests sent at once)</strong></p>
 ## # ℹ 9 more variables: DEVICE_GEO_ZIP &lt;chr&gt;, PRICE &lt;chr&gt;, REQUESTED_SIZES &lt;chr&gt;,
 ## #   SIZE &lt;chr&gt;, RESPONSE_TIME &lt;chr&gt;, BID_WON &lt;chr&gt;, DEVICE_GEO_LAT &lt;dbl&gt;,
 ## #   DEVICE_GEO_LONG &lt;dbl&gt;, DEVICE_GEO_REGION &lt;chr&gt;</code></pre></li>
+<li><p><strong>Pre-existing NA values make up roughly 4.77% of the data
+set (including duplicates).</strong></p>
+<pre class="r"><code>na_by_col &lt;- colSums(is.na(ad_data))
+na_pct &lt;- (na_by_col / nrow(ad_data)) * 100
+na_pct[na_pct &gt; 0]</code></pre>
+<pre><code>## DEVICE_GEO_CITY  DEVICE_GEO_ZIP 
+##        4.774658        4.774658</code></pre></li>
 </ul>
 <table>
 <tbody>
 <tr class="odd">
-<td align="center">DETERMINATION OF IMPORTANCE FOR
-ERRORS/INCONSISTENCIES</td>
+<td align="center"><strong>DETERMINATION OF IMPORTANCE FOR
+ERRORS/INCONSISTENCIES</strong></td>
 </tr>
 </tbody>
 </table>
@@ -810,6 +839,27 @@ height).</p>
 <strong>Note:</strong> It would be quite important to determine whether
 or not duplicates are natural part of the dataset or if it needs to be
 removed.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>DETERMINATION OF IMPORTANCE FOR NA
+VALUES</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Template: - [KEY(S)] &lt;DATATYPE(S)&gt; &lt;IMPORTANCE LEVEL in
+*’s&gt; &lt;✔️ if implemented&gt;<br />
++ Notes on importance.</p>
+<p><br />
+- DEVICE_GEO_ZIP &lt;chr&gt; &lt;*****&gt; ✔️<br />
+<strong>Note:</strong> Correcting NA values in DEVICE_GEO_ZIP by
+retrieving data that otherwise would not be usable in analysis would be
+very benecial.</p>
+<p><br />
+- DEVICE_GEO_CITY &lt;chr&gt; &lt;*****&gt; ✔️<br />
+<strong>Note:</strong> Correcting NA values in DEVICE_GEO_CITY by
+retrieving data that otherwise would not be usable in analysis would be
+very benecial.</p>
 
 
 

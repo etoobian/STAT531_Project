@@ -1,7 +1,7 @@
 ---
-title: "data_cleaning_inconsistencies_errors"
-author: "Takeshi Stormer"
-date: "2025-11-17"
+title: "Final Data Cleaning"
+author: "Takeshi Stormer & Khloud Zamzami"
+date: "2025-11-23"
 output: html_document
 editor_options: 
   markdown: 
@@ -12,11 +12,13 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-|                                              |
-|:--------------------------------------------:|
-| Project/scripts/data_cleaning_inconsistent.R |
+|                                           |
+|:-----------------------------------------:|
+| **Project/scripts/data_cleaning_final.R** |
 
 Run:
+
+load_ad_data()
 
 ```{r}
 # Dependencies
@@ -25,19 +27,22 @@ library(dplyr)
 setwd(dirname(dirname(dirname(getwd()))))
 base_data_path = file.path(getwd(), "Project/scripts/data_io.R")
 source(base_data_path)
+
+# Setting options
+options(pillar.sigfig = 7)
 ```
 
-|                                        |
-|:--------------------------------------:|
-| PROJECT DATA CLEANER (inconsistencies) |
+|                                                    |
+|:--------------------------------------------------:|
+| **PROJECT DATA CLEANER (inconsistencies and NAs)** |
 
 Purpose: Document noticeable errors/inconsistency with data types, formatting, prior data modifications (confirmed 10/12 bombs caught), and spelling mistakes to name a few.
 
 **Note:** May otherwise miss some errors/inconsistencies.
 
-|                             |
-|:---------------------------:|
-| NOTED ERRORS/INCONSITENCIES |
+|                                 |
+|:-------------------------------:|
+| **NOTED ERRORS/INCONSITENCIES** |
 
 Template: - [KEY(S)] \<DATATYPE(S)\>: Error\
 + Code\
@@ -168,9 +173,30 @@ select(.data=filter(.data=ad_data, (SIZE=="0x0" | SIZE=="1x1"), BID_WON=="TRUE")
 
 **Note:** We would not be able to determine the actual size won for these invalid SIZE values if REQUESTED_SIZE contains more than 2 requested sizes.
 
-|                           |
-|:-------------------------:|
-| Tested for / other notes: |
+|                                  |
+|:--------------------------------:|
+| **NOTED PRE-EXISTING NA VALUES** |
+
+Template: - [KEY(S)] \<DATATYPE(S)\>: Error\
++ Code\
++ [Optional: Note]
+
+NA Values:\
+- DEVICE_GEO_ZIP \<CHR\>: Contains NA values.
+
+```{r}
+any(is.na(ad_data$DEVICE_GEO_ZIP))
+```
+
+\- DEVICE_GEO_CITY \<CHR\>: Contains NA values.
+
+```{r}
+any(is.na(ad_data$DEVICE_GEO_CITY))
+```
+
+|                               |
+|:-----------------------------:|
+| **Tested for / other notes:** |
 
 -   Multiple time entries for distinct AUCTION_ID.
 
@@ -182,15 +208,23 @@ select(.data=filter(.data=ad_data, (SIZE=="0x0" | SIZE=="1x1"), BID_WON=="TRUE")
 
 -   For further exploration, we can potentially re-order these instances in chronological order by RESPONSE_TIME
 
--   **There are rows that aren't unique (potential duplicates/multiple requests sent at once)**
+-   **There are rows that aren't unique (potential duplicates/multiple requests sent at once) (confirmed intentional errors)**
 
     ```{r}
     unique(ad_data)
     ```
 
-|                                                        |
-|:------------------------------------------------------:|
-| DETERMINATION OF IMPORTANCE FOR ERRORS/INCONSISTENCIES |
+-   **Pre-existing NA values make up roughly 4.77% of the data set (including duplicates).**
+
+    ```{r}
+    na_by_col <- colSums(is.na(ad_data))
+    na_pct <- (na_by_col / nrow(ad_data)) * 100
+    na_pct[na_pct > 0]
+    ```
+
+|                                                            |
+|:----------------------------------------------------------:|
+| **DETERMINATION OF IMPORTANCE FOR ERRORS/INCONSISTENCIES** |
 
 Template: - [KEY(S)] \<DATATYPE(S)\> \<IMPORTANCE LEVEL in \*'s\> \<✔️ if implemented\>\
 + Notes on importance.
@@ -253,3 +287,18 @@ Maybe a name change for the column would better reflect the data.\
 
 \- No key \<no data type\> \<\*\*\*\*\> ✔️\
 **Note:** It would be quite important to determine whether or not duplicates are natural part of the dataset or if it needs to be removed.
+
+|                                               |
+|:---------------------------------------------:|
+| **DETERMINATION OF IMPORTANCE FOR NA VALUES** |
+
+Template: - [KEY(S)] \<DATATYPE(S)\> \<IMPORTANCE LEVEL in \*'s\> \<✔️ if implemented\>\
++ Notes on importance.
+
+\
+- DEVICE_GEO_ZIP \<chr\> \<\*\*\*\*\*\> ✔️\
+**Note:** Correcting NA values in DEVICE_GEO_ZIP by retrieving data that otherwise would not be usable in analysis would be very benecial.
+
+\
+- DEVICE_GEO_CITY \<chr\> \<\*\*\*\*\*\> ✔️\
+**Note:** Correcting NA values in DEVICE_GEO_CITY by retrieving data that otherwise would not be usable in analysis would be very benecial.

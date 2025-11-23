@@ -1,17 +1,16 @@
-# Project/scripts/data_cleaning_inconsistent.R
+# Project/scripts/final_data_cleaning_script
 # ------------------------------------------------------------------
-#  PROJECT DATA CLEANER (inconsistencies)
+#  PROJECT DATA CLEANER (inconsistencies and NA)
 # ------------------------------------------------------------------
 # Purpose:
 #   - Mend noticeable errors/inconsistency with data types, formatting, prior data modifications (some of the 12 bombs), and spelling mistakes to name a few.
+#   - Mend NA values seen within the 
 #
 # NOTES:
 #   - May otherwise miss some errors/inconsistencies.
 #   - Code with three pound signs are for individual alterations to the data.
-<<<<<<< HEAD
 #   - Any new NA's are put in place where data is otherwise irretrievable.
-=======
->>>>>>> 8a3cc67 (Added all updates during repository limbo.)
+#   - Any remaining NA's at the end of execution will be removed as they have been deemed irretrievable.
 # ------------------------------------------------------------------
 
 # ------------------------------------------------------------------
@@ -20,15 +19,16 @@
 library(stringr)
 library(jsonlite)
 library(dplyr)
+library(tidyverse)
 library(arrow)
 
 # ------------------------------------------------------------------
 # Install base unmodified bid data as ad_data.
 # ------------------------------------------------------------------
-base_data_path = file.path(getwd(), "Project/scripts/load_data.R")
+base_data_path = file.path(getwd(), "Project/scripts/data_io.R")
 source(base_data_path)
 cumulative_ad_data <- ad_data
-rm(ad_data, base_data_path, data_file, data_folder, data_path, df)
+rm(base_data_path, data_file, data_folder, data_path, df)
 
 # ------------------------------------------------------------------
 #  FINAL DECISIONS REGARDING THE FATE OF ERRORS/INCONSISTENCIES
@@ -40,7 +40,7 @@ rm(ad_data, base_data_path, data_file, data_folder, data_path, df)
 #   + Code
 #   + Return Type
 #
-message("Starting cleaning...")
+message("\nStarted cleaning of inconsistencies and errors...")
 #
 #  Decision:
 message("Truncating duplicates...")
@@ -66,14 +66,10 @@ message("Cleaning PRICE [2]...")
 #   - PRICE <double>
 #   + Removing nonpositive nonzero values as there is no meaningful way of retrieving the original data.
 ###altered_price_data <- mutate(.data=ad_data, PRICE=if_else(PRICE < 0, NA, PRICE))
-<<<<<<< HEAD
 cumulative_ad_data <- mutate(.data=cumulative_ad_data, PRICE=if_else(PRICE==-999, NA, PRICE))
 message("Cleaning PRICE [3]...")
 ###altered_price_data <- mutate(.data=altered_price_data, PRICE=if_else(PRICE < 0, -PRICE, PRICE))
 cumulative_ad_data <- mutate(.data=cumulative_ad_data, PRICE=if_else(PRICE < 0, -PRICE, PRICE))
-=======
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, PRICE=if_else(PRICE < 0, NA, PRICE))
->>>>>>> 8a3cc67 (Added all updates during repository limbo.)
 #   + tibble of size n by 15
 message("Finished cleaning PRICE.")
 #
@@ -89,17 +85,9 @@ message("Cleaning DEVICE_GEO_ZIP [2]...")
 #   - DEVICE_GEO_ZIP <int>
 #   + ZIPS with negative values (or values that exist below 9000 (doesn't exist)) are retrievable given by:
 #     print(summarize(.data=group_by(.data=ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG, DEVICE_GEO_CITY, DEVICE_GEO_ZIP), count=n()), n=320)
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 #     where DEVICE_GEO_LONG and DEVICE_GEO_LAT can be utilized to match zip codes.
->>>>>>> 141aa06 (Consolidated and provided ammendments to NA values seen in the data. Furthermore, provided Rmd file to allow for ease of documenting all errors/inconsistencies and missing values.)
 ###altered_device_geo_zip_data <- mutate(.data=group_by(.data=altered_device_geo_zip_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, first(DEVICE_GEO_ZIP[DEVICE_GEO_ZIP>9000]), DEVICE_GEO_ZIP))
 cumulative_ad_data <- ungroup(mutate(.data=group_by(.data=cumulative_ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, first(DEVICE_GEO_ZIP[DEVICE_GEO_ZIP>9000]), DEVICE_GEO_ZIP)))
-=======
-###altered_device_geo_zip_data <- mutate(.data=altered_device_geo_zip_data, DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, NA, DEVICE_GEO_ZIP))
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, NA, DEVICE_GEO_ZIP))
->>>>>>> 8a3cc67 (Added all updates during repository limbo.)
 #   + tibble of size n by 15
 message("Finished cleaning DEVICE_GEO_ZIP.")
 #
@@ -180,4 +168,26 @@ message("Cleaning BID_WON [1] ...")
 cumulative_ad_data <- mutate(.data=cumulative_ad_data, BID_WON=ifelse(tolower(BID_WON)=="true", TRUE, FALSE))
 #   + tibble of size n x 15
 message("Finished cleaning BID_WON.")
-message("\n Finished cleaning.")
+message("\n Finished cleaning up inconsistencies and errors.")
+message("\n Started cleaning up NA values...")
+#
+message("Cleaning DEVICE_GEO_ZIP [1]...")
+#   - DEVICE_GEO_ZIP <int> 
+#   + NA values that exist in DEVICE_GEO_ZIP will be recovered using DEVICE_GEO_LAT and DEVICE_GEO_LONG.
+###altered_device_geo_zip_data <- ungroup(mutate(.data=group_by(.data=ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_ZIP=if_else(is.na(DEVICE_GEO_ZIP), first(DEVICE_GEO_ZIP[!is.na(DEVICE_GEO_ZIP)]), DEVICE_GEO_ZIP)))
+cumulative_ad_data <- ungroup(mutate(.data=group_by(.data=cumulative_ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_ZIP=if_else(is.na(DEVICE_GEO_ZIP), first(DEVICE_GEO_ZIP[!is.na(DEVICE_GEO_ZIP)]), DEVICE_GEO_ZIP)))
+#   + tibble of size n x 15
+message("Finished cleaning DEVICE_GEO_ZIP.")
+#
+message("Cleaning DEVICE_GEO_CITY [1]...")
+#   - DEVICE_GEO_CITY <chr>
+#   + NA values that exist in DEVICE_GEO_CITY will be recovered using DEVICE_GEO_LAT and DEVICE_GEO_LONG
+###altered_device_geo_city <- ungroup(mutate(.data=group_by(.data=ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_CITY=if_else(is.na(DEVICE_GEO_CITY), first(DEVICE_GEO_CITY[!is.na(DEVICE_GEO_CITY)]), DEVICE_GEO_CITY)))
+cumulative_ad_data <- ungroup(mutate(.data=group_by(.data=cumulative_ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_CITY=if_else(is.na(DEVICE_GEO_CITY), first(DEVICE_GEO_CITY[!is.na(DEVICE_GEO_CITY)]), DEVICE_GEO_CITY)))
+#   + tibble of size n x 15
+message("Finished cleaning DEVICE_GEO_CITY.")
+message("\n Finished cleaning up NA values.")
+message("\n Truncating all remaining NA values...")
+cumulative_ad_data <- na.omit(cumulative_ad_data)
+message("\n Finished truncating all remaining NA values.")
+message("\n Finished the cleaning procedure.")
