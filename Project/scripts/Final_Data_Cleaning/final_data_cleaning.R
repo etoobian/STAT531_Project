@@ -16,6 +16,14 @@
 # ------------------------------------------------------------------
 # Import additional dependencies (if they are not already loaded in).
 # ------------------------------------------------------------------
+# Inspiration taken from Project/scripts/data_io.R
+needed_pkgs <- c("stringr", "jsonlite", "dplyr", "tidyverse", "arrow")
+for (pkg in needed_pkgs) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg)
+  }
+}
+
 library(stringr)
 library(jsonlite)
 library(dplyr)
@@ -28,7 +36,7 @@ library(arrow)
 base_data_path = file.path(getwd(), "Project/scripts/data_io.R")
 source(base_data_path)
 cumulative_ad_data <- ad_data
-rm(base_data_path, default_data_folder, default_input_data_file, default_out_base_name, df, pkg, needed_pkgs, default_out_dir, export_ad_data, load_ad_data, summarize_ad_data)
+rm(ad_data, base_data_path, default_data_folder, default_input_data_file, default_out_base_name, df, pkg, needed_pkgs, default_out_dir, export_ad_data, load_ad_data, summarize_ad_data)
 
 # ------------------------------------------------------------------
 #  FINAL DECISIONS REGARDING THE FATE OF ERRORS/INCONSISTENCIES
@@ -40,7 +48,7 @@ rm(base_data_path, default_data_folder, default_input_data_file, default_out_bas
 #   + Code
 #   + Return Type
 #
-message("\nStarted cleaning of inconsistencies and errors...")
+message("\nStarted cleaning of inconsistencies and errors...\n")
 #
 #  Decision:
 message("Truncating duplicates...")
@@ -168,8 +176,8 @@ message("Cleaning BID_WON [1] ...")
 cumulative_ad_data <- mutate(.data=cumulative_ad_data, BID_WON=ifelse(tolower(BID_WON)=="true", TRUE, FALSE))
 #   + tibble of size n x 15
 message("Finished cleaning BID_WON.")
-message("\n Finished cleaning up inconsistencies and errors.")
-message("\n Started cleaning up NA values...")
+message("\nFinished cleaning up inconsistencies and errors.")
+message("\nStarted cleaning up NA values...")
 #
 message("Cleaning DEVICE_GEO_ZIP [1]...")
 #   - DEVICE_GEO_ZIP <int> 
@@ -186,8 +194,8 @@ message("Cleaning DEVICE_GEO_CITY [1]...")
 cumulative_ad_data <- ungroup(mutate(.data=group_by(.data=cumulative_ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_CITY=if_else(is.na(DEVICE_GEO_CITY), first(DEVICE_GEO_CITY[!is.na(DEVICE_GEO_CITY)]), DEVICE_GEO_CITY)))
 #   + tibble of size n x 15
 message("Finished cleaning DEVICE_GEO_CITY.")
-message("\n Finished cleaning up NA values.")
-message("\n Truncating all remaining NA values...")
+message("\nFinished cleaning up NA values.")
+message("\nTruncating all remaining NA values...")
 cumulative_ad_data <- na.omit(cumulative_ad_data)
-message("\n Finished truncating all remaining NA values.")
-message("\n Finished the cleaning procedure.")
+message("\nFinished truncating all remaining NA values.")
+message("\nFinished the cleaning procedure.")
