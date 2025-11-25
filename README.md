@@ -113,8 +113,8 @@ Do **not** rename or reorganize top-level folders without discussion on **Discor
 
 ## Clone the Repository
 ```
-git clone https://github.com/etoobian/EnP_2025Labs.git
-cd EnP_2025Labs
+git clone https://github.com/etoobian/STAT531_Project.git
+cd STAT531_Project
 ```
 
 ## Open the R Project
@@ -122,17 +122,20 @@ cd EnP_2025Labs
 Open:
 
 ```
-EnP_2025Labs.Rproj
+STAT531_Project.Rproj
 ```
 
 This ensures correct working directory and project settings.
 
 ## Install Required Packages
 
-Packages will normally auto-install when sourcing the script, but can also be installed manually:
+Packages will normally auto-install when sourcing the scripts, but can also be installed manually:
 
 ```
-install.packages(c("arrow", "tibble", "dplyr"))
+required_packages <- c("arrow", "tibble", 
+                       "dplyr", "stringr", 
+                       jsonlite", tidyverse")
+install.packages(required_packages)
 ```
 **TEAM TO-DO:** Add required packages for this script to this list.
 
