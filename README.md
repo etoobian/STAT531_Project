@@ -158,7 +158,7 @@ Packages will normally auto-install when sourcing the script, but can
 also be installed manually:
 
 ```         
-install.packages(c("arrow", "tibble", "dplyr"))
+install.packages(c("arrow", "tibble", "dplyr", "jsonlite", "stringr", "tidyverse"))
 ```
 
 **TEAM TO-DO:** Add required packages for this script to this list.
@@ -233,27 +233,24 @@ as:
 <base_name>_<version>.parquet
 ```
 
-# Data Cleaning: Identifying and mending inconsistencies, NA values, and other errors.
+# Data Cleaning: NA values, inconsistencies and other errors.
 
 All data cleaning related files will be found in:
 
-```{=}
-Project/scripts/Final_Data_Cleaning/
-```
-The R script that imports and cleans the raw data is:
+`Project/scripts/Final_Data_Cleaning/` The R script that imports and
+cleans the raw data is:
 
-```{=}
-Final_Data_Cleaning/final_data.cleaning.R
-```
-When you source this file, you will be left with a tibble that has been
-cleaned in your environment named `cumulative_ad_data`.
+`Final_Data_Cleaning/final_data.cleaning.R` When you source this file,
+you will be left with a tibble that has been cleaned in your environment
+named `cumulative_ad_data`.
+
+Refer to `Final_Data_Cleaning/final_data.cleaning.Rmd` for more
+information on the errors.
 
 ## Cleaning Data (Auto):
 
-```{=}
-# Given that getwd() returns "~/STAT531_Project"
-source(file.path(getwd(), "Project/scripts/Final_Data_Cleaning/final_data_cleaning.R"))
-```
+`# Given that getwd() returns "~/STAT531_Project" source(file.path(getwd(), "Project/scripts/Final_Data_Cleaning/final_data_cleaning.R"))`
+
 **NOTE:** This process will take roughly 10-15 seconds to complete if
 not sooner.
 
@@ -324,11 +321,9 @@ errors.
 
 **Example Usage:**
 
-```{=}
-# Given that getwd() returns "~/STAT531_Project"
-source(file.path(getwd(), "Project/scripts/Final_Data_Cleaning/final_data_cleaning.R"))
-```
-# **Adding New Work to the Codebase**
+`# Given that getwd() returns "~/STAT531_Project" source(file.path(getwd(), "Project/scripts/Final_Data_Cleaning/final_data_cleaning.R"))`
+
+**Adding New Work to the Codebase**
 
 **Where to put new files**
 
