@@ -13,6 +13,10 @@ output:
 library(ggplot2)
 library(dplyr)
 library(lubridate)
+library(GGally)
+library(FSelectorRcpp)
+
+
 
 # This is not running for me currently. I don't know if I am making
 # some kind of error in setup, but there is something odd with it.
@@ -20,9 +24,27 @@ library(lubridate)
 # base_data_path = file.path(getwd(), "Project/scripts/data_io.R")
 # source(base_data_path)
 
-# Formatting data to read similar to lab
-# Will change later.
+# Removing SIZE and REQUESTED_SIZES for now to make
+# data easier to read. Can be kept for analysis if
+# we wish.
 cumulative_ad_data <- select(cumulative_ad_data, -SIZE, -REQUESTED_SIZES)
+
+
+# Converting TIMESTAMP to a POSIXtc variable.
+cumulative_ad_data$TIMESTAMP <- lubridate::parse_date_time(cumulative_ad_data$TIMESTAMP, c("ymd HMS", "mdy HMS"), tz = "UTC")
+
+
+# Converting DEVICE_TYPE to a factor
+cumulative_ad_data$DEVICE_TYPE <- as.factor(cumulative_ad_data$DEVICE_TYPE)
+
+# Modifying DEVICE_TYPE according to
+# corresponding labels
+cumulative_ad_data$DEVICE_TYPE <- recode(cumulative_ad_data$DEVICE_TYPE,
+                         "0" = "Mobile/Tablet",
+                         "1" = "Personal Computer",
+                         "2" = "Connected TV",
+                         "4" = "Tablet",
+                         "5" = "Connected Device")
 
 ```
 
@@ -31,10 +53,30 @@ cumulative_ad_data <- select(cumulative_ad_data, -SIZE, -REQUESTED_SIZES)
 
 First Pass: Initial selection of variables has mostly been done by grouping them logically or seeking intuitive relations between them. Major areas of interest to me are Price, Location and Device Type.
 
+Looking at a pairs plot we can gain a bit of insight into what the relations are doing, as well as see that some might not be easy to investigate. TIMESTAMP, for example, is difficult to read for Zipcode, Latitude and Longitude.
+
+Using the *information_gain()* function, we can try to look at how significantly variables reduce the uncertainty of the target variable BID_WON. The outcome shows only AUCTION_ID, PUBLISHER_ID, and PRICE as high information gain parameters. Almost all the other variables have lower (but similar to each other) information gain except for the Region variable. This makes sense, given that our data is confined to Oregon.
+
+```{r}
+# Pairs generator for the numerical data
+ggpairs(cumulative_ad_data[, c("TIMESTAMP", "DEVICE_TYPE", "DEVICE_GEO_ZIP", "PRICE", "RESPONSE_TIME", "DEVICE_GEO_LAT", "DEVICE_GEO_LONG")])
+
+
+# Testing for "Predictive Power"
+information_gain(BID_WON ~ ., data = cumulative_ad_data)
+
+
+```
+
+
+
 
 ## Price
 
+Generating a quick summary of PRICE shows us the average bid price is 0.47, while we have a MASSIVE maximum bid price at 141.25. Most of the data falls around the smaller end of value.
+
 ```{r Price}
+# Quick summary of the PRICE variable.
 summary(cumulative_ad_data$PRICE)
 ```
 
@@ -44,9 +86,11 @@ summary(cumulative_ad_data$PRICE)
 We can see from a t-test that there is a significant different in the mean prices between bids won and bids lost. A boxplot can show us the median prices for the bids, categorized by whether or not the bid won. We can see a clear distinction in the distribution of values between the two variables. The plot has been zoomed in for ease of reading.
 
 ```{r Price v. Bid Wins}
+
+# T test of means
 t.test(PRICE ~ BID_WON, data = cumulative_ad_data)
 
-
+# Boxplot
 ggplot(cumulative_ad_data, aes(x = BID_WON, y = PRICE)) +
   geom_boxplot() +
   coord_cartesian(ylim = c(0, 2))
@@ -56,9 +100,11 @@ ggplot(cumulative_ad_data, aes(x = BID_WON, y = PRICE)) +
 
 ### Response Time
 
-There are some very high values in the PRICE variable that pull values away from the overall shape. There could be a relation here as the increase in response time seems to lower the 
+There are some very high values in the PRICE variable that pull values away from the overall shape. There could be a relation here as the increase in response time seems to lower the PRICE. My guess is that slower response times lead to bidders coming in at a lower price, but then losing to others who outbid them.
 
 ```{r Price v Response Time}
+
+# Scatterplot
 ggplot(cumulative_ad_data, aes(x = RESPONSE_TIME, y = PRICE)) +
   geom_point()
 
@@ -73,9 +119,6 @@ This graph cuts off many outliers in the positive direction, but was done so to 
 
 ```{r Device Type v Price}
 
-# Converting to factor for categorization
-cumulative_ad_data$DEVICE_TYPE <- as.factor(cumulative_ad_data$DEVICE_TYPE) 
-
 # Boxplot
 cumulative_ad_data %>%
   ggplot(aes(x = DEVICE_TYPE, y = PRICE, fill = DEVICE_TYPE)) +
@@ -86,7 +129,6 @@ cumulative_ad_data %>%
     x = "Device Type",
     y = "Price"
   )
-
 
 ```
 
@@ -109,8 +151,10 @@ I feel Location and Response time could be related. The overall distances and th
 Potential for a relation of speed across devices. Some devices might be optimized differently, causing some bids to be slower? To make that claim, we would probably need to know more about the internet traffic during the bidding.
 
 ```{r Device Type v Response Time}
+
+# Boxplot
 cumulative_ad_data %>%
-  ggplot(aes(x = DEVICE_TYPE, y = RESPONSE_TIME, fill = DEVICE_TYPE)) + # Plotting the BoxPlot and labels
+  ggplot(aes(x = DEVICE_TYPE, y = RESPONSE_TIME, fill = DEVICE_TYPE)) + 
   geom_boxplot(outlier.size = 0.7) +
   labs(
     title = "Response Time by Device Type",
@@ -128,9 +172,6 @@ This could be interesting to see if areas have differing device usage. Valuable 
 This could be a relation of heavier use on certain devices based on time of day.
 
 ```{r Device Type vs Time}
-# Converting TIMESTAMP to a POSIXtc variable.
-cumulative_ad_data$TIMESTAMP <- lubridate::parse_date_time(cumulative_ad_data$TIMESTAMP, c("ymd HMS", "mdy HMS"), tz = "UTC")
-
 
 cumulative_ad_data$TIMEofDAY <- hour(cumulative_ad_data$TIMESTAMP)
 
