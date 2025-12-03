@@ -433,6 +433,14 @@ errors/inconsistencies.</p>
 - PRICE <chr>: Should be of data type numeric.</p>
 <pre class="r"><code>typeof(ad_data$PRICE)</code></pre>
 <pre><code>## [1] &quot;character&quot;</code></pre>
+<ul>
+<li>PRICE <chr>: There exists one instance of PRICE that has a leading O
+instead of 0, which causes issues with conversion to the numeric
+type.</li>
+</ul>
+<pre class="r"><code>idx &lt;- which(substr(ad_data$PRICE, 1, 1)==&quot;O&quot;)
+ad_data$PRICE[idx]</code></pre>
+<pre><code>## [1] &quot;O.340000&quot;</code></pre>
 <p>- DEVICE_GEO_ZIP <chr>: Should be of data type integer.</p>
 <pre class="r"><code>typeof(ad_data$DEVICE_GEO_ZIP)</code></pre>
 <pre><code>## [1] &quot;character&quot;</code></pre>

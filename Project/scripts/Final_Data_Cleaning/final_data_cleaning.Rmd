@@ -56,6 +56,13 @@ Errors/Inconsistencies:\
 typeof(ad_data$PRICE)
 ```
 
+- PRICE <chr>: There exists one instance of PRICE that has a leading O instead of 0, which causes issues with conversion to the numeric type.
+
+```{r}
+idx <- which(substr(ad_data$PRICE, 1, 1)=="O")
+ad_data$PRICE[idx]
+```
+
 \- DEVICE_GEO_ZIP <chr>: Should be of data type integer.
 
 ```{r}
