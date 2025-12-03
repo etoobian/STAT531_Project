@@ -10,6 +10,7 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Users/inkud/Desktop/STAT 531/STAT531_Project")
 ```
 
 |                                                               |
@@ -24,9 +25,9 @@ load_ad_data()
 # Dependencies
 library(arrow)
 library(dplyr)
-setwd(dirname(dirname(dirname(getwd()))))
 base_data_path = file.path(getwd(), "Project/scripts/data_io.R")
 source(base_data_path)
+rm(df)
 
 # Setting options
 options(pillar.sigfig = 7)
@@ -80,19 +81,29 @@ print(filter(.data=ad_data, DEVICE_GEO_LONG < -130)$DEVICE_GEO_LONG, na.print='.
 print(length(filter(.data=ad_data, DEVICE_GEO_LONG < -130)$DEVICE_GEO_LONG))
 ```
 
-**Note:** These points lie exactly 10 degrees to the west of corresponding city longitudinal values.\
+**Note:** These points lie exactly 10 degrees to the west of corresponding city longitudinal values.
+Furthermore, when you add 10 to these values, all there appears to be no issue with DEVICE_GEO_LAT values (paired with DEVICE_GEO_ZIP, even before it is cleaned) having more than one distinct longitudinal value.
 
-\
-- PRICE <chr>: There exist prices that are negative.
+```{r}
+temp_ad_data <- ad_data
+lat_of_has_over_long_val <- filter(.data=temp_ad_data, DEVICE_GEO_LONG < -130)$DEVICE_GEO_LAT
+temp_ad_data <- mutate(.data=temp_ad_data, DEVICE_GEO_LONG=if_else(DEVICE_GEO_LONG < -130, DEVICE_GEO_LONG + 10, DEVICE_GEO_LONG))
+ungroup(filter(.data=summarize(.data=group_by(.data=filter(.data=temp_ad_data, DEVICE_GEO_LAT %in% lat_of_has_over_long_val), DEVICE_GEO_LAT, DEVICE_GEO_ZIP), n=n_distinct(DEVICE_GEO_LONG)), n>2))
+rm(lat_of_has_over_long_val)
+```
+
+\- PRICE <chr>: There exist prices that are negative.
 
 ```{r}
 filter(mutate(.data=ad_data, PRICE=ifelse(substr(PRICE, 1, 1) == "O", sub("^O", "0", PRICE), PRICE), PRICE=as.double(PRICE)), PRICE < 0)$PRICE
 ```
 
-\- PRICE <chr>: There exist negative prices that have BID_WON==TRUE.
+**Note:** Disregarding sentinels, we can deduce that these negated values follow the underlying distribution of PRICE's (below) and can be reverse negated as such:
 
 ```{r}
-select(.data=filter(mutate(.data=ad_data, PRICE=ifelse(substr(PRICE, 1, 1) == "O", sub("^O", "0", PRICE), PRICE), PRICE=as.double(PRICE)), PRICE < 0), PRICE, BID_WON)
+set.seed(123)
+hist(sample(as.numeric(ad_data$PRICE), size=1000, replace=FALSE), breaks=150, xlim=c(0, 3))
+hist(as.numeric(filter(.data=ad_data, as.numeric(PRICE) < 0, as.numeric(PRICE) > -10)$PRICE), breaks=50, xlim=c(0, -3))
 ```
 
 \- PRICE <chr>: There exist prices that are close to -1000 (-999).
@@ -282,8 +293,8 @@ Maybe a name change for the column would better reflect the data.\
 **Note:** Formatting then converting RESPONSE_TIME into type integer would improve accuracy.\
 
 \
-- REQUESTED_SIZE, SIZE \<chr, chr\> \<\*\*\*\*\*\> ✔\
-**Note:** Establishing correct SIZE values along with converting REQUESTED_SIZE back into an character array would allow us to establish select parameters like Price Per Pixel (price / width \* height).
+- REQUESTED_SIZE \<chr, chr\> \<\*\*\*\> ✔\
+**Note:** Converting REQUESTED_SIZE back into an character array would allow us to perform analysis on REQUESTED_SIZE easier.
 
 \- No key \<no data type\> \<\*\*\*\*\> ✔\
 **Note:** It would be quite important to determine whether or not duplicates are natural part of the dataset or if it needs to be removed.
@@ -295,10 +306,8 @@ Maybe a name change for the column would better reflect the data.\
 Template: - [KEY(S)] \<DATATYPE(S)\> \<IMPORTANCE LEVEL in \*'s\> \<✔ if implemented\>\
 + Notes on importance.
 
-\
-- DEVICE_GEO_ZIP \<chr\> \<\*\*\*\*\*\> ✔\
+\- DEVICE_GEO_ZIP \<chr\> \<\*\*\*\*\*\> ✔\
 **Note:** Correcting NA values in DEVICE_GEO_ZIP by retrieving data that otherwise would not be usable in analysis would be very beneficial.
 
-\
-- DEVICE_GEO_CITY \<chr\> \<\*\*\*\*\*\> ✔\
+\- DEVICE_GEO_CITY \<chr\> \<\*\*\*\*\*\> ✔\
 **Note:** Correcting NA values in DEVICE_GEO_CITY by retrieving data that otherwise would not be usable in analysis would be very beneficial.

@@ -233,14 +233,14 @@ as:
 <base_name>_<version>.parquet
 ```
 
-# Data Cleaning: NA values, inconsistencies and other errors.
+# Data Cleaning: Identifying and mending inconsistencies, NA values, and other errors.
 
 All data cleaning related files will be found in:
 
-`Project/scripts/Final_Data_Cleaning/` The R script that imports and
+`Project/scripts/Final_Data_Cleaning/` - The R script that imports and
 cleans the raw data is:
 
-`Final_Data_Cleaning/final_data.cleaning.R` When you source this file,
+`Final_Data_Cleaning/final_data.cleaning.R` - When you source this file,
 you will be left with a tibble that has been cleaned in your environment
 named `cumulative_ad_data`.
 
