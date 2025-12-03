@@ -76,7 +76,7 @@ message("Finished cleaning PRICE.")
 
 
 message("Cleaning DEVICE_GEO_ZIP [1]...")
-#   + DEVICE_GEO_ZIP shall now take on the integer type.
+#   + DEVICE_GEO_ZIP shall take on the integer type for processing, then be converted back to character.
 cumulative_ad_data <- mutate(.data=cumulative_ad_data, DEVICE_GEO_ZIP=as.integer(DEVICE_GEO_ZIP))
 message("Cleaning DEVICE_GEO_ZIP [2]...")
 #   + ZIPS with negative values (or values that exist below 9000 (doesn't exist)) are retrievable given by:
@@ -85,6 +85,7 @@ message("Cleaning DEVICE_GEO_ZIP [2]...")
 #     Algorithm: Group by Lat, Long, if there exists a group that contains an invalid DEVICE_GEO_ZIP value, 
 #     along with a valid DEVICE_GEO_ZIP value, it will set the invalid DEVICE_GEO_ZIP value to that of the first valid DEVICE_GEO_ZIP value within the same group.
 cumulative_ad_data <- ungroup(mutate(.data=group_by(.data=cumulative_ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, first(DEVICE_GEO_ZIP[DEVICE_GEO_ZIP>9000]), DEVICE_GEO_ZIP)))
+cumulative_ad_data <- mutate(.data=cumulative_ad_data, DEVICE_GEO_ZIP=as.character(DEVICE_GEO_ZIP))
 message("Finished cleaning DEVICE_GEO_ZIP.")
 
 
@@ -165,7 +166,7 @@ message("\nFinished truncating all remaining NA values.")
 
 message("\nFinal check for duplicates...")
 cumulative_ad_data <- unique(cumulative_ad_data)
-message("\Finished checking for duplicates.")
+message("\nFinished checking for duplicates.")
 
 
 message("\nFinished the cleaning procedure.")
