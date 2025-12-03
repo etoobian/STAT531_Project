@@ -30,15 +30,14 @@ reflect the repo's current functionality.
 
 # **Repository Structure**
 
-**Important:**\
-This repo does **NOT** contain datasets, nor should any data files be
-committed.\
-All data must be stored **locally** by team members following the
-structure described below.
+**Important:**  
+This repo does **NOT** contain datasets, nor should any data files be 
+committed.  
+All data must be stored **locally** by team members following 
+the structure described below.
 
 ## **Remote Structure**
-
-```         
+```
 Project/
 │
 ├── scripts/
@@ -79,10 +78,11 @@ TeamDocuments/
 
 **DO NOT COMMIT DATA TO THIS REPO**
 
-Instead, create a local directory. Please copy the data files from the
-team's Canvas page and add locally, structured as shown below:
+Instead, create a local directory. 
+Please copy the data files from the team's
+Canvas page and add locally, structured as shown below:
 
-```         
+```
 Project/
 │
 ├── data/
@@ -131,13 +131,10 @@ consistent.
 Do **not** rename or reorganize top-level folders without discussion on
 **Discord**.
 
-------------------------------------------------------------------------
-
 # **Setup Instructions**
 
 ## Clone the Repository
-
-```         
+```
 git clone https://github.com/etoobian/EnP_2025Labs.git
 cd EnP_2025Labs
 ```
@@ -145,8 +142,7 @@ cd EnP_2025Labs
 ## Open the R Project
 
 Open:
-
-```         
+```
 EnP_2025Labs.Rproj
 ```
 
@@ -181,17 +177,23 @@ source("Project/scripts/data_io.R")
 head(ad_data)
 ```
 
-This: - Validates the raw data exists - Loads it using
-`arrow::read_parquet()` - Prints a preview - Stores it as `ad_data` in
-your R session
+This:
+  - Validates the raw data exists
+  - Loads it using `arrow::read_parquet()`
+  - Prints a preview
+  - Stores it as `ad_data` in your R session
 
-**NOTE:** Once sourced, `load_ad_data()` can be run for other datasets
-as needed.
+**NOTE:** Once sourced, `load_ad_data()` can be run for other datasets as needed.
 
 ## Load Dataset (From function)
-
-Once sourced (shown above):
-`load_ad_data(    data_folder = "Project/data/processed",  # Location of data file    data_file   = "Data_filename.parquet"    # Name of .parquet data file to load  )`
+ 
+ Once sourced (shown above):
+ ```
+ load_ad_data(
+   data_folder = "Project/data/processed",  # Location of data file
+   data_file   = "Data_filename.parquet"    # Name of .parquet data file to load
+ )
+ ```
 
 ## Summarize Dataset
 
@@ -208,7 +210,7 @@ This is helpful before beginning cleaning tasks.
 
 All processed datasets should be exported using:
 
-```         
+```
 export_ad_data(
   df        = cleaned_df,                # df to export to .parquet
   version   = "clean_v1_description",    # char description / version number
@@ -264,7 +266,7 @@ Use this template exactly so our README stays cohesive:
 
 Copy/paste and fill in:
 
-```         
+```
 ### <script_name>.R 
 
 **Purpose:** One-sentence description  
@@ -278,7 +280,6 @@ Copy/paste and fill in:
 **Example Usage:**  
   # example usage commands here
 ```
-
 ------------------------------------------------------------------------
 
 ## Existing Scripts
@@ -323,18 +324,20 @@ errors.
 
 `# Given that getwd() returns "~/STAT531_Project" source(file.path(getwd(), "Project/scripts/Final_Data_Cleaning/final_data_cleaning.R"))`
 
-**Adding New Work to the Codebase**
+<!-- NOTE TO TEAM:
+Add new scripts below using the template. -->
 
 **Where to put new files**
 
 | Type of File                           | Folder                    |
-|----------------------------------------|---------------------------|
+| -------------------------------------- | ------------------------- |
 | Data cleaning / transformation scripts | `Project/scripts/`        |
 | Helpers / utilities                    | `Project/scripts/`        |
 | EDA notebooks                          | `Project/notebooks/`      |
 | Plots / visualizations                 | `Project/results/`        |
 | Processed datasets                     | `Project/data/processed/` |
 | Report sections                        | `Project/reports/`        |
+
 
 When adding a new script:
 
@@ -356,3 +359,4 @@ It is only guidance during development. -->
 -   Keep examples short and copy/paste friendly
 -   Do NOT add EDA results or report content here
 -   Before final submission, we will prune placeholder notes
+
