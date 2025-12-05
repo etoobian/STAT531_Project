@@ -48,6 +48,23 @@ rm(ad_data, base_data_path, default_data_folder, default_input_data_file, defaul
 #   + Code
 #   + Return Type
 
+message("\nStarted cleaning up NA values...")
+
+
+message("Cleaning DEVICE_GEO_ZIP [1]...")
+#   + NA values that exist in DEVICE_GEO_ZIP will be recovered using DEVICE_GEO_LAT and DEVICE_GEO_LONG.
+cumulative_ad_data <- ungroup(mutate(.data=group_by(.data=cumulative_ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_ZIP=if_else(is.na(DEVICE_GEO_ZIP), first(DEVICE_GEO_ZIP[!is.na(DEVICE_GEO_ZIP)]), DEVICE_GEO_ZIP)))
+message("Finished cleaning DEVICE_GEO_ZIP.")
+
+
+message("Cleaning DEVICE_GEO_CITY [1]...")
+#   + NA values that exist in DEVICE_GEO_CITY will be recovered using DEVICE_GEO_LAT and DEVICE_GEO_LONG
+cumulative_ad_data <- ungroup(mutate(.data=group_by(.data=cumulative_ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_CITY=if_else(is.na(DEVICE_GEO_CITY), first(DEVICE_GEO_CITY[!is.na(DEVICE_GEO_CITY)]), DEVICE_GEO_CITY)))
+message("Finished cleaning DEVICE_GEO_CITY.")
+
+
+message("\nFinished cleaning up NA values.")
+
 
 message("\nStarted cleaning of inconsistencies and errors...\n")
 
@@ -119,9 +136,12 @@ message("Finished cleaning REQUESTED_SIZE, SIZE.")
 
 message("Cleaning DEVICE_GEO_LONG [1]...")
 #   + Modifying the invalid values in DEVICE_GEO_LONG. Utilizes DEVICE_GEO_LAT and modified DEVICE_GEO_LONG to search for existing DEVICE_GEO_LONG values.
+#   + Rounding is utilized in order to account for small floating-point error differences that are introduced when adding by 10.
 lat_of_has_over_long_val <- filter(.data=cumulative_ad_data, DEVICE_GEO_LONG < -130)$DEVICE_GEO_LAT
+filter(.data=summarize(.data=group_by(.data=filter(.data=cumulative_ad_data, DEVICE_GEO_LAT %in% lat_of_has_over_long_val), DEVICE_GEO_LAT, DEVICE_GEO_ZIP), n=n_distinct(DEVICE_GEO_LONG)), n>1)
 cumulative_ad_data <- mutate(.data=cumulative_ad_data, DEVICE_GEO_LONG=if_else(DEVICE_GEO_LONG < -130, DEVICE_GEO_LONG + 10, DEVICE_GEO_LONG))
-ungroup(filter(.data=summarize(.data=group_by(.data=filter(.data=cumulative_ad_data, DEVICE_GEO_LAT %in% lat_of_has_over_long_val), DEVICE_GEO_LAT, DEVICE_GEO_ZIP), n=n_distinct(DEVICE_GEO_LONG)), n>2))
+cumulative_ad_data <- mutate(.data=cumulative_ad_data, DEVICE_GEO_LONG = round(DEVICE_GEO_LONG, 10), DEVICE_GEO_LAT = round(DEVICE_GEO_LAT, 8))
+filter(.data=summarize(.data=group_by(.data=filter(.data=cumulative_ad_data, DEVICE_GEO_LAT %in% lat_of_has_over_long_val), DEVICE_GEO_LAT, DEVICE_GEO_ZIP), n=n_distinct(DEVICE_GEO_LONG)), n>1)
 rm(lat_of_has_over_long_val)
 message("Finished cleaning DEVICE_GEO_LONG.")
 
@@ -139,24 +159,6 @@ message("Finished cleaning BID_WON.")
 
 
 message("\nFinished cleaning up inconsistencies and errors.")
-
-
-message("\nStarted cleaning up NA values...")
-
-
-message("Cleaning DEVICE_GEO_ZIP [1]...")
-#   + NA values that exist in DEVICE_GEO_ZIP will be recovered using DEVICE_GEO_LAT and DEVICE_GEO_LONG.
-cumulative_ad_data <- ungroup(mutate(.data=group_by(.data=cumulative_ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_ZIP=if_else(is.na(DEVICE_GEO_ZIP), first(DEVICE_GEO_ZIP[!is.na(DEVICE_GEO_ZIP)]), DEVICE_GEO_ZIP)))
-message("Finished cleaning DEVICE_GEO_ZIP.")
-
-
-message("Cleaning DEVICE_GEO_CITY [1]...")
-#   + NA values that exist in DEVICE_GEO_CITY will be recovered using DEVICE_GEO_LAT and DEVICE_GEO_LONG
-cumulative_ad_data <- ungroup(mutate(.data=group_by(.data=cumulative_ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_CITY=if_else(is.na(DEVICE_GEO_CITY), first(DEVICE_GEO_CITY[!is.na(DEVICE_GEO_CITY)]), DEVICE_GEO_CITY)))
-message("Finished cleaning DEVICE_GEO_CITY.")
-
-
-message("\nFinished cleaning up NA values.")
 
 
 message("\nTruncating all remaining NA values...")
