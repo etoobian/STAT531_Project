@@ -53,6 +53,7 @@ Errors/Inconsistencies:\
 **Discovery Method:** This was discovered by checking the type of PRICE.
 
 ```{r}
+ad_data["PRICE"]
 typeof(ad_data$PRICE)
 ```
 
@@ -60,30 +61,37 @@ typeof(ad_data$PRICE)
 **Discovery Method:** This was discovered when noticing coercion when converting PRICE to the numeric type.
 
 ```{r}
-idx <- which(substr(ad_data$PRICE, 1, 1)=="O")
-ad_data$PRICE[idx]
+discov_data <- ad_data
+discov_data <- mutate(.data=discov_data, PRICE=as.numeric(PRICE)) # NAs introduced by coercion.
+discov_idx <- which(is.na(discov_data$PRICE)) # Where the NA exists.
+discov_idx
+ad_data$PRICE[discov_idx] # Where NA values are introduced.
 ```
 
 \- TIMESTAMP <chr>: Inconsistent formatting.\
 **Discovery Method:** This was discovered by removing the timestamp portion of TIMESTAMP, and analyzing the unique values of the string representing the intended date.
 
 ```{r}
-print(c(ad_data$TIMESTAMP[1528], ad_data$TIMESTAMP[1], ad_data$TIMESTAMP[10]))
+discov_data <- ad_data
+discov_data$TIMESTAMP <- sub("\\s[^\\s]*$", "", discov_data$TIMESTAMP) # Remove the last portion of a string separated by a whitespace.
+unique(discov_data$TIMESTAMP) 
 ```
 
 \- TIMESTAMP <chr>: Data set is not sorted chronologically.\
 **Discovery Method:** This was discovered by looking at the TIMESTAMP column.
 
 ```{r}
-print(c(ad_data$TIMESTAMP[24], ad_data$TIMESTAMP[25]))
+ad_data["TIMESTAMP"]
 ```
 
 \- DEVICE_GEO_LONG <dbl>: There exists exactly 100 points that lie beyond the border of Oregon.\
-**Discovery Method:** This was discovered by checking for values outside of Oregon's border.
+**Discovery Method:** This was discovered by checking for values outside of Oregon's border (-124'38 to -116.28).
 
 ```{r}
-print(filter(.data=ad_data, DEVICE_GEO_LONG < -130)$DEVICE_GEO_LONG, na.print='.')
-print(length(filter(.data=ad_data, DEVICE_GEO_LONG < -130)$DEVICE_GEO_LONG))
+discov_data <- ad_data
+discov_data <- filter(.data=discov_data, DEVICE_GEO_LONG < -125 | DEVICE_GEO_LONG > -116)
+discov_data$DEVICE_GEO_LONG
+count(discov_data)
 ```
 
 **Note:** These points lie exactly 10 degrees to the west of corresponding city longitudinal values.
@@ -91,40 +99,41 @@ Furthermore, when you add 10 to these values, all there appears to be no issue w
 
 ```{r}
 temp_ad_data <- ad_data
-lat_of_has_over_long_val <- filter(.data=temp_ad_data, DEVICE_GEO_LONG < -130)$DEVICE_GEO_LAT
-ungroup(filter(.data=summarize(.data=group_by(.data=filter(.data=temp_ad_data, DEVICE_GEO_LAT %in% lat_of_has_over_long_val), DEVICE_GEO_LAT, DEVICE_GEO_ZIP), n=n_distinct(DEVICE_GEO_LONG)), n>1))
-temp_ad_data <- mutate(.data=temp_ad_data, DEVICE_GEO_LONG=if_else(DEVICE_GEO_LONG < -130, DEVICE_GEO_LONG + 10, DEVICE_GEO_LONG))
-temp_ad_data <- mutate(.data=temp_ad_data, DEVICE_GEO_LAT=round(DEVICE_GEO_LAT, 10), DEVICE_GEO_LONG=round(DEVICE_GEO_LONG, 10))
-ungroup(filter(.data=summarize(.data=group_by(.data=filter(.data=temp_ad_data, DEVICE_GEO_LAT %in% lat_of_has_over_long_val), DEVICE_GEO_LAT, DEVICE_GEO_ZIP), n=n_distinct(DEVICE_GEO_LONG)), n>1))
-rm(lat_of_has_over_long_val)
+lat_of_has_over_long_val <- filter(.data=temp_ad_data, DEVICE_GEO_LONG < -130)$DEVICE_GEO_LAT # Lat values where DEVICE_GEO_LONG < -130
+ungroup(filter(.data=summarize(.data=group_by(.data=filter(.data=temp_ad_data, DEVICE_GEO_LAT %in% lat_of_has_over_long_val), DEVICE_GEO_LAT, DEVICE_GEO_ZIP), n=n_distinct(DEVICE_GEO_LONG)), n>1)) # Initial print out of those grouped together by Lat and Zip having more than 2 longitudinal values.
+temp_ad_data <- mutate(.data=temp_ad_data, DEVICE_GEO_LONG=if_else(DEVICE_GEO_LONG < -130, DEVICE_GEO_LONG + 10, DEVICE_GEO_LONG)) # Add 10 to those values.
+temp_ad_data <- mutate(.data=temp_ad_data, DEVICE_GEO_LAT=round(DEVICE_GEO_LAT, 10), DEVICE_GEO_LONG=round(DEVICE_GEO_LONG, 10)) # Round to account for floating-point precision errors introduced.
+ungroup(filter(.data=summarize(.data=group_by(.data=filter(.data=temp_ad_data, DEVICE_GEO_LAT %in% lat_of_has_over_long_val), DEVICE_GEO_LAT, DEVICE_GEO_ZIP), n=n_distinct(DEVICE_GEO_LONG)), n>1)) # Final print out of those grouped together... (contains nothing).
+rm(lat_of_has_over_long_val, temp_ad_data)
 ```
 
 \- PRICE <chr>: There exist prices that are negative.\
 **Discovery Method:** This was discovered by converting PRICE to the numeric type and checking for negative values.
 
 ```{r}
-filter(mutate(.data=ad_data, PRICE=ifelse(substr(PRICE, 1, 1) == "O", sub("^O", "0", PRICE), PRICE), PRICE=as.double(PRICE)), PRICE < 0)$PRICE
+filter(mutate(.data=ad_data, PRICE=as.numeric(PRICE)), PRICE < 0)$PRICE
 ```
 
 **Note:** Disregarding sentinels, we can deduce that these negated values follow the underlying distribution of PRICE's (below) and can be reverse negated as such:
 
 ```{r}
 set.seed(123)
-hist(sample(as.numeric(ad_data$PRICE), size=1000, replace=FALSE), breaks=150, xlim=c(0, 3))
-hist(as.numeric(filter(.data=ad_data, as.numeric(PRICE) < 0, as.numeric(PRICE) > -10)$PRICE), breaks=50, xlim=c(0, -3))
+hist(sample(as.numeric(ad_data$PRICE), size=1000, replace=FALSE), breaks=150, xlim=c(0, 3)) # Histogram of positive values.
+hist(as.numeric(filter(.data=ad_data, as.numeric(PRICE) < 0, as.numeric(PRICE) > -10)$PRICE), breaks=50, xlim=c(0, -3)) # Histogram of the negative values.
 ```
 
-\- PRICE <chr>: There exist prices that are close to -1000 (-999).\
+\- PRICE <chr>: There exist prices that are -999.\
 **Discovery Method:** This was discovered by checking the histogram of negative values.
 
 ```{r}
-select(.data=filter(mutate(.data=ad_data, PRICE=ifelse(substr(PRICE, 1, 1) == "O", sub("^O", "0", PRICE), PRICE), PRICE=as.double(PRICE)), PRICE < 0), PRICE, BID_WON)$PRICE[9]
+filter(mutate(.data=ad_data, PRICE=as.numeric(PRICE)), PRICE < -10)$PRICE
 ```
 
 \- BID_WON <chr>: Should be of data type logical.\
 **Discovery Method:** This was discovered by checking the type of BID_WON
 
 ```{r}
+ad_data["BID_WON"]
 typeof(ad_data$BID_WON)
 ```
 
@@ -160,13 +169,14 @@ Example of non-city: Rhododendron (is an unincorporated community).\
 **Discovery Method:** This was discovered by converting ZIP to the integer type and checking for values less than 0.
 
 ```{r}
-filter(mutate(.data=ad_data, DEVICE_GEO_ZIP=as.double(DEVICE_GEO_ZIP)), DEVICE_GEO_ZIP < 0)$DEVICE_GEO_ZIP
+filter(mutate(.data=ad_data, DEVICE_GEO_ZIP=as.integer(DEVICE_GEO_ZIP)), DEVICE_GEO_ZIP < 0)$DEVICE_GEO_ZIP
 ```
 
 \- RESPONSE_TIME <chr>: Should be of type integer.\
 **Discovery Method:** This was discovered by checking the type of RESPONSE_TIME.
 
 ```{r}
+ad_data["RESPONSE_TIME"]
 typeof(ad_data$RESPONSE_TIME)
 ```
 
@@ -177,10 +187,13 @@ typeof(ad_data$RESPONSE_TIME)
 **Discovery Method:** This was discovered through an attempt at truncating the "RESPONSE_TIME" prefix and getting coercion errors when converting to the integer type.
 
 ```{r}
-print(c(unique(ad_data$RESPONSE_TIME)[727], unique(ad_data$RESPONSE_TIME)[1019]))
+discov_data <- ad_data
+discov_data$RESPONSE_TIME <- sub("^RESPONSE_TIME: ", "", discov_data$RESPONSE_TIME) # Remove prefix "RESPONSE_TIME: " from RESPONSE_TIME.
+discov_data <- mutate(.data=discov_data, RESPONSE_TIME=as.integer(RESPONSE_TIME)) # NAs introduced by coercion.
+discov_idx <- which(is.na(discov_data$RESPONSE_TIME)) # Where the NAs exist.
+discov_idx
+ad_data$RESPONSE_TIME[discov_idx] # Where NA values are introduced.
 ```
-
-**Note:** There exists at least one RESPONSE_TIME value that has the following delimiter RESSPONSE_TIME (as opposed to RESPONSE_TIME).\
 
 \
 - REQUESTED_SIZE, SIZE \<chr, chr\>: There exists requested sizes of 0x0 and 1x1 that also do not meet requested size specifications despite have BID_WON==TRUE\
@@ -188,6 +201,7 @@ print(c(unique(ad_data$RESPONSE_TIME)[727], unique(ad_data$RESPONSE_TIME)[1019])
 Furthermore, then filtering whether or not BID_WON is true allows for more specificity.
 
 ```{r}
+unique(ad_data$SIZE)
 select(.data=filter(.data=ad_data, (SIZE=="0x0" | SIZE=="1x1"), BID_WON=="TRUE" | BID_WON=="true"), SIZE, BID_WON)
 ```
 
@@ -226,9 +240,13 @@ any(is.na(ad_data$DEVICE_GEO_CITY))
 
 -   Could be an issue with it being not in chronological order (error applied before scrambling).
 
--   Noted that some cities encompass more than 20 zip codes in DEVICE_GEO_ZIP and DEVICE_GEO_ZIP - Noted that at least some AUCTION_ID values are encompassed purely by one bidder in PUBLISHER_ID (one bidder bidding multiple times).
+-   Noted that some cities encompass more than 20 zip codes in DEVICE_GEO_ZIP and DEVICE_GEO_ZIP
+
+-   Noted that at least some AUCTION_ID values are encompassed purely by one bidder in PUBLISHER_ID (one bidder bidding multiple times) (Given by multiple bidders bidding through a publisher).
 
 -   For further exploration, we can potentially re-order these instances in chronological order by RESPONSE_TIME
+
+-   For some of these discoveries, some columns were converted to numeric data types (int, numeric) then had pairs ran on them.
 
 -   **There are rows that aren't unique (potential duplicates/multiple requests sent at once) (confirmed intentional errors)**
 
