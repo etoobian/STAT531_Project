@@ -1,0 +1,300 @@
+---
+title: "Exploratory Data Analysis"
+output: html_document
+date: "2025-12-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Libraries
+library(ggplot2)
+library(lubridate)
+library(dplyr)
+library(tidyverse)
+library(summarytools)
+library(GGally)
+library(FSelectorRcpp)
+
+
+# Data
+# source("C:/Users/chris/Downloads/final_data_cleaning.R")
+```
+
+
+```{r Repairing Variables, include = FALSE}
+# Converting DEVICE_TYPE to a factor
+cumulative_ad_data$DEVICE_TYPE <- as.factor(cumulative_ad_data$DEVICE_TYPE)
+
+# Modifying DEVICE_TYPE according to
+# corresponding labels
+cumulative_ad_data$DEVICE_TYPE <- recode(cumulative_ad_data$DEVICE_TYPE,
+                         "0" = "Mobile/Tablet",
+                         "1" = "Personal Computer",
+                         "2" = "Connected TV",
+                         "4" = "Tablet",
+                         "5" = "Connected Device")
+
+```
+
+
+# Univariate Analysis
+
+## Numerical Variables (Histogram Boxplot)
+
+Looking at a pairs plot we can gain a bit of insight into what the relations are doing, as well as see that some might not be easy to investigate. TIMESTAMP, for example, is difficult to read for Zipcode, Latitude and Longitude.
+
+Using the *information_gain()* function, we can try to look at how significantly variables reduce the uncertainty of the target variable BID_WON. The outcome shows only AUCTION_ID, PUBLISHER_ID, and PRICE as high information gain parameters. Almost all the other variables have lower (but similar to each other) information gain except for the Region variable. This makes sense, given that our data is confined to Oregon.
+
+```{r}
+# Pairs generator for the numerical data
+ggpairs(cumulative_ad_data[, c("TIMESTAMP", "DEVICE_TYPE", "DEVICE_GEO_ZIP", "PRICE", "RESPONSE_TIME", "DEVICE_GEO_LAT", "DEVICE_GEO_LONG")])
+
+
+# Testing for "Predictive Power"
+information_gain(BID_WON ~ ., data = cumulative_ad_data)
+
+
+```
+
+```{r}
+# Summary function
+summary_table <- function(data, var) {
+  
+  x <- data[[var]]
+  
+  tibble(
+    Min = min(x, na.rm = TRUE),
+    `1st Q` = round(quantile(x, 0.25, na.rm = TRUE), 3),
+    Median = round(median(x, na.rm = TRUE), 3),
+    Mean = round(mean(x, na.rm = TRUE), 3),
+    `3rd Q` = round(quantile(x, 0.75, na.rm = TRUE), 3),
+    Max = max(x, na.rm = TRUE),
+    `NA count` = sum(is.na(x))
+  )
+}
+
+# Function for pretty histogram
+pretty_histogram <- function(data, var) {
+  ggplot(data, aes(x = .data[[var]])) +
+    geom_histogram(
+      bins = 150,
+      fill = "#4C9AFF",    # soft blue
+      color = "white",
+      alpha = 0.85
+    ) +
+    labs(
+      title = paste("Distribution of", var),
+      x = var,
+      y = "Count"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+      plot.title = element_text(face = "bold", size = 16),
+      panel.grid.minor = element_blank(),
+      panel.grid.major.x = element_blank()
+    )
+}
+
+# Function for pretty boxplot
+pretty_boxplot <- function(data, var, y_label = NULL) {
+  
+  # Default to variable name if y_label not specified
+  if (is.null(y_label)) {
+    y_label <- var
+  }
+  
+  # Boxplot
+  ggplot(data, aes(y = .data[[var]])) +
+    geom_boxplot(
+      fill = "#FF7F50",    # coral
+      color = "black",
+      outlier.color = "red",
+      outlier.alpha = 0.6,
+      width = 0.3
+    ) +
+    coord_cartesian(ylim = quantile(data[[var]], c(0.05, 0.95), na.rm = TRUE)) + # Zoom to better see graph
+    labs(
+      title = paste("Boxplot of", var),
+      y = y_label
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+      plot.title = element_text(face = "bold", size = 16),
+      axis.title.x = element_blank(),
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor = element_blank()
+    )
+}
+```
+
+### Price
+
+Generating a quick summary of PRICE shows us the average bid price is 0.47, while we have a MASSIVE maximum bid price at 141.25. Most of the data falls around the smaller end of value.
+
+```{r Price, results = 'asis', echo = FALSE}
+# Quick summary of the PRICE variable.
+summary_table(cumulative_ad_data, "PRICE") %>%
+  kable("html", caption = "Summary Statistics for PRICE") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+
+# Histogram of Price
+pretty_histogram(cumulative_ad_data, "PRICE")
+
+# Boxplot of Price
+pretty_boxplot(cumulative_ad_data, "PRICE", "Price")
+```
+
+### Response Time
+
+```{r, results = 'asis'}
+summary_table(cumulative_ad_data, "RESPONSE_TIME") %>%
+  kable("html", caption = "Summary Statistics for PRICE") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+
+
+pretty_boxplot(cumulative_ad_data, "RESPONSE_TIME")
+
+
+```
+
+### Device Geo Latitude
+### Device Geo Longitude
+
+## Categorical Variables (Frequency Chart/ Bar plot)
+```{r}
+# Categorical Variables: Frequency table
+    frequency_table <- as.data.frame(table(data[[var]])) %>%
+      setNames(c("Category", "Frequency"))
+    cat("### Frequency Table\n")
+    knitr::kable(frequency_table, caption = paste("Frequency Table for", var))
+    
+    # Categorical Variables: Bar Chart
+    cat("### Bar Chart\n")
+    print(
+      ggplot(data, aes_string(x = var)) +
+        geom_bar(fill = "lightgreen", color = "black") +
+        labs(title = paste("Bar Chart of", var), x = var, y = "Frequency") +
+        theme_minimal()
+    )
+```
+
+### Auction ID
+### Publisher ID
+### Device Type
+### Device Geo City
+### Device Geo Zip
+### Size
+### Requested Size
+### Bid Won
+### Device Geo Region
+
+
+# Bivariate Analysis
+## Numerical vs Numerical
+### Price/Response Time
+
+There are some very high values in the PRICE variable that pull values away from the overall shape. There could be a relation here as the increase in response time seems to lower the PRICE. My guess is that slower response times lead to bidders coming in at a lower price, but then losing to others who outbid them.
+
+```{r Price v Response Time}
+# Scatterplot
+ggplot(cumulative_ad_data, aes(x = RESPONSE_TIME, y = PRICE)) +
+  geom_point()
+
+```
+
+### Price/LatLong
+### LatLong/Response Time
+
+## Numerical vs Categorical
+### Price/Bid Won
+
+We can see from a t-test that there is a significant different in the mean prices between bids won and bids lost. A boxplot can show us the median prices for the bids, categorized by whether or not the bid won. We can see a clear distinction in the distribution of values between the two variables. The plot has been zoomed in for ease of reading.
+
+```{r Price v. Bid Wins}
+
+# T test of means
+t.test(PRICE ~ BID_WON, data = cumulative_ad_data)
+
+# Boxplot
+ggplot(cumulative_ad_data, aes(x = BID_WON, y = PRICE)) +
+  geom_boxplot() +
+  coord_cartesian(ylim = c(0, 2))
+```
+
+### Price/Device Type
+
+After reaching out to Andrew, he says that it should refer to a table he gave, but that the incrementor starts at 0. Meaning we can retrieve the Device Types by adding 1 and referring to the table. (Ex. DEVICE_TYPE = 0 -> DEVICE_TYPE = Mobile/Tablet (1 on the table) ).
+
+This graph cuts off many outliers in the positive direction, but was done so to see the inner quartile range more clearly.
+
+```{r Device Type v Price}
+# Boxplot
+cumulative_ad_data %>%
+  ggplot(aes(x = DEVICE_TYPE, y = PRICE, fill = DEVICE_TYPE)) +
+  geom_boxplot(outlier.size = 0.7) +
+  coord_cartesian(ylim = c(0, 5)) +
+  labs(
+    title = "Price by Device Type",
+    x = "Device Type",
+    y = "Price"
+  )
+```
+
+### Price/Zip or City
+### Zip or City/Response Time
+### Device Type/Response Time
+
+Potential for a relation of speed across devices. Some devices might be optimized differently, causing some bids to be slower? To make that claim, we would probably need to know more about the internet traffic during the bidding.
+
+```{r Device Type v Response Time}
+# Boxplot
+cumulative_ad_data %>%
+  ggplot(aes(x = DEVICE_TYPE, y = RESPONSE_TIME, fill = DEVICE_TYPE)) + 
+  geom_boxplot(outlier.size = 0.7) +
+  labs(
+    title = "Response Time by Device Type",
+    x = "Device Type",
+    y = "Response Time (ms)"
+  )
+```
+
+### Device Type/LatLong
+### Device Type/Timestamp
+
+This could be a relation of heavier use on certain devices based on time of day.
+
+```{r Device Type vs Time}
+
+cumulative_ad_data$TIMEofDAY <- hour(cumulative_ad_data$TIMESTAMP)
+
+
+# Lineplot of Device Type over Time
+cumulative_ad_data %>%
+  count(DEVICE_TYPE, TIMEofDAY) %>%
+  ggplot(aes(x = TIMEofDAY, y = n, color = DEVICE_TYPE)) +
+  geom_line(size = 1) +
+  geom_point() +
+  labs(
+    x = "Hour of Day",
+    y = "Useage",
+    title = "Device Activity by Hour"
+  ) +
+  scale_x_continuous(breaks = 0:23)
+
+```
+
+## Categorical vs Categorical
+### Device Type/Zip or City
+
+# Key Findings
+
+# Conclusion?
+
+- Summary
+
+- Limitations
+
+- Future Analysis
