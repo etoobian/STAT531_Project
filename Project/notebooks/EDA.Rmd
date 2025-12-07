@@ -15,6 +15,7 @@ library(tidyverse)
 library(summarytools)
 library(GGally)
 library(FSelectorRcpp)
+library(kableExtra)
 
 
 # Data
@@ -37,28 +38,8 @@ cumulative_ad_data$DEVICE_TYPE <- recode(cumulative_ad_data$DEVICE_TYPE,
 
 ```
 
-
-# Univariate Analysis
-
-## Numerical Variables (Histogram Boxplot)
-
-Looking at a pairs plot we can gain a bit of insight into what the relations are doing, as well as see that some might not be easy to investigate. TIMESTAMP, for example, is difficult to read for Zipcode, Latitude and Longitude.
-
-Using the *information_gain()* function, we can try to look at how significantly variables reduce the uncertainty of the target variable BID_WON. The outcome shows only AUCTION_ID, PUBLISHER_ID, and PRICE as high information gain parameters. Almost all the other variables have lower (but similar to each other) information gain except for the Region variable. This makes sense, given that our data is confined to Oregon.
-
-```{r}
-# Pairs generator for the numerical data
-ggpairs(cumulative_ad_data[, c("TIMESTAMP", "DEVICE_TYPE", "DEVICE_GEO_ZIP", "PRICE", "RESPONSE_TIME", "DEVICE_GEO_LAT", "DEVICE_GEO_LONG")])
-
-
-# Testing for "Predictive Power"
-information_gain(BID_WON ~ ., data = cumulative_ad_data)
-
-
-```
-
-```{r}
-# Summary function
+```{r Function creation, echo = FALSE}
+## Summary function
 summary_table <- function(data, var) {
   
   x <- data[[var]]
@@ -74,7 +55,7 @@ summary_table <- function(data, var) {
   )
 }
 
-# Function for pretty histogram
+## Function for pretty histogram
 pretty_histogram <- function(data, var) {
   ggplot(data, aes(x = .data[[var]])) +
     geom_histogram(
@@ -96,39 +77,130 @@ pretty_histogram <- function(data, var) {
     )
 }
 
-# Function for pretty boxplot
+## Function for pretty boxplot
+
 pretty_boxplot <- function(data, var, y_label = NULL) {
   
-  # Default to variable name if y_label not specified
-  if (is.null(y_label)) {
-    y_label <- var
+  # Default to variable name if y_label not specified 
+  if (is.null(y_label)) { y_label <- var } 
+  
+  # Boxplot 
+  ggplot(data, aes(y = .data[[var]])) + 
+    geom_boxplot( fill = "#FF7F50",
+                  color = "black",
+                  outlier.color = "red",
+                  outlier.alpha = 0.6,
+                  width = 0.3 ) +
+    coord_cartesian(ylim = quantile(data[[var]], c(0.05, 0.95), na.rm = TRUE)) + # Zoom to better see graph
+    labs( title = paste("Boxplot of", var), y = y_label ) +
+    theme_minimal(base_size = 14) +
+    theme( plot.title = element_text(face = "bold", size = 16),
+           axis.title.x = element_blank(),
+           axis.text.x = element_blank(),
+           axis.ticks.x = element_blank(),
+           panel.grid.major.x = element_blank(),
+           panel.grid.minor = element_blank())
+}
+
+
+
+## Barplot Function
+pretty_barplot <- function(data, var, label = NULL) {
+  
+  # Default to variable name if label not specified
+  if (is.null(label)) {
+      label <- var
   }
   
-  # Boxplot
-  ggplot(data, aes(y = .data[[var]])) +
-    geom_boxplot(
-      fill = "#FF7F50",    # coral
-      color = "black",
-      outlier.color = "red",
-      outlier.alpha = 0.6,
-      width = 0.3
-    ) +
-    coord_cartesian(ylim = quantile(data[[var]], c(0.05, 0.95), na.rm = TRUE)) + # Zoom to better see graph
+  # Barplot
+  ggplot(data, aes(x = .data[[var]])) +
+    geom_bar(fill = "#6495ED", color = "black") +   # cornflower blue
     labs(
-      title = paste("Boxplot of", var),
+      x = label,
+      y = "Count",
+      title = paste("Barplot of", var)
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+      plot.title = element_text(face = "bold", size = 16),
+      panel.grid.major.x = element_blank()
+    )
+}
+
+
+
+## Frequency Table Function
+pretty_freq <- function(data, var, label = NULL) {
+  
+  # Default to variable name if label not specified
+  if (is.null(label)) {
+    label <- var
+  }
+
+  # Storing var  
+  x <- data[[var]]
+
+  
+  # Building frequency table
+  freq_table <- x %>%
+    table(useNA = "ifany") %>%
+    as.data.frame() %>%
+    rename(Category = ".", Count = "Freq") %>%
+    mutate(Percent = round(Count / sum(Count) * 100, 2)) %>%
+    arrange(desc(Count))
+  
+  # Produce nice kable table
+  kable(freq_table, 
+        caption = paste("Frequency Table for", label),
+        col.names = c(label, "Count", "Percent"),
+        align = "lrr") %>%
+    kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+}
+
+
+## Scatterplot
+pretty_xyplot <- function(data, xvar, yvar, x_label = NULL, y_label = NULL) {
+  
+  # Default  labels to variable names
+  if (is.null(x_label)) x_label <- xvar
+  if (is.null(y_label)) y_label <- yvar
+  
+  ggplot(data, aes(x = .data[[xvar]], y = .data[[yvar]])) +
+    geom_point(alpha = 0.6, color = "#1f78b4", size = 3) +
+    labs(
+      title = paste("Scatterplot of", xvar, "vs", yvar),
+      x = x_label,
       y = y_label
     ) +
     theme_minimal(base_size = 14) +
     theme(
       plot.title = element_text(face = "bold", size = 16),
-      axis.title.x = element_blank(),
-      axis.text.x = element_blank(),
-      axis.ticks.x = element_blank(),
-      panel.grid.major.x = element_blank(),
       panel.grid.minor = element_blank()
     )
 }
+
+
 ```
+
+
+# Univariate Analysis
+
+## Numerical Variables (Histogram Boxplot)
+
+Looking at a pairs plot we can gain a bit of insight into what the relations are doing, as well as see that some might not be easy to investigate. TIMESTAMP, for example, is difficult to read for Zipcode, Latitude and Longitude.
+
+Using the *information_gain()* function, we can try to look at how significantly variables reduce the uncertainty of the target variable BID_WON. The outcome shows only AUCTION_ID, PUBLISHER_ID, and PRICE as high information gain parameters. Almost all the other variables have lower (but similar to each other) information gain except for the Region variable. This makes sense, given that our data is confined to Oregon.
+
+```{r}
+# Pairs generator for the numerical data
+ggpairs(cumulative_ad_data[, c("TIMESTAMP", "DEVICE_TYPE", "DEVICE_GEO_ZIP", "PRICE", "RESPONSE_TIME", "DEVICE_GEO_LAT", "DEVICE_GEO_LONG")])
+
+
+# Testing for "Predictive Power"
+information_gain(BID_WON ~ ., data = cumulative_ad_data)
+```
+
+
 
 ### Price
 
@@ -144,52 +216,95 @@ summary_table(cumulative_ad_data, "PRICE") %>%
 pretty_histogram(cumulative_ad_data, "PRICE")
 
 # Boxplot of Price
-pretty_boxplot(cumulative_ad_data, "PRICE", "Price")
+pretty_boxplot(cumulative_ad_data, "PRICE", "Price in Dollars")
 ```
 
 ### Response Time
 
 ```{r, results = 'asis'}
+# Quick summary of the RESPONSE_TIME variable.
 summary_table(cumulative_ad_data, "RESPONSE_TIME") %>%
-  kable("html", caption = "Summary Statistics for PRICE") %>%
+  kable("html", caption = "Summary Statistics for Response Time") %>%
   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 
+# Histogram of Price
+pretty_histogram(cumulative_ad_data, "RESPONSE_TIME")
 
-pretty_boxplot(cumulative_ad_data, "RESPONSE_TIME")
-
-
+# Boxplot of Price
+pretty_boxplot(cumulative_ad_data, "RESPONSE_TIME", "Response Time in ms")
 ```
 
 ### Device Geo Latitude
-### Device Geo Longitude
 
-## Categorical Variables (Frequency Chart/ Bar plot)
-```{r}
-# Categorical Variables: Frequency table
-    frequency_table <- as.data.frame(table(data[[var]])) %>%
-      setNames(c("Category", "Frequency"))
-    cat("### Frequency Table\n")
-    knitr::kable(frequency_table, caption = paste("Frequency Table for", var))
-    
-    # Categorical Variables: Bar Chart
-    cat("### Bar Chart\n")
-    print(
-      ggplot(data, aes_string(x = var)) +
-        geom_bar(fill = "lightgreen", color = "black") +
-        labs(title = paste("Bar Chart of", var), x = var, y = "Frequency") +
-        theme_minimal()
-    )
+```{r Latitude, results = 'asis'}
+
+# Quick summary of the DEVICE_GEO_LATITUDE variable.
+summary_table(cumulative_ad_data, "DEVICE_GEO_LAT") %>%
+  kable("html", caption = "Summary Statistics for Latitude") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+
+# Histogram of Price
+pretty_histogram(cumulative_ad_data, "DEVICE_GEO_LAT")
+
+# Boxplot of Price
+pretty_boxplot(cumulative_ad_data, "DEVICE_GEO_LAT", "Latitude")
+
 ```
 
+### Device Geo Longitude
+
+```{r Longitude, results = 'asis'}
+
+# Quick summary of the DEVICE_GEO_LONG variable.
+summary_table(cumulative_ad_data, "DEVICE_GEO_LONG") %>%
+  kable("html", caption = "Summary Statistics for Longitude") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+
+# Histogram of Price
+pretty_histogram(cumulative_ad_data, "DEVICE_GEO_LONG")
+
+# Boxplot of Price
+pretty_boxplot(cumulative_ad_data, "DEVICE_GEO_LONG", "Longitude")
+
+```
+
+## Categorical Variables (Frequency Chart/ Bar plot)
+
 ### Auction ID
+
+
+
 ### Publisher ID
 ### Device Type
+
+```{r Device Type, results = 'asis'}
+pretty_barplot(cumulative_ad_data, "DEVICE_TYPE", "")
+pretty_freq(cumulative_ad_data, "DEVICE_TYPE")
+```
+
 ### Device Geo City
+
+```{r Geo City, results = 'asis'}
+pretty_freq(cumulative_ad_data, "DEVICE_GEO_CITY")
+```
+
 ### Device Geo Zip
+
+```{r Zipcode, results = 'asis', echo = FALSE}
+pretty_freq(cumulative_ad_data, "DEVICE_GEO_ZIP")
+```
+
 ### Size
 ### Requested Size
 ### Bid Won
+```{r Bid Won, results = 'asis', echo = FALSE}
+pretty_barplot(cumulative_ad_data, "BID_WON")
+pretty_freq(cumulative_ad_data, "BID_WON")
+```
 ### Device Geo Region
+```{r Geo Region, results = 'asis', echo = FALSE}
+pretty_freq(cumulative_ad_data, "DEVICE_GEO_REGION")
+```
 
 
 # Bivariate Analysis
@@ -200,13 +315,27 @@ There are some very high values in the PRICE variable that pull values away from
 
 ```{r Price v Response Time}
 # Scatterplot
-ggplot(cumulative_ad_data, aes(x = RESPONSE_TIME, y = PRICE)) +
-  geom_point()
+pretty_xyplot(cumulative_ad_data, "RESPONSE_TIME", "PRICE", "Response Time (ms)", "Price")
 
 ```
 
-### Price/LatLong
-### LatLong/Response Time
+### Price/Lat
+```{r Price v Lat, results = 'asis', echo = FALSE}
+pretty_xyplot(cumulative_ad_data, "DEVICE_GEO_LAT", "PRICE", "Latitude", "Price")
+```
+### Price/Long
+```{r Price v Longitude, results = 'asis', echo = FALSE}
+pretty_xyplot(cumulative_ad_data, "DEVICE_GEO_LONG", "PRICE", "Longitude", "Price")
+```
+### Latitude/Response Time
+```{r Latitude v Response Time, results = 'asis', echo = FALSE}
+pretty_xyplot(cumulative_ad_data, "DEVICE_GEO_LAT", "RESPONSE_TIME", "Latitude", "Response Time (ms)")
+```
+
+### Longitude/Response Time
+```{r Latitude v Response Time, results = 'asis', echo = FALSE}
+pretty_xyplot(cumulative_ad_data, "DEVICE_GEO_LONG", "RESPONSE_TIME", "Longitude", "Response Time (ms)")
+```
 
 ## Numerical vs Categorical
 ### Price/Bid Won
@@ -232,62 +361,75 @@ This graph cuts off many outliers in the positive direction, but was done so to 
 
 ```{r Device Type v Price}
 # Boxplot
-cumulative_ad_data %>%
-  ggplot(aes(x = DEVICE_TYPE, y = PRICE, fill = DEVICE_TYPE)) +
-  geom_boxplot(outlier.size = 0.7) +
-  coord_cartesian(ylim = c(0, 5)) +
-  labs(
-    title = "Price by Device Type",
-    x = "Device Type",
-    y = "Price"
-  )
+ggplot(cumulative_ad_data, aes(x = cumulative_ad_data$DEVICE_TYPE, y = cumulative_ad_data$PRICE)) + 
+    geom_boxplot(
+        fill = "#FF7F50",
+        color = "black",
+        outlier.color = "red",
+        outlier.alpha = 0.6,
+        width = 0.3
+    ) +
+    coord_cartesian(ylim = quantile(cumulative_ad_data$PRICE, c(0.05, 0.95), na.rm = TRUE)) +
+    labs(
+        title = paste("Boxplot of Price by Device Type"),
+        x = ("Device Type"),
+        y = ("Price")
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        plot.title = element_text(face = "bold", size = 16),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        panel.grid.minor = element_blank()
+    )
+
 ```
 
 ### Price/Zip or City
+Map graph? Zip and city are too many categories for a boxplot spread.
+
+
 ### Zip or City/Response Time
 ### Device Type/Response Time
 
-Potential for a relation of speed across devices. Some devices might be optimized differently, causing some bids to be slower? To make that claim, we would probably need to know more about the internet traffic during the bidding.
-
-```{r Device Type v Response Time}
-# Boxplot
-cumulative_ad_data %>%
-  ggplot(aes(x = DEVICE_TYPE, y = RESPONSE_TIME, fill = DEVICE_TYPE)) + 
-  geom_boxplot(outlier.size = 0.7) +
-  labs(
-    title = "Response Time by Device Type",
-    x = "Device Type",
-    y = "Response Time (ms)"
-  )
+```{r Response Time/Price, echo = FALSE}
+ggplot(cumulative_ad_data, aes(x = cumulative_ad_data$DEVICE_TYPE, y = cumulative_ad_data$RESPONSE_TIME)) + 
+    geom_boxplot(
+        fill = "#FF7F50",
+        color = "black",
+        outlier.color = "red",
+        outlier.alpha = 0.6,
+        width = 0.3
+    ) +
+    coord_cartesian(ylim = quantile(cumulative_ad_data$RESPONSE_TIME, c(0.05, 0.95), na.rm = TRUE)) +
+    labs(
+        title = paste("Boxplot of Response Time by Device Type"),
+        x = ("Device Type"),
+        y = ("Response Time")
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        plot.title = element_text(face = "bold", size = 16),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        panel.grid.minor = element_blank()
+    )
 ```
 
+Potential for a relation of speed across devices. Some devices might be optimized differently, causing some bids to be slower? To make that claim, we would probably need to know more about the internet traffic during the bidding.
+
 ### Device Type/LatLong
+
+Map, maybe?
+
 ### Device Type/Timestamp
 
 This could be a relation of heavier use on certain devices based on time of day.
 
-```{r Device Type vs Time}
 
-cumulative_ad_data$TIMEofDAY <- hour(cumulative_ad_data$TIMESTAMP)
-
-
-# Lineplot of Device Type over Time
-cumulative_ad_data %>%
-  count(DEVICE_TYPE, TIMEofDAY) %>%
-  ggplot(aes(x = TIMEofDAY, y = n, color = DEVICE_TYPE)) +
-  geom_line(size = 1) +
-  geom_point() +
-  labs(
-    x = "Hour of Day",
-    y = "Useage",
-    title = "Device Activity by Hour"
-  ) +
-  scale_x_continuous(breaks = 0:23)
-
-```
 
 ## Categorical vs Categorical
 ### Device Type/Zip or City
+
+Map of Device Density?
 
 # Key Findings
 
