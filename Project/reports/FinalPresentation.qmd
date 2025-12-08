@@ -1,0 +1,87 @@
+---
+title: "STAT 531 — Final Presentation"
+subtitle: "Oregon Ad Bidding: Data Cleaning, EDA, and Team Workflow"
+author: "TECK Squad — Chris G., Takeshi S., Esther T., Khloud Z."
+format:
+  revealjs:
+    slide-number: true
+    incremental: true
+    theme: simple
+    transition: fade
+    chalkboard: false
+editor: visual
+---
+
+
+# Title Slide
+
+- **Project:** Oregon Ad Bidding Analysis  
+- **Team:** TECK Squad — *Chris G., Takeshi S., Esther T., Khloud Z.*  
+- **GitHub repository:** <https://github.com/etoobian/STAT531_Project/>
+- **Summary:** A collaborative workflow demonstrating data cleaning, reproducibility, and exploratory analysis on Oregon advertising auction data.
+
+::: notes
+Professor's requirement:
+- Project title
+- Team members
+- Repo link
+- One-sentence summary of project's focus
+:::
+
+---
+
+# Team Banner
+
+## TECK Squad
+
+- **T** — Takeshi  
+- **E** — Esther  
+- **C** — Chris  
+- **K** — Khloud  
+
+Previously known as **KTC (Kentucky Thighed Chicken)** before the team reformed.
+
+::: notes
+Optional slide.
+Can add pic if we make one. (KTC Chicken??  New one??)
+Can be skipped if time is tight.
+:::
+
+---
+
+# The Data & Initial Plan
+
+## Dataset Context
+
+- Parquet dataset of Oregon digital ad auctions
+    - Each row represents **a single line bid within a Prebid Auction**.
+    - The Prebid server handles online ad auctions where multiple bidders submit CPM bids.
+    - Each auction can have multiple bidders and each bidder may bid on multiple sizes.
+    - Each row corresponds to **one bidder's response for one size within an auction**.
+- Includes timestamps, geolocation, device info, publisher data  
+- Contains intentionally inserted data-quality issues  
+
+## Guiding Questions (examples)
+
+- What patterns appear across time, device type, and geography?  
+- How does missingness or inconsistency affect analysis?  
+- What behaviors or trends characterize Oregon's ad ecosystem?  
+
+## Why These Questions Matter (examples)
+
+- Ethical concerns around targeting and bias  
+- Interpretability and decision-making  
+- Understanding data reliability and uncertainty
+
+::: notes
+Professor's requirement (Section 2):
+- Basic data set context
+- Guiding questions we developed
+- Why these guiding questions matter
+- The roles you assigned within the team and how you coordinated work:
+    – GitHub workflow (branches, pull requests, commits)
+    – Jira/Kanban tasks, deadlines, progress tracking
+    - NOTE: Roles/coordination will be detailed in the next slide group
+Target: under 5 minutes total.
+:::
+
