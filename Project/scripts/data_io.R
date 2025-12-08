@@ -86,15 +86,17 @@ for (pkg in needed_pkgs) {
   }
 }
 
-library(arrow) # Only need to attach arrow, use tibble:: and dplyr:: explicitly
+# Attach arrow; Use `tibble::` and `dplyr::` explicitly
+library(arrow) 
 
-# -------------------------------------
-# CONFIG: DEFAULTS (Change as needed)
-# -------------------------------------
+# ------------------------------------------
+# CONFIG: DEFAULT PATHS (change as needed)
+# ------------------------------------------
 default_data_folder      <- "Project/data"       # Folder relative to repo root
-default_input_data_file  <- "bids_data_vDTR.parquet"     # Initial project data
-default_out_dir          <- "Project/data/processed" # Dir for clean data files
-default_out_base_name    <- "bids_data"            # Base of new file filenames
+default_input_data_file  <- "bids_data_vDTR.parquet"         # Raw project data
+
+default_out_dir          <- "Project/data/processed"  # For exported/clean data
+default_out_base_name    <- "bids_data"          # Base name for exported files
 
 # ------------------------------------------------
 # HELPFUL CHECK: Set WD to repo root (if needed)
@@ -111,7 +113,8 @@ default_out_base_name    <- "bids_data"            # Base of new file filenames
 # ------------------------------------------
 
 load_ad_data <- function(data_folder = default_data_folder,
-                         data_file   = default_input_data_file) {
+                         data_file   = default_input_data_file,
+                         preview     = FALSE) {
   
   data_path <- file.path(data_folder, data_file)
   
@@ -121,16 +124,16 @@ load_ad_data <- function(data_folder = default_data_folder,
   # Check the directory
   if (!dir.exists(data_folder)) {
     stop(
-      "\n Data folder not found: '", data_folder,
-      "Check working directory. Use `getwd()`."
+      "\nData folder not found: '", data_folder, "'",
+      "\nCheck working directory. (Use `getwd()`.)"
     )
   }
   
   # Check that the file exists
   if (!file.exists(data_path)) {
     stop(
-      "\n Data file not found: ", data_path,
-      "\n Check filename."
+      "\nData file not found at: \n'", data_path, "'",
+      "\nCheck filename and ensure parquet file is present locally."
     )
   }
   
@@ -153,9 +156,12 @@ load_ad_data <- function(data_folder = default_data_folder,
   
   message("Load successful: ", data_file)
   message("Rows x Columns: ", paste(dim(df), collapse = " x "))
-  print(utils::head(df, 5))
   
-  return(df)
+  if (preview) {
+    print(utils::head(df, 5))  
+  }
+  
+  df
 }
 
 
@@ -172,11 +178,6 @@ summarize_ad_data <- function(df) {
     n_unique      = vapply(df, function(x) dplyr::n_distinct(x), integer(1))
   )
 }
-
-# Example usage (after sourcing this file):
-#   summary_tbl <- summarize_ad_data(ad_data)
-#   View(summary_tbl)
-
 
 # ----------------------------------
 # FUNCTION: EXPORT DATA TO PARQUET
@@ -196,7 +197,7 @@ export_ad_data <- function(df,
     )
   }
   
-  # Clean version string a bit (avoid unwanted filename chars)
+  # Clean version string (avoid unwanted filename chars)
   safe_version <- gsub("[^A-Za-z0-9_-]", "_", version)
   
   if (!dir.exists(out_dir)) {
@@ -213,7 +214,7 @@ export_ad_data <- function(df,
     stop(
       "\nExport aborted: file already exists:\n  ", out_path,
       "\n\nOptions:\n",
-      "  - Choose a new `version` name (recommended), e.g. \"clean_NA_v1\"\n",
+      "  - Choose a new `version` name (recommended), e.g. \"clean_v2\"\n",
       "  - Call again with `overwrite = TRUE` if intentionally replacing.\n"
     )
   }
@@ -232,13 +233,3 @@ export_ad_data <- function(df,
     stop("\n Failed to export parquet file: ", e$message)
   })
 }
-
-
-# --------------------------------------------------------
-# AUTO-LOAD DATA INTO SESSION WHEN FILE IS SOURCED
-# --------------------------------------------------------
-df <- load_ad_data()
-assign("ad_data", df, envir = .GlobalEnv)
-invisible(df)
-
-message("\nData is now available as `ad_data` in this R session.\n")

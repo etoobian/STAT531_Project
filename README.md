@@ -22,10 +22,6 @@ Our goals:
 -   Produce cleaned / processed datasets
 -   Generate visualizations, reports, and a final presentation
 
-**NOTE TO TEAM:** This is a *working document* which will be completed
-as we go. When you add to the repo, the README should be altered to
-reflect the repo's current functionality.
-
 ------------------------------------------------------------------------
 
 # **Repository Structure**
@@ -75,16 +71,17 @@ TeamDocuments/
 
 **DO NOT COMMIT DATA TO THIS REPO**
 
-Instead, create a local directory. 
-Please copy the data files from the team's
-Canvas page and add locally, structured as shown below:
+Only store data in local directory, structured as shown below:
 
 ```
 data/
 │
-├── bids_data_vDTR.parquet      # Project data .parquet file
+├── bids_data_vDTR.parquet      # Raw project data .parquet file 
 │
-└── data_dictionary.md          # Data dictionary for project data
+├── data_dictionary.md          # Data dictionary for project data
+│
+└── processed/
+    └── ...                     # Cleaned / processed data .parquet file
 
 
 Project/
@@ -120,14 +117,6 @@ TeamDocuments/
     └── ...                     # Dated .md files from each meeting
 ```
 
-**TEAM TO-DO:** Add files/folders into this doc's tree as created as
-well as to *Script Index* section below. Keep descriptions short and
-consistent.
-
-**Important:**\
-Do **not** rename or reorganize top-level folders without discussion on
-**Discord**.
-
 # **Setup Instructions**
 
 ## Clone the Repository
@@ -157,9 +146,7 @@ required_packages <- c("arrow", "tibble",
 install.packages(required_packages)
 ```
 
-**TEAM TO-DO:** Add required packages for this script to this list.
-
-# **Data I/O: Loading, Summarizing, and Exporting Data**
+# **Data I/O Utilities: Loading, Summarizing, and Exporting Data**
 
 Dataset I/O-related functions live in:
 
@@ -167,48 +154,37 @@ Dataset I/O-related functions live in:
 Project/scripts/data_io.R
 ```
 
-When you source this file, the dataset is automatically loaded and made
-available as `ad_data`.
+This script defines functions for loading, summarizing, and exporting the ad bids data.
 
-## Load Dataset (Auto-load)
+## Setup
 
-```         
+From the project root (inside STAT531_Project):
+
+```
 source("Project/scripts/data_io.R")
-head(ad_data)
 ```
 
-This:
-  - Validates the raw data exists
-  - Loads it using `arrow::read_parquet()`
-  - Prints a preview
-  - Stores it as `ad_data` in your R session
+## Load Raw Dataset
 
-**NOTE:** Once sourced, `load_ad_data()` can be run for other datasets as needed.
+Once sourced (shown above):
 
-## Load Dataset (From function)
- 
- Once sourced (shown above):
- ```
- load_ad_data(
-   data_folder = "Project/data/processed",  # Location of data file
-   data_file   = "Data_filename.parquet"    # Name of .parquet data file to load
- )
- ```
+```
+# By default, read:  "Project/data/bids_data_vDTR.parquet"
+ad_raw <- load_ad_data(preview = TRUE)
+```
 
 ## Summarize Dataset
 
-Use this to inspect column types, missingness, and unique values:
+Use to inspect column types, missingness, and unique values:
 
 ```         
-summary_tbl <- summarize_ad_data(ad_data)
-View(summary_tbl)
+summary_tbl <- summarize_ad_data(ad_raw)
+View(summary_tbl)       # or print(summary_tbl)
 ```
-
-This is helpful before beginning cleaning tasks.
 
 ## Export Processed Data
 
-All processed datasets should be exported using:
+Processed datasets exported using:
 
 ```
 export_ad_data(
@@ -220,6 +196,7 @@ export_ad_data(
 )
 ```
 
+**NOTES:**
 -   `version` MUST be provided
 -   existing files are NOT overwritten unless `overwrite = TRUE`
 
