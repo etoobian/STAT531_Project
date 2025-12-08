@@ -12,21 +12,23 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-|                                                               |
-|:-------------------------------------------------------------:|
-| **Project/scripts/Final_Data_Cleaning/data_cleaning_final.R** |
+|                                       |
+|:-------------------------------------:|
+| **Project/notebooks/data_cleaning.R** |
 
 Run:
 
-```{r}
+```{r load-libraries-and-data}
 # Dependencies
 library(arrow)
 library(dplyr)
 
 # RStudio: Ensure Knit Directory is set to Project Directory
-base_data_path = file.path(getwd(), "Project/scripts/data_io.R")
-source(base_data_path)
-rm(df)
+# (Set this in Knit options, not in code.)
+
+# Load shared data I/O utilities and raw data
+source("Project/scripts/data_io.R")
+ad_data <- load_ad_data(preview = FALSE)
 
 # Setting options
 options(pillar.sigfig = 7)
@@ -266,6 +268,19 @@ any(is.na(ad_data$DEVICE_GEO_CITY))
 |                                                            |
 |:----------------------------------------------------------:|
 | **DETERMINATION OF IMPORTANCE FOR ERRORS/INCONSISTENCIES** |
+
+Checkmark (and X) options: 
+
+&#10003 
+&#x2713
+`r intToUtf8(010003)`
+`r intToUtf8(0x2714)`
+`r intToUtf8(0x2713)`
+`r intToUtf8(0x2714)`
+`r intToUtf8(0x2715)`
+`r intToUtf8(0x2716)`
+
+
 
 Template: - [KEY(S)] \<DATATYPE(S)\> \<IMPORTANCE LEVEL in \*'s\> \<✔ if implemented\>\
 + Notes on importance.

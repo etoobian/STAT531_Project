@@ -360,7 +360,7 @@ display: none;
 <table>
 <tbody>
 <tr>
-<td align="center"><strong>Project/scripts/Final_Data_Cleaning/data_cleaning_final.R</strong></td>
+<td align="center"><strong>Project/notebooks/data_cleaning.R</strong></td>
 </tr>
 </tbody>
 </table>
@@ -381,31 +381,18 @@ library(arrow)</code></pre>
 <pre><code>## The following objects are masked from &#39;package:base&#39;:
 ## 
 ##     intersect, setdiff, setequal, union</code></pre>
-<pre class="r"><code>(base_data_path = file.path(getwd(), &quot;STAT531_Project/Project/scripts/data_io.R&quot;))</code></pre>
-<pre><code>## [1] &quot;C:/Users/etoobian/Documents/STAT/STAT_531/STAT531_Project/Project/scripts/data_io.R&quot;</code></pre>
-<pre class="r"><code>source(base_data_path)</code></pre>
+<pre class="r"><code># RStudio: Ensure Knit Directory is set to Project Directory
+# (Set this in Knit options, not in code.)
+
+# Load shared data I/O utilities and raw data
+source(&quot;Project/scripts/data_io.R&quot;)
+ad_data &lt;- load_ad_data(preview = FALSE)</code></pre>
 <pre><code>## 
-##  Loading dataset: C:/Users/etoobian/Documents/STAT/STAT_531/STAT531_Project/Project/data/bids_data_vDTR.parquet ...</code></pre>
+## Loading dataset: Project/data/bids_data_vDTR.parquet ...</code></pre>
 <pre><code>## Load successful: bids_data_vDTR.parquet</code></pre>
 <pre><code>## Rows x Columns: 443969 x 15</code></pre>
-<pre><code>## # A tibble: 5 × 15
-##   AUCTION_ID         TIMESTAMP DATE_UTC PUBLISHER_ID DEVICE_TYPE DEVICE_GEO_CITY
-##   &lt;chr&gt;              &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt;              &lt;int&gt; &lt;chr&gt;          
-## 1 0000060c-b8a9-414… 2025-10-… 2025-10… LteIcOiSsaE5           4 Salem          
-## 2 0000060c-b8a9-414… 2025-10-… 2025-10… LteIcOiSsaE5           4 Salem          
-## 3 0000060c-b8a9-414… 2025-10-… 2025-10… LteIcOiSsaE5           4 Salem          
-## 4 0000060c-b8a9-414… 2025-10-… 2025-10… LteIcOiSsaE5           4 Salem          
-## 5 0000060c-b8a9-414… 2025-10-… 2025-10… LteIcOiSsaE5           4 Salem          
-## # ℹ 9 more variables: DEVICE_GEO_ZIP &lt;chr&gt;, PRICE &lt;chr&gt;, REQUESTED_SIZES &lt;chr&gt;,
-## #   SIZE &lt;chr&gt;, RESPONSE_TIME &lt;chr&gt;, BID_WON &lt;chr&gt;, DEVICE_GEO_LAT &lt;dbl&gt;,
-## #   DEVICE_GEO_LONG &lt;dbl&gt;, DEVICE_GEO_REGION &lt;chr&gt;</code></pre>
-<pre><code>## 
-## Data is now available as `ad_data` in this R session.</code></pre>
-<pre class="r"><code>rm(df)
-
-# Setting options
+<pre class="r"><code># Setting options
 options(pillar.sigfig = 7)</code></pre>
-<pre><code>  C:\Users\etoobian\Documents\STAT\STAT_531\STAT531_Project\Project\scripts</code></pre>
 <table>
 <tbody>
 <tr>
@@ -891,6 +878,8 @@ ERRORS/INCONSISTENCIES</strong></td>
 </tr>
 </tbody>
 </table>
+<p>Checkmark (and X) options:</p>
+<p>&amp;#10003 &amp;#x2713 ✓ ✔ ✓ ✔ ✕ ✖</p>
 <p>Template: - [KEY(S)] &lt;DATATYPE(S)&gt; &lt;IMPORTANCE LEVEL in
 *’s&gt; &lt;✔ if implemented&gt;<br />
 + Notes on importance.</p>

@@ -1,22 +1,25 @@
-# Project/scripts/Final_Data_Cleaning/data_cleaning_final.R
+# Project/scripts/data_cleaning.R
 # ------------------------------------------------------------------
-#  PROJECT DATA CLEANER (inconsistencies and NA)
+#  DATA CLEANING PIPELINE
 # ------------------------------------------------------------------
 # Purpose:
-#   - Mend noticeable errors/inconsistency with data types, formatting, prior data modifications (some of the 12 bombs), and spelling mistakes to name a few within the bid data.
-#   - Mend NA values seen within the bid data.
+#   - Load raw ad bidding data (via `load_ad_data()` from `data_io.R`)
+#   - Apply all team, agreed-upon cleaning steps
+#   - Leave a cleaned tibble in the environment (currently `ad_clean`)
+#   - Export cleaned data parquet file
 #
 # NOTES:
-#   - May otherwise miss some errors/inconsistencies.
+#   - A future branch will refactor this into a reusable function:
+#       clean_ad_data <- function(ad_raw) { ... }
 #   - Code with three pound signs are for individual alterations to the data.
-#   - Any new NA's are put in place where data is otherwise irretrievable.
+#   - NA's are used in cases where data is otherwise irretrievable.
 #   - Any remaining NA's at the end of execution will be removed as they have been deemed irretrievable.
 # ------------------------------------------------------------------
 
-# ------------------------------------------------------------------
-# Import additional dependencies (if they are not already loaded in).
-# ------------------------------------------------------------------
-# Inspiration taken from Project/scripts/data_io.R
+# --------------------------------
+# Import additional dependencies 
+# --------------------------------
+
 needed_pkgs <- c("stringr", "jsonlite", "dplyr", "tidyverse", "arrow")
 for (pkg in needed_pkgs) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
@@ -31,12 +34,10 @@ library(tidyverse)
 library(arrow)
 
 # ------------------------------------------------------------------
-# Install base unmodified bid data as ad_data.
+# Load base raw data into cumulative_ad_data
 # ------------------------------------------------------------------
-base_data_path = file.path(getwd(), "Project/scripts/data_io.R")
-source(base_data_path)
-cumulative_ad_data <- ad_data
-rm(ad_data, base_data_path, default_data_folder, default_input_data_file, default_out_base_name, df, pkg, needed_pkgs, default_out_dir, export_ad_data, load_ad_data, summarize_ad_data)
+source("Project/scripts/data_io.R")
+cumulative_ad_data <- load_ad_data(preview = FALSE)
 
 # ------------------------------------------------------------------
 #  FINAL DECISIONS REGARDING THE FATE OF ERRORS/INCONSISTENCIES
