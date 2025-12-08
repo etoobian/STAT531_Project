@@ -1,0 +1,343 @@
+---
+title: "Data Cleaning"
+author: "TECK Squad"
+date: "2025-12-12"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+|                                                               |
+|:-------------------------------------------------------------:|
+| **Project/scripts/Final_Data_Cleaning/data_cleaning_final.R** |
+
+Run:
+
+```{r}
+# Dependencies
+library(arrow)
+library(dplyr)
+
+# RStudio: Ensure Knit Directory is set to Project Directory
+base_data_path = file.path(getwd(), "Project/scripts/data_io.R")
+source(base_data_path)
+rm(df)
+
+# Setting options
+options(pillar.sigfig = 7)
+```
+
+|                                                    |
+|:--------------------------------------------------:|
+| **PROJECT DATA CLEANER (inconsistencies and NAs)** |
+
+Purpose: Document noticeable errors/inconsistency with data types, formatting, prior data modifications (confirmed 10/12 bombs caught), and spelling mistakes to name a few.
+
+**Note:** May otherwise miss some errors/inconsistencies.
+
+|                                 |
+|:-------------------------------:|
+| **NOTED ERRORS/INCONSITENCIES** |
+
+Template: - [KEY(S)] \<DATATYPE(S)\>: Error\
++ Discovery Method\
++ Code\
++ [Optional: Note]
+
+Errors/Inconsistencies:\
+- PRICE <chr>: Should be of data type numeric.\
+**Discovery Method:** This was discovered by checking the type of PRICE.
+
+```{r}
+ad_data["PRICE"]
+typeof(ad_data$PRICE)
+```
+
+\- PRICE <chr>: There exists one instance of PRICE that has a leading O instead of 0, which causes issues with conversion to the numeric type.\
+**Discovery Method:** This was discovered when noticing coercion when converting PRICE to the numeric type.
+
+```{r}
+discov_data <- ad_data
+discov_data <- mutate(.data=discov_data, PRICE=as.numeric(PRICE)) # NAs introduced by coercion.
+discov_idx <- which(is.na(discov_data$PRICE)) # Where the NA exists.
+discov_idx
+ad_data$PRICE[discov_idx] # Where NA values are introduced.
+```
+
+\- TIMESTAMP <chr>: Inconsistent formatting.\
+**Discovery Method:** This was discovered by removing the timestamp portion of TIMESTAMP, and analyzing the unique values of the string representing the intended date.
+
+```{r}
+discov_data <- ad_data
+discov_data$TIMESTAMP <- sub("\\s[^\\s]*$", "", discov_data$TIMESTAMP) # Remove the last portion of a string separated by a whitespace.
+unique(discov_data$TIMESTAMP) 
+```
+
+\- TIMESTAMP <chr>: Data set is not sorted chronologically.\
+**Discovery Method:** This was discovered by looking at the TIMESTAMP column.
+
+```{r}
+ad_data["TIMESTAMP"]
+```
+
+\- DEVICE_GEO_LONG <dbl>: There exists exactly 100 points that lie beyond the border of Oregon.\
+**Discovery Method:** This was discovered by checking for values outside of Oregon's border (-124'38 to -116.28).
+
+```{r}
+discov_data <- ad_data
+discov_data <- filter(.data=discov_data, DEVICE_GEO_LONG < -125 | DEVICE_GEO_LONG > -116)
+discov_data$DEVICE_GEO_LONG
+count(discov_data)
+```
+
+**Note:** These points lie exactly 10 degrees to the west of corresponding city longitudinal values.
+Furthermore, when you add 10 to these values, all there appears to be no issue with DEVICE_GEO_LAT values (paired with DEVICE_GEO_ZIP, even before it is cleaned) having more than one distinct longitudinal value.
+
+```{r}
+temp_ad_data <- ad_data
+lat_of_has_over_long_val <- filter(.data=temp_ad_data, DEVICE_GEO_LONG < -130)$DEVICE_GEO_LAT # Lat values where DEVICE_GEO_LONG < -130
+ungroup(filter(.data=summarize(.data=group_by(.data=filter(.data=temp_ad_data, DEVICE_GEO_LAT %in% lat_of_has_over_long_val), DEVICE_GEO_LAT, DEVICE_GEO_ZIP), n=n_distinct(DEVICE_GEO_LONG)), n>1)) # Initial print out of those grouped together by Lat and Zip having more than 2 longitudinal values.
+temp_ad_data <- mutate(.data=temp_ad_data, DEVICE_GEO_LONG=if_else(DEVICE_GEO_LONG < -130, DEVICE_GEO_LONG + 10, DEVICE_GEO_LONG)) # Add 10 to those values.
+temp_ad_data <- mutate(.data=temp_ad_data, DEVICE_GEO_LAT=round(DEVICE_GEO_LAT, 10), DEVICE_GEO_LONG=round(DEVICE_GEO_LONG, 10)) # Round to account for floating-point precision errors introduced.
+ungroup(filter(.data=summarize(.data=group_by(.data=filter(.data=temp_ad_data, DEVICE_GEO_LAT %in% lat_of_has_over_long_val), DEVICE_GEO_LAT, DEVICE_GEO_ZIP), n=n_distinct(DEVICE_GEO_LONG)), n>1)) # Final print out of those grouped together... (contains nothing).
+rm(lat_of_has_over_long_val, temp_ad_data)
+```
+
+\- PRICE <chr>: There exist prices that are negative.\
+**Discovery Method:** This was discovered by converting PRICE to the numeric type and checking for negative values.
+
+```{r}
+filter(mutate(.data=ad_data, PRICE=as.numeric(PRICE)), PRICE < 0)$PRICE
+```
+
+**Note:** Disregarding sentinels, we can deduce that these negated values follow the underlying distribution of PRICE's (below) and can be reverse negated as such:
+
+```{r}
+set.seed(123)
+hist(sample(as.numeric(ad_data$PRICE), size=1000, replace=FALSE), breaks=150, xlim=c(0, 3)) # Histogram of positive values.
+hist(as.numeric(filter(.data=ad_data, as.numeric(PRICE) < 0, as.numeric(PRICE) > -10)$PRICE), breaks=50, xlim=c(0, -3)) # Histogram of the negative values.
+```
+
+\- PRICE <chr>: There exist prices that are -999.\
+**Discovery Method:** This was discovered by checking the histogram of negative values.
+
+```{r}
+filter(mutate(.data=ad_data, PRICE=as.numeric(PRICE)), PRICE < -10)$PRICE
+```
+
+\- BID_WON <chr>: Should be of data type logical.\
+**Discovery Method:** This was discovered by checking the type of BID_WON
+
+```{r}
+ad_data["BID_WON"]
+typeof(ad_data$BID_WON)
+```
+
+\- AUCTION_ID, BID_WON \<chr, chr\>: There are bids with multiple wins.\
+**Discovery Method:** This was discovered by grouping by AUCTION_ID and counting the number of winning bids.
+
+```{r}
+filter(.data=summarise(.data=group_by(.data=ad_data, AUCTION_ID), won=sum(BID_WON=="TRUE"), lost=sum(BID_WON=="FALSE"), total=n()), won > 1)
+```
+
+**Note:** Due to duplicates, some of these values have incredibly high counts.\
+
+\
+- DEVICE_GEO_REGION <chr>: Inconsistent formatting.\
+**Discovery Method:** This was discovered by checking the unique values of DEVICE_GEO_REGION.
+
+```{r}
+unique(ad_data$DEVICE_GEO_REGION)
+```
+
+\- DEVICE_GEO_CITY <chr>: Existence of non-cities (unincorporated communities, CDPs, etc.).\
+**Discovery Method:** This was discovered by researching some of the city elements in DEVICE_GEO_CITY.
+
+```{r}
+print(unique(ad_data$DEVICE_GEO_CITY), n=100, na.print=".")
+```
+
+**Note:** Most probably negligible.
+Example of non-city: Rhododendron (is an unincorporated community).\
+
+\
+- DEVICE_GEO_ZIP <chr>: There exists a negative ZIP code (-999).\
+**Discovery Method:** This was discovered by converting ZIP to the integer type and checking for values less than 0.
+
+```{r}
+filter(mutate(.data=ad_data, DEVICE_GEO_ZIP=as.integer(DEVICE_GEO_ZIP)), DEVICE_GEO_ZIP < 0)$DEVICE_GEO_ZIP
+```
+
+\- RESPONSE_TIME <chr>: Should be of type integer.\
+**Discovery Method:** This was discovered by checking the type of RESPONSE_TIME.
+
+```{r}
+ad_data["RESPONSE_TIME"]
+typeof(ad_data$RESPONSE_TIME)
+```
+
+**Note:** The last three-four characters in most cases should contain the desired information.\
+
+\
+- RESPONSE_TIME <chr>: Inconsistent formatting.\
+**Discovery Method:** This was discovered through an attempt at truncating the "RESPONSE_TIME" prefix and getting coercion errors when converting to the integer type.
+
+```{r}
+discov_data <- ad_data
+discov_data$RESPONSE_TIME <- sub("^RESPONSE_TIME: ", "", discov_data$RESPONSE_TIME) # Remove prefix "RESPONSE_TIME: " from RESPONSE_TIME.
+discov_data <- mutate(.data=discov_data, RESPONSE_TIME=as.integer(RESPONSE_TIME)) # NAs introduced by coercion.
+discov_idx <- which(is.na(discov_data$RESPONSE_TIME)) # Where the NAs exist.
+discov_idx
+ad_data$RESPONSE_TIME[discov_idx] # Where NA values are introduced.
+```
+
+\
+- REQUESTED_SIZE, SIZE \<chr, chr\>: There exists requested sizes of 0x0 and 1x1 that also do not meet requested size specifications despite have BID_WON==TRUE\
+**Discovery Method:** This was discovered by checking the unique values of REQUESTED_SIZE.
+Furthermore, then filtering whether or not BID_WON is true allows for more specificity.
+
+```{r}
+unique(ad_data$SIZE)
+select(.data=filter(.data=ad_data, (SIZE=="0x0" | SIZE=="1x1"), BID_WON=="TRUE" | BID_WON=="true"), SIZE, BID_WON)
+```
+
+**Note:** We would not be able to determine the actual size won for these invalid SIZE values if REQUESTED_SIZE contains more than 2 requested sizes.
+
+|                                  |
+|:--------------------------------:|
+| **NOTED PRE-EXISTING NA VALUES** |
+
+Template: - [KEY(S)] \<DATATYPE(S)\>: Error\
++ Code\
++ [Optional: Note]
+
+NA Values:\
+- DEVICE_GEO_ZIP \<CHR\>: Contains NA values.\
+**Discovery Method:** This was discovered by checking for the existence of NA's in DEVICE_GEO_ZIP.
+
+```{r}
+any(is.na(ad_data$DEVICE_GEO_ZIP))
+```
+
+\- DEVICE_GEO_CITY \<CHR\>: Contains NA values.\
+**Discovery Method:** This was discovered by checking for the existence of NA's in DEVICE_GEO_CITY.
+
+```{r}
+any(is.na(ad_data$DEVICE_GEO_CITY))
+```
+
+|                               |
+|:-----------------------------:|
+| **Tested for / other notes:** |
+
+-   Multiple time entries for distinct AUCTION_ID.
+
+-   Pattern in inconsistent formatting for TIMESTAMP
+
+-   Could be an issue with it being not in chronological order (error applied before scrambling).
+
+-   Noted that some cities encompass more than 20 zip codes in DEVICE_GEO_ZIP and DEVICE_GEO_ZIP
+
+-   Noted that at least some AUCTION_ID values are encompassed purely by one bidder in PUBLISHER_ID (one bidder bidding multiple times) (Given by multiple bidders bidding through a publisher).
+
+-   For further exploration, we can potentially re-order these instances in chronological order by RESPONSE_TIME
+
+-   For some of these discoveries, some columns were converted to numeric data types (int, numeric) then had pairs ran on them.
+
+-   **There are rows that aren't unique (potential duplicates/multiple requests sent at once) (confirmed intentional errors)**
+
+    ```{r}
+    unique(ad_data)
+    ```
+
+-   **Pre-existing NA values make up roughly 4.77% of the data set (including duplicates).**
+
+    ```{r}
+    na_by_col <- colSums(is.na(ad_data))
+    na_pct <- (na_by_col / nrow(ad_data)) * 100
+    na_pct[na_pct > 0]
+    ```
+
+|                                                            |
+|:----------------------------------------------------------:|
+| **DETERMINATION OF IMPORTANCE FOR ERRORS/INCONSISTENCIES** |
+
+Template: - [KEY(S)] \<DATATYPE(S)\> \<IMPORTANCE LEVEL in \*'s\> \<✔ if implemented\>\
++ Notes on importance.
+
+Importance:\
+- PRICE <chr> \<\*\*\*\*\*\> ✔\
+**Note:** For ease of data processing, it can be believed that converting the column price in type numeric (after ensuring that all values follow a numeric type [i.e. no "five point eight" or "O.340000" values]) will be highly beneficial.\
+
+\
+- PRICE <chr> \<\*\*\*\*\*\> ✔\
+**Note:** Removing outliers (negative values) will improve accuracy, therefore we should look to remove negative values as there is appears to be no pattern that would allow us to recover the underlying data without introducing error.\
+
+\
+- DEVICE_GEO_ZIP <chr> \<\*\*\*\*\*\> ✔\
+**Note:** The more numerical values we have, the easier it would be for us to find patterns we otherwise couldn't see.\
+
+\
+- DEVICE_GEO_ZIP <chr> \<\*\*\*\*\*\> ✔\
+**Note:** Searching for like latitudinal and longitudinal coordinates to deduce DEVICE_GEO_ZIP will improve accuracy and make the rows usable again.\
+
+\
+- TIMESTAMP <chr> \<\*\*\*\*\> ✔\
+**Note:** Providing a consistent formatting for TIMESTAMP would allow for ease of conversion into numerical representation.\
+
+\
+- TIMESTAMP <chr> \<\*\*\*\> ✔\
+**Note:** Sorting TIMESTAMP into chronological order would allow for the creation of parameters that are typically seen in time-series data (moving averages, lag, etc.).
+However given we have 400k+ rows of data (\~100k+ rows if you collapse by AUCTION_ID and BID_WON), it will take a while to sort.\
+
+\
+- BID_WON <chr> \<\*\> ✔\
+**Note:** Converting BID_WON into type logical would not really make a difference as we can easily query through the three existing unique values of TRUE, true, and FALSE.\
+
+\
+- DEVICE_GEO_LONG <dbl> \<\*\*\*\> ✔\
+**Note:** Given that only 100 data points out of the 400k+ contain invalid longitudinal points, these points can be thrown out.
+It is also easily deducible that these 100 points are exactly 10 degrees further to the west than their respective counterparts (when sorted by DEVICE_GEO_CITY, DEVICE_GEO_ZIP and DEVICE_GEO_LONG) and can be returned to their original position for further use.\
+
+\
+- AUCTION_ID, BID_WON \<chr, chr\> \<\*\*\*\*\>\
+**Note:** Deducing whether or not it's possible for an auction to have multiple winners is going to be relatively important.
+If we deduce it is not important, there is no effective way of determining which bid actually won, and therefore we can throw them out.\
+
+\
+- DEVICE_GEO_REGION <chr> \<\*\> ✔\
+**Note:** We know that this data exclusively comes from Oregon, therefore we can just set all values to Oregon (or OR).\
+
+\
+- DEVICE_GEO_CITY <chr> \<\>\
+**Note:** It does not seem necessary as to why we would remove non-cities from DEVICE_GEO_CITY.
+Maybe a name change for the column would better reflect the data.\
+
+\
+- RESPONSE_TIME <chr> \<\*\*\*\*\*\> ✔\
+**Note:** Formatting then converting RESPONSE_TIME into type integer would improve accuracy.\
+
+\
+- REQUESTED_SIZE \<chr, chr\> \<\*\*\*\> ✔\
+**Note:** Converting REQUESTED_SIZE back into an character array would allow us to perform analysis on REQUESTED_SIZE easier.
+
+\- No key \<no data type\> \<\*\*\*\*\> ✔\
+**Note:** It would be quite important to determine whether or not duplicates are natural part of the dataset or if it needs to be removed.
+
+|                                               |
+|:---------------------------------------------:|
+| **DETERMINATION OF IMPORTANCE FOR NA VALUES** |
+
+Template: - [KEY(S)] \<DATATYPE(S)\> \<IMPORTANCE LEVEL in \*'s\> \<✔ if implemented\>\
++ Notes on importance.
+
+\- DEVICE_GEO_ZIP \<chr\> \<\*\*\*\*\*\> ✔\
+**Note:** Correcting NA values in DEVICE_GEO_ZIP by retrieving data that otherwise would not be usable in analysis would be very beneficial.
+
+\- DEVICE_GEO_CITY \<chr\> \<\*\*\*\*\*\> ✔\
+**Note:** Correcting NA values in DEVICE_GEO_CITY by retrieving data that otherwise would not be usable in analysis would be very beneficial.
