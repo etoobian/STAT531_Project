@@ -2,7 +2,7 @@
 *STAT 531 — Ethics & Practice of Data Science, Portland State University*
 
 This repository contains all code, documentation, and analysis for the **Oregon Ad Bidding** project.  
-It is the team project repository for the team **Kentucky Thighed Chicken (KTC)**. 
+It is the team project repository for the team **TECK Squad** (formerly **Kentucky Thighed Chicken (KTC)**). 
 
 Our goals:
 
@@ -28,19 +28,20 @@ All data must be stored **locally** by team members following the structure desc
 Project/
 │
 ├── scripts/
-│   ├── data_io.R                     # Data loading/export utilities
-│   └── ...                           # (future scripts here)
+│   ├── data_io.R               # Data loading/export utilities
+│   └── data_cleaning.R         # Data cleaning pipeline
 │
 ├── notebooks/
-│   └── ...                           # Rmd files for EDA / analysis
+│   ├── data_cleaning.Rmd       # Data cleaning exploration/justifications
+│   └── eda.Rmd                 # Rmd file for EDA / analysis
 │
 ├── results/
-│   └── ...                           # Figures, tables, summaries
+│   └── ...                     # Figures, tables, summaries
 │
 ├── reports/
-│   └── ...                           # Final written deliverables
+│   └── ...                     # Final slideshow
 │
-└── README.md                         # Currently a working document
+└── README.md                   # Currently a working document
 
 
 TeamDocuments/
@@ -66,26 +67,30 @@ Instead, create a local directory.
 Please copy the data files from the team's Canvas page and add locally, structured as shown below:
 
 ```
+data/
+│
+├── bids_data_vDTR.parquet      # Project data .parquet file
+│
+└── data_dictionary.md          # Data dictionary for project data
+
+
 Project/
 │
-├── data/
-│   ├── bids_data_vDTR.parquet        # Raw dataset (do not modify)
-│   └── processed/                    # Saved cleaned/processed datasets
-│
 ├── scripts/
-│   ├── data_io.R                     # Data loading/export utilities
-│   └── ...                           # (future scripts here)
+│   ├── data_io.R               # Data loading/export utilities
+│   └── data_cleaning.R         # Data cleaning pipeline
 │
 ├── notebooks/
-│   └── ...                           # Rmd files for EDA / analysis
+│   ├── data_cleaning.Rmd       # Data cleaning exploration/justifications
+│   └── eda.Rmd                 # Rmd file for EDA / analysis
 │
 ├── results/
-│   └── ...                           # Figures, tables, summaries
+│   └── ...                     # Figures, tables, summaries
 │
 ├── reports/
-│   └── ...                           # Final written deliverables
+│   └── ...                     # Final slideshow
 │
-└── README.md                         # Currently a working document
+└── README.md                   # Currently a working document
 
 
 TeamDocuments/
@@ -135,6 +140,7 @@ Packages will normally auto-install when sourcing the scripts, but can also be i
 required_packages <- c("arrow", "tibble", 
                        "dplyr", "stringr", 
                        jsonlite", tidyverse")
+
 install.packages(required_packages)
 ```
 **TEAM TO-DO:** Add required packages for this script to this list.
@@ -241,7 +247,7 @@ Copy/paste and fill in:
 
 ---
 
-## Existing Scripts
+## Scripts
 
 
 ### `data_io.R`  
