@@ -34,6 +34,9 @@ the structure described below.
 
 ## **Remote Structure**
 ```
+README.md                       # Current document
+
+
 Project/
 │
 ├── scripts/
@@ -47,10 +50,8 @@ Project/
 ├── results/
 │   └── ...                     # Figures, tables, summaries
 │
-├── reports/
-│   └── ...                     # Final slideshow
-│
-└── README.md                   # Currently a working document
+└── reports/
+    └── ...                     # Final slideshow
 
 
 TeamDocuments/
@@ -74,17 +75,16 @@ TeamDocuments/
 Only store data in local directory, structured as shown below:
 
 ```
-data/
-│
-├── bids_data_vDTR.parquet      # Raw project data .parquet file
-│
-├── data_dictionary.md          # Data dictionary for project data
-│
-└── processed/
-    └── ...                     # Cleaned / processed data .parquet file
+README.md                       # Current document
 
 
 Project/
+│
+├── data/
+│   ├── bids_data_vDTR.parquet   # Raw project data .parquet file
+│   ├── data_dictionary.md       # Data dictionary for project data
+│   └── processed/
+│       └── ...                  # Cleaned / processed data .parquet file
 │
 ├── scripts/
 │   ├── data_io.R               # Data loading/export utilities
@@ -97,10 +97,8 @@ Project/
 ├── results/
 │   └── ...                     # Figures, tables, summaries
 │
-├── reports/
-│   └── ...                     # Final slideshow
-│
-└── README.md                   # Currently a working document
+└── reports/
+    └── ...                     # Final slideshow
 
 
 TeamDocuments/
@@ -141,7 +139,7 @@ Packages will normally auto-install when sourcing the scripts, but can also be i
 ```         
 required_packages <- c("arrow", "tibble",
                        "dplyr", "stringr",
-                       "jsonlite", tidyverse")
+                       "jsonlite", "tidyverse")
 
 install.packages(required_packages)
 ```
@@ -178,8 +176,8 @@ ad_raw <- load_ad_data(preview = TRUE)
 Use to inspect column types, missingness, and unique values:
 
 ```         
-summary_tbl <- summarize_ad_data(ad_raw)
-View(summary_tbl)       # or print(summary_tbl)
+summary_tbl_raw <- summarize_ad_data(ad_raw)
+View(summary_tbl_raw)       # or print(summary_tbl_raw)
 ```
 
 ## Export Processed Data
@@ -247,7 +245,7 @@ Optional: Summarize columns
 
 ```
 summary_tbl_raw <- summarize_ad_data(ad_raw)
-View(summary_tbl)
+View(summary_tbl_raw)
 ```
 
 ### Apply the cleaning pipeline

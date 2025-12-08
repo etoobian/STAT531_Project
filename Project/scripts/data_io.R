@@ -24,7 +24,7 @@
 #        - Writes a dataframe (typically a cleaned version) to a parquet file:
 #            * requires a version name (e.g. "clean_v1")
 #            * writes to "Project/data/processed" by default
-#            * will NOT overwrite existing files unless "overwrite = TRUE"
+#            * will NOT overwrite existing files unless `overwrite = TRUE`
 #
 # ----------------------------------------------------------------------------
 # TYPICAL USAGE: (from repo root in R / RStudio)
@@ -48,8 +48,8 @@
 #          export_ad_data(
 #            df        = ad_clean,
 #            version   = "clean_v1",                # choose unique version name
-#            out_dir   = "Project/data/processed",  # omit to leave as default
-#            base_name = "bids_data"                # omit to leave as default
+#            out_dir   = "Project/data/processed",  # omit to use default
+#            base_name = "bids_data"                # omit to use default
 #          )
 #          ```
 #       - To overwrite an existing file:
@@ -140,14 +140,14 @@ load_ad_data <- function(data_folder = default_data_folder,
   
   # ----- Load parquet dataset -----
   
-  message("\n Loading dataset: ", data_path, " ...")
+  message("\nLoading dataset: ", data_path, " ...")
   df <- tryCatch({
     arrow::read_parquet(data_path)
   }, error = function(e) {
     stop(
-      "\n Failed to read parquet file: ",
+      "\nFailed to read parquet file: ",
       e$message,
-      "\n Make sure the file is a valid parquet and not corrupted."
+      "\nMake sure the file is a valid parquet and not corrupted."
     )
   })
   
@@ -190,10 +190,10 @@ export_ad_data <- function(df,
                            overwrite = FALSE) {
   
   # ----- Validate `version` -----
-  if (missing(version) || length(version) != 1L || !nzchar(version)){
+  if (missing(version) || length(version) != 1L || !nzchar(version)) {
     stop(
       "`version` must be provided as a non-empty string, e.g. ",
-      "`version = \"clean_NA_v1\"`."
+      "`version = \"clean_v1\"`."
     )
   }
   
@@ -212,14 +212,14 @@ export_ad_data <- function(df,
   
   if (file_already_exists && !overwrite) {
     stop(
-      "\nExport aborted: file already exists:\n  ", out_path,
+      "\nExport aborted: file already exists:\n", out_path,
       "\n\nOptions:\n",
       "  - Choose a new `version` name (recommended), e.g. \"clean_v2\"\n",
       "  - Call again with `overwrite = TRUE` if intentionally replacing.\n"
     )
   }
   
-  message("\n Exporting dataset to: ", out_path, " ...")
+  message("\nExporting dataset to: ", out_path, " ...")
   
   tryCatch({
     arrow::write_parquet(df, out_path)
@@ -230,6 +230,6 @@ export_ad_data <- function(df,
     }
     invisible(out_path)
   }, error = function(e) {
-    stop("\n Failed to export parquet file: ", e$message)
+    stop("\nFailed to export parquet file: ", e$message)
   })
 }
