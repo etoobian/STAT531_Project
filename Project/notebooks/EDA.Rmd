@@ -19,7 +19,7 @@ library(kableExtra)
 
 
 # Data
-# source("C:/Users/chris/Downloads/final_data_cleaning.R")
+# source("../scripts/final_data_cleaning.R")
 ```
 
 
@@ -192,8 +192,10 @@ Looking at a pairs plot we can gain a bit of insight into what the relations are
 Using the *information_gain()* function, we can try to look at how significantly variables reduce the uncertainty of the target variable BID_WON. The outcome shows only AUCTION_ID, PUBLISHER_ID, and PRICE as high information gain parameters. Almost all the other variables have lower (but similar to each other) information gain except for the Region variable. This makes sense, given that our data is confined to Oregon.
 
 ```{r}
-# Pairs generator for the numerical data
-ggpairs(cumulative_ad_data[, c("TIMESTAMP", "DEVICE_TYPE", "DEVICE_GEO_ZIP", "PRICE", "RESPONSE_TIME", "DEVICE_GEO_LAT", "DEVICE_GEO_LONG")])
+## Pairs generator for the numerical data
+# TIMESTAMP gave issues when running this function,
+# so I left it out.
+ggpairs(cumulative_ad_data[, c("DEVICE_TYPE", "DEVICE_GEO_ZIP", "PRICE", "RESPONSE_TIME", "DEVICE_GEO_LAT", "DEVICE_GEO_LONG")])
 
 
 # Testing for "Predictive Power"
@@ -204,7 +206,7 @@ information_gain(BID_WON ~ ., data = cumulative_ad_data)
 
 ### Price
 
-Generating a quick summary of PRICE shows us the average bid price is 0.47, while we have a MASSIVE maximum bid price at 141.25. Most of the data falls around the smaller end of value.
+The histogram is very peaked on the left side of the graph, and from the summary table we see there are a few very large outliers causing a right-skewed distribution of price that range up to \$141.25. The boxplot shows a median value of approximately \$0.20, with the IQR ranging from \$0.07 to \$0.57. Price per bid is typically less than \$1.
 
 ```{r Price, results = 'asis', echo = FALSE}
 # Quick summary of the PRICE variable.
@@ -221,6 +223,9 @@ pretty_boxplot(cumulative_ad_data, "PRICE", "Price in Dollars")
 
 ### Response Time
 
+The histogram of the Response Time variable displays a right-skewed distribution. A majority of the data falls between 50 and 400 milliseconds, with an average response time of 201 milliseconds. The boxplot has a median of 164, with an IQR spanning from 110 to 257 milliseconds. There is a large number of outliers that are cut off by the boxplot, but can be seen trailing toward higher values in the histogram. Response time for the system is typically fast, with a subset of the values being longer than the others.
+
+
 ```{r, results = 'asis'}
 # Quick summary of the RESPONSE_TIME variable.
 summary_table(cumulative_ad_data, "RESPONSE_TIME") %>%
@@ -235,6 +240,8 @@ pretty_boxplot(cumulative_ad_data, "RESPONSE_TIME", "Response Time in ms")
 ```
 
 ### Device Geo Latitude
+
+A majority of data falls between 45 and 46 degrees latitude, with the absolute minimum value in the data being 42 degrees. The distribution of latitude is slightly left-skewed, with a peak around 45.5 degrees. The median value shown by the boxplot is 45.514, with the inner quartile range spanning a short distance from 45.3 to 45.525. This is consistent with the information we have about location of the bid data, which was collected from exclusively Oregon.
 
 ```{r Latitude, results = 'asis'}
 
@@ -252,6 +259,8 @@ pretty_boxplot(cumulative_ad_data, "DEVICE_GEO_LAT", "Latitude")
 ```
 
 ### Device Geo Longitude
+
+The longitude variable appears to be somewhat normally distributed in its histogram. Several outliers can be seen trailing from the data toward values of -118, but the majority of the data falls around -122.5 degrees. In the boxplot, the median is centered at -122.83 and the IQR ranges from -122.83 to -122.59. This is an extremely small window of 0.24 degrees, which encompasses the central 50% of the longitude data.
 
 ```{r Longitude, results = 'asis'}
 
@@ -277,6 +286,8 @@ pretty_boxplot(cumulative_ad_data, "DEVICE_GEO_LONG", "Longitude")
 ### Publisher ID
 ### Device Type
 
+In Device Type, 2 categories dominate the rest: Personal Computers and Tablets. Accounting for 93.5% of the data, those two devices have a large influence on the dataset as a whole. The lowest type listed is "connected device" accounting for 0.07% of the Device Type variable.
+
 ```{r Device Type, results = 'asis'}
 pretty_barplot(cumulative_ad_data, "DEVICE_TYPE", "")
 pretty_freq(cumulative_ad_data, "DEVICE_TYPE")
@@ -284,11 +295,15 @@ pretty_freq(cumulative_ad_data, "DEVICE_TYPE")
 
 ### Device Geo City
 
+The most frequently appearing city in this dataset is Portland, by a large margin. Portland accounts for almost 60% of the data, with the next closest being Salem, Beaverton and Hillsboro, each at approximately 3% each. With the density of Portland's population, it has a large influence on the bids data compared to any of the other cities included.
+
 ```{r Geo City, results = 'asis'}
 pretty_freq(cumulative_ad_data, "DEVICE_GEO_CITY")
 ```
 
 ### Device Geo Zip
+
+The zipcode variable is much more evenly distributed, with the largest zip code being only 10% of the data. The higher counts of zipcode entries are from about 24,000 to 45,000, and the smallest zipcodes have counts of just 1.
 
 ```{r Zipcode, results = 'asis', echo = FALSE}
 pretty_freq(cumulative_ad_data, "DEVICE_GEO_ZIP")
@@ -297,11 +312,17 @@ pretty_freq(cumulative_ad_data, "DEVICE_GEO_ZIP")
 ### Size
 ### Requested Size
 ### Bid Won
+
+We can see from the barplot of BID_WON, that there are significantly more losing bids than winning. While the interest in the dataset is in the relation to winning a bid and its price, it is interesting that there are almost 3 times as many losses as there are wins.
+
 ```{r Bid Won, results = 'asis', echo = FALSE}
 pretty_barplot(cumulative_ad_data, "BID_WON")
 pretty_freq(cumulative_ad_data, "BID_WON")
 ```
 ### Device Geo Region
+
+As stated earlier in this document, all datapoints fall within the borders of Oregon, confining analysis to that specific region.
+
 ```{r Geo Region, results = 'asis', echo = FALSE}
 pretty_freq(cumulative_ad_data, "DEVICE_GEO_REGION")
 ```
@@ -311,7 +332,7 @@ pretty_freq(cumulative_ad_data, "DEVICE_GEO_REGION")
 ## Numerical vs Numerical
 ### Price/Response Time
 
-There are some very high values in the PRICE variable that pull values away from the overall shape. There could be a relation here as the increase in response time seems to lower the PRICE. My guess is that slower response times lead to bidders coming in at a lower price, but then losing to others who outbid them.
+There are some very high values in the PRICE variable that pull values away from the overall shape. There could be a relation here as the increase in response time seems to lower the PRICE. It could be that slower response times lead to bidders coming in at a lower price, but then losing to others who outbid them. Additionally, we can see some points are separated from the overall shape. These most likely represent bidders either submitting higher priced bids initially, or were fast enough to rebid with a higher price during the same auction.
 
 ```{r Price v Response Time}
 # Scatterplot
@@ -320,27 +341,39 @@ pretty_xyplot(cumulative_ad_data, "RESPONSE_TIME", "PRICE", "Response Time (ms)"
 ```
 
 ### Price/Lat
+
+In the scatterplot of Latitude vs Price, we can see a slight increase in price as the latitude shifts toward the 45.5 area. Here we see an increase in points, which is possibly related to that location being higher in population density. We can also see a similar pattern to the Price vs Response Time graph with values being significantly higher than the other points. Again, this could be a "second round" of bidding in the situation the original bid was rejected.
+
 ```{r Price v Lat, results = 'asis', echo = FALSE}
 pretty_xyplot(cumulative_ad_data, "DEVICE_GEO_LAT", "PRICE", "Latitude", "Price")
 ```
 ### Price/Long
+
+Similar to the latitude plot, we can see a large number of the points clustered at approximately -122.5. This is most likely due to high population density at that point. We also continue to see the pattern of higher priced bids above the lower distribution, indicating a second, higher set of bids from those locations.
+
 ```{r Price v Longitude, results = 'asis', echo = FALSE}
 pretty_xyplot(cumulative_ad_data, "DEVICE_GEO_LONG", "PRICE", "Longitude", "Price")
 ```
 ### Latitude/Response Time
+
+This scatterplot has data points in a pretty similar pattern across the differing latitudes. There is a significant focus around 45.5, but the data seems well distributed.
+
 ```{r Latitude v Response Time, results = 'asis', echo = FALSE}
 pretty_xyplot(cumulative_ad_data, "DEVICE_GEO_LAT", "RESPONSE_TIME", "Latitude", "Response Time (ms)")
 ```
 
 ### Longitude/Response Time
-```{r Latitude v Response Time, results = 'asis', echo = FALSE}
+
+In this graph, there is a spike of higher response time values at longitude -123. This could be an indicator of a specific location having slower response times than others.
+
+```{r Longitude v Response Time, results = 'asis', echo = FALSE}
 pretty_xyplot(cumulative_ad_data, "DEVICE_GEO_LONG", "RESPONSE_TIME", "Longitude", "Response Time (ms)")
 ```
 
 ## Numerical vs Categorical
 ### Price/Bid Won
 
-We can see from a t-test that there is a significant different in the mean prices between bids won and bids lost. A boxplot can show us the median prices for the bids, categorized by whether or not the bid won. We can see a clear distinction in the distribution of values between the two variables. The plot has been zoomed in for ease of reading.
+We can perform a t-test and see that there is a significant different in the mean prices between bids won and bids lost. The boxplot shows the median prices for the bids, categorized by whether or not the bid won. We can see a clear distinction in the distribution of values between the two variables. The plot has been zoomed in for ease of reading.
 
 ```{r Price v. Bid Wins}
 
@@ -348,16 +381,31 @@ We can see from a t-test that there is a significant different in the mean price
 t.test(PRICE ~ BID_WON, data = cumulative_ad_data)
 
 # Boxplot
-ggplot(cumulative_ad_data, aes(x = BID_WON, y = PRICE)) +
-  geom_boxplot() +
-  coord_cartesian(ylim = c(0, 2))
+ggplot(cumulative_ad_data, aes(x = cumulative_ad_data$BID_WON, y = cumulative_ad_data$PRICE)) + 
+    geom_boxplot(
+        fill = "#FF7F50",
+        color = "black",
+        outlier.color = "red",
+        outlier.alpha = 0.6,
+        width = 0.3
+    ) +
+    coord_cartesian(ylim = quantile(cumulative_ad_data$PRICE, c(0.05, 0.95), na.rm = TRUE)) +
+    labs(
+        title = paste("Boxplot of Price by Bid Win/Loss"),
+        x = ("Bid Win/Loss"),
+        y = ("Price")
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        plot.title = element_text(face = "bold", size = 16),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        panel.grid.minor = element_blank()
+    )
 ```
 
 ### Price/Device Type
 
-After reaching out to Andrew, he says that it should refer to a table he gave, but that the incrementor starts at 0. Meaning we can retrieve the Device Types by adding 1 and referring to the table. (Ex. DEVICE_TYPE = 0 -> DEVICE_TYPE = Mobile/Tablet (1 on the table) ).
-
-This graph cuts off many outliers in the positive direction, but was done so to see the inner quartile range more clearly.
+The boxplot of Device Type vs Price shows that the categories *Tablet*, *Personal Computer*, and *Mobile/Tablet* have similar medians, but the inner quartile range for the *Tablet* variable is much smaller than the other two. The *Connected Device* category has the highest median of the device types, and also has the largest IQR. There could be an underlying factor that leads to a larger variance among price values in that category. 
 
 ```{r Device Type v Price}
 # Boxplot
@@ -391,6 +439,9 @@ Map graph? Zip and city are too many categories for a boxplot spread.
 ### Zip or City/Response Time
 ### Device Type/Response Time
 
+All of the device types have similar median response times, save for the *connected device* category which has a higher value than the others. All the boxplots show outliers, and *connected TV* also has a larger IQR. This could be a difference in hardware, where the method at which TVs interact with the auction is different than the others. Some devices might be optimized differently, causing some bids to be slower. To make that claim, however, we would probably need to know more about the internet traffic during the bidding and other external factors.
+
+
 ```{r Response Time/Price, echo = FALSE}
 ggplot(cumulative_ad_data, aes(x = cumulative_ad_data$DEVICE_TYPE, y = cumulative_ad_data$RESPONSE_TIME)) + 
     geom_boxplot(
@@ -414,7 +465,6 @@ ggplot(cumulative_ad_data, aes(x = cumulative_ad_data$DEVICE_TYPE, y = cumulativ
     )
 ```
 
-Potential for a relation of speed across devices. Some devices might be optimized differently, causing some bids to be slower? To make that claim, we would probably need to know more about the internet traffic during the bidding.
 
 ### Device Type/LatLong
 
