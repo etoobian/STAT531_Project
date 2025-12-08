@@ -1,7 +1,7 @@
 ---
-title: "Final Data Cleaning"
-author: "Takeshi Stormer & Khloud Zamzami"
-date: "2025-11-23"
+title: "Data Cleaning"
+author: "TECK Squad"
+date: "2025-12-12"
 output: html_document
 editor_options: 
   markdown: 
@@ -10,7 +10,6 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = dirname(dirname(dirname(getwd()))))
 ```
 
 |                                                               |
@@ -23,6 +22,8 @@ Run:
 # Dependencies
 library(arrow)
 library(dplyr)
+
+# RStudio: Ensure Knit Directory is set to Project Directory
 base_data_path = file.path(getwd(), "Project/scripts/data_io.R")
 source(base_data_path)
 rm(df)
