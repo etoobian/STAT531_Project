@@ -9,9 +9,9 @@ editor_options:
 *STAT 531 — Ethics & Practice of Data Science, Portland State
 University*
 
-This repository contains all code, documentation, and analysis for the **Oregon Ad Bidding** project. 
+This repository contains all code, documentation, and analysis for the **Oregon Ad Bidding** project.
 
-It is the team project repository for the team **TECK Squad** (formerly **Kentucky Thighed Chicken (KTC)**). 
+It is the team project repository for the team **TECK Squad** (formerly **Kentucky Thighed Chicken (KTC)**).
 
 
 Our goals:
@@ -76,7 +76,7 @@ Only store data in local directory, structured as shown below:
 ```
 data/
 │
-├── bids_data_vDTR.parquet      # Raw project data .parquet file 
+├── bids_data_vDTR.parquet      # Raw project data .parquet file
 │
 ├── data_dictionary.md          # Data dictionary for project data
 │
@@ -139,9 +139,9 @@ This ensures correct working directory and project settings.
 Packages will normally auto-install when sourcing the scripts, but can also be installed manually:
 
 ```         
-required_packages <- c("arrow", "tibble", 
-                       "dplyr", "stringr", 
-                       jsonlite", tidyverse")
+required_packages <- c("arrow", "tibble",
+                       "dplyr", "stringr",
+                       "jsonlite", tidyverse")
 
 install.packages(required_packages)
 ```
@@ -212,30 +212,220 @@ as:
 <base_name>_<version>.parquet
 ```
 
-# Data Cleaning: Identifying and mending inconsistencies, NA values, and other errors.
+# **Data Cleaning: Identifying and Correcting Issues in the Raw Dataset**
+
+The cleaning process fixes a series of inconsistencies in the dataset, including incorrect ZIP/CITY pairs, shifted longitude values, malformed fields, invalid price values, duplicated rows, and missingness patterns.
 
 All data cleaning related files will be found in:
 
-`Project/scripts/Final_Data_Cleaning/` - The R script that imports and
-cleans the raw data is:
+- `Project/notebooks/data_cleaning.Rmd` 
+    - Details on investigation & error handling
+- `Project/scripts/data_cleaning.R` 
+    - Cleaning workflow via reusable function `clean_ad_data()`, which accepts **raw input data** and returns a **fully cleaned tibble**.
 
-`Final_Data_Cleaning/final_data.cleaning.R` - When you source this file,
-you will be left with a tibble that has been cleaned in your environment
-named `cumulative_ad_data`.
 
-Refer to `Final_Data_Cleaning/final_data.cleaning.Rmd` for more
-information on the errors.
+---
 
-## Cleaning Data (Auto):
+## Cleaning Workflow
 
-`# Given that getwd() returns "~/STAT531_Project" source(file.path(getwd(), "Project/scripts/Final_Data_Cleaning/final_data_cleaning.R"))`
+### Load utilities and raw data
 
-**NOTE:** This process will take roughly 10-15 seconds to complete if
-not sooner.
+From the project root (`STAT531_Project`), run:
 
-# **Script Index** (Add Here When Creating New Scripts)
+```
+source("Project/scripts/data_io.R")
+source("Project/scripts/data_cleaning.R")
+```
 
-Every new script added to the project should be briefly documented here.
+Load raw dataset from Project/data/bids_data_vDTR.parquet
+
+```
+ad_raw <- load_ad_data(preview = TRUE)
+```
+
+Optional: Summarize columns
+
+```
+summary_tbl_raw <- summarize_ad_data(ad_raw)
+View(summary_tbl)
+```
+
+### Apply the cleaning pipeline
+
+```
+ad_clean <- clean_ad_data(ad_raw)
+```
+
+This function performs all cleaning steps, including:
+
+  - Reconstructing missing ZIP/CITY values
+  - Correcting out-of-range geographic fields
+  - Cleaning malformed timestamps
+  - Repairing inconsistent field values
+  - Handling NAs
+  - Removing duplicates
+  - Enforcing consistent column types
+  - Ensuring reproducible, well-structured final output
+
+### Export the cleaned dataset (optional)
+
+```
+export_ad_data(
+  df      = ad_clean,
+  version = "clean_v1",
+  out_dir = "Project/data/processed"
+)
+```
+Exports a versioned parquet file:
+
+```
+Project/data/processed/bids_data_clean_v1.parquet
+```
+
+### Refer to the cleaning notebook
+
+Detailed explanations, diagnostics, and examples of each problem and fix are documented in:
+
+```
+Project/notebooks/data_cleaning.Rmd
+```
+
+This notebook shows:
+
+  - The original data issues
+  - Why certain corrections were necessary
+  - Before/after views of problematic fields
+  - Justification for decisions in the cleaning pipeline
+
+
+# **Script & Notebook Index**
+
+This index summarizes all scripts, notebooks, and reports in the project.
+Each entry includes a short description, location, and example usage (when
+applicable). 
+
+---
+
+## `data_io.R`
+
+**Type:** Script  
+
+**Purpose:** Provides reusable utilities for loading, summarizing, and exporting datasets.  
+
+**Location:** `Project/scripts/data_io.R`
+
+**Functions Provided:**  
+
+  - `load_ad_data()` — loads a dataset from a parquet file  
+  - `summarize_ad_data()` — produces a column-level summary  
+  - `export_ad_data()` — writes a safely versioned parquet file  
+
+**Example Usage:**
+
+```         
+source("Project/scripts/data_io.R")
+
+# Load raw dataset (default path: Project/data/bids_data_vDTR.parquet)
+ad_raw <- load_ad_data(preview = TRUE)
+
+# Summaries
+summary_tbl <- summarize_ad_data(ad_raw)
+
+# Export cleaned dataset
+export_ad_data(ad_clean, version = "clean_v1")
+```
+---
+
+## `data_cleaning.R`
+
+**Type:** Script  
+
+**Purpose:** Implements the full data cleaning pipeline via a reusable function.
+
+**Location:** `Project/scripts/data_cleaning.R`
+
+**Functions Provided:** 
+
+  - `clean_ad_data()` - applies the complete cleaning workflow and returns a cleaned tibble
+      - **NOTE:** Work is specific to raw project data.
+
+**Example Usage:**
+
+```
+source("Project/scripts/data_io.R")
+source("Project/scripts/data_cleaning.R")
+
+ad_raw   <- load_ad_data()
+ad_clean <- clean_ad_data(ad_raw)
+```
+
+After cleaning, users may export results using `export_ad_data()`.
+
+---
+
+## `data_cleaning.Rmd`
+
+**Type:** Notebook
+
+**Purpose:** Documents and justifies all cleaning steps, including diagnostics and demonstrations of issues in the raw dataset.
+
+**Location:** `Project/notebooks/data_cleaning.Rmd`
+
+**Usage:**
+
+  - Open inside the `STAT531_Project.RProj`
+  - Ensure *Knit Directory = “Project Directory”*
+  - Knit to produce an HTML record of the cleaning workflow
+
+This notebook serves as the narrative counterpart to `data_cleaning.R`.
+
+---
+
+## `EDA.Rmd`
+
+**Type:** Notebook
+
+**Purpose:** Performs exploratory data analysis (EDA) on the cleaned dataset. Includes summary tables, visualizations, and modeling insights supporting the final report.
+
+**Location:** `Project/notebooks/EDA.Rmd`
+
+**Usage:**
+
+```
+source("Project/scripts/data_io.R")
+
+# Either re-clean from raw:
+source("Project/scripts/data_cleaning.R")
+ad_clean <- clean_ad_data(load_ad_data())
+
+# Or load a previously exported cleaned dataset:
+ad_clean <- load_ad_data(
+  data_folder = "Project/data/processed",
+  data_file   = "bids_data_clean_v1.parquet"
+)
+```
+
+---
+
+## `reports/` (Final Presentation)
+
+**Type:** Report / Slides
+
+**Purpose:** Final presentation summarizing cleaning, EDA, findings, and recommendations.
+
+**Location:** `Project/reports/`
+
+Example filenames:
+
+  - `final_presentation.pdf`
+  - `final_slideshow.`
+
+These files are generated manually or exported from R Markdown/Slides tools.
+
+
+
+<!-- NOTE TO TEAM:
+Add new scripts below using the template. -->
 
 Use this template exactly so our README stays cohesive:
 
@@ -245,6 +435,8 @@ Copy/paste and fill in:
 
 ```
 ### <script_name>.R 
+
+**Type:** script/notebook/report/etc
 
 **Purpose:** One-sentence description  
 
@@ -259,50 +451,6 @@ Copy/paste and fill in:
 ```
 ------------------------------------------------------------------------
 
-## Scripts
-
-### `data_io.R`
-
-**Purpose:** Utilities for loading the raw dataset, summarizing columns,
-and exporting cleaned datasets.
-
-**Location:** `Project/scripts/data_io.R`
-
-**Functions Provided:**\
-- `load_ad_data()` — loads the main dataset\
-- `summarize_ad_data()` — creates a summary table\
-- `export_ad_data()` — saves processed data safely
-
-**Example Usage:**
-
-```         
-source("Project/scripts/data_io.R")
-head(ad_data)
-summary_tbl <- summarize_ad_data(ad_data)
-export_ad_data(cleaned_df, version = "clean_v1")
-```
-
-```{=html}
-<!-- NOTE TO TEAM:
-Add new scripts below using the template. -->
-```
-
-### `final_data_cleaning.R`
-
-**Purpose:** Cleans the raw data of inconsistencies, NA values and other
-errors.
-
-**Location:**
-`Project/scripts/Final_Data_Cleaning/final_data_cleaning.R`
-
-**Functions Provided:** No functions provided.
-
-**Example Usage:**
-
-`# Given that getwd() returns "~/STAT531_Project" source(file.path(getwd(), "Project/scripts/Final_Data_Cleaning/final_data_cleaning.R"))`
-
-<!-- NOTE TO TEAM:
-Add new scripts below using the template. -->
 
 **Where to put new files**
 

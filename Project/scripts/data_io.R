@@ -3,7 +3,7 @@
 #  PROJECT DATA I/O UTILITIES
 # ----------------------------------------------------------------------------
 # PURPOSE:
-#   This script provides reusable tools for loading, summarizing, and exporting 
+#   This script provides reusable tools for loading, summarizing, and exporting
 #   the project dataset. Sourcing this file only defines functions.
 #   To load data, call `load_ad_data()`.
 #
@@ -158,7 +158,7 @@ load_ad_data <- function(data_folder = default_data_folder,
   message("Rows x Columns: ", paste(dim(df), collapse = " x "))
   
   if (preview) {
-    print(utils::head(df, 5))  
+    print(utils::head(df, 5))
   }
   
   df
