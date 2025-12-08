@@ -21,16 +21,17 @@ library(kableExtra)
 # Data
 source("Project/scripts/data_io.R")
 source("Project/scripts/data_cleaning.R")
+ad_clean <- clean_ad_data(load_ad_data())
 ```
 
 
 ```{r Repairing Variables, include = FALSE}
 # Converting DEVICE_TYPE to a factor
-cumulative_ad_data$DEVICE_TYPE <- as.factor(cumulative_ad_data$DEVICE_TYPE)
+ad_clean$DEVICE_TYPE <- as.factor(ad_clean$DEVICE_TYPE)
 
 # Modifying DEVICE_TYPE according to
 # corresponding labels
-cumulative_ad_data$DEVICE_TYPE <- recode(cumulative_ad_data$DEVICE_TYPE,
+ad_clean$DEVICE_TYPE <- recode(ad_clean$DEVICE_TYPE,
                          "0" = "Mobile/Tablet",
                          "1" = "Personal Computer",
                          "2" = "Connected TV",
@@ -196,11 +197,11 @@ Using the *information_gain()* function, we can try to look at how significantly
 ## Pairs generator for the numerical data
 # TIMESTAMP gave issues when running this function,
 # so I left it out.
-ggpairs(cumulative_ad_data[, c("DEVICE_TYPE", "DEVICE_GEO_ZIP", "PRICE", "RESPONSE_TIME", "DEVICE_GEO_LAT", "DEVICE_GEO_LONG")])
+ggpairs(ad_clean[, c("DEVICE_TYPE", "DEVICE_GEO_ZIP", "PRICE", "RESPONSE_TIME", "DEVICE_GEO_LAT", "DEVICE_GEO_LONG")])
 
 
 # Testing for "Predictive Power"
-information_gain(BID_WON ~ ., data = cumulative_ad_data)
+information_gain(BID_WON ~ ., data = ad_clean)
 ```
 
 
@@ -211,15 +212,15 @@ The histogram is very peaked on the left side of the graph, and from the summary
 
 ```{r Price, results = 'asis', echo = FALSE}
 # Quick summary of the PRICE variable.
-summary_table(cumulative_ad_data, "PRICE") %>%
+summary_table(ad_clean, "PRICE") %>%
   kable("html", caption = "Summary Statistics for PRICE") %>%
   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 
 # Histogram of Price
-pretty_histogram(cumulative_ad_data, "PRICE")
+pretty_histogram(ad_clean, "PRICE")
 
 # Boxplot of Price
-pretty_boxplot(cumulative_ad_data, "PRICE", "Price in Dollars")
+pretty_boxplot(ad_clean, "PRICE", "Price in Dollars")
 ```
 
 ### Response Time
@@ -229,15 +230,15 @@ The histogram of the Response Time variable displays a right-skewed distribution
 
 ```{r, results = 'asis'}
 # Quick summary of the RESPONSE_TIME variable.
-summary_table(cumulative_ad_data, "RESPONSE_TIME") %>%
+summary_table(ad_clean, "RESPONSE_TIME") %>%
   kable("html", caption = "Summary Statistics for Response Time") %>%
   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 
 # Histogram of Price
-pretty_histogram(cumulative_ad_data, "RESPONSE_TIME")
+pretty_histogram(ad_clean, "RESPONSE_TIME")
 
 # Boxplot of Price
-pretty_boxplot(cumulative_ad_data, "RESPONSE_TIME", "Response Time in ms")
+pretty_boxplot(ad_clean, "RESPONSE_TIME", "Response Time in ms")
 ```
 
 ### Device Geo Latitude
@@ -247,15 +248,15 @@ A majority of data falls between 45 and 46 degrees latitude, with the absolute m
 ```{r Latitude, results = 'asis'}
 
 # Quick summary of the DEVICE_GEO_LATITUDE variable.
-summary_table(cumulative_ad_data, "DEVICE_GEO_LAT") %>%
+summary_table(ad_clean, "DEVICE_GEO_LAT") %>%
   kable("html", caption = "Summary Statistics for Latitude") %>%
   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 
 # Histogram of Price
-pretty_histogram(cumulative_ad_data, "DEVICE_GEO_LAT")
+pretty_histogram(ad_clean, "DEVICE_GEO_LAT")
 
 # Boxplot of Price
-pretty_boxplot(cumulative_ad_data, "DEVICE_GEO_LAT", "Latitude")
+pretty_boxplot(ad_clean, "DEVICE_GEO_LAT", "Latitude")
 
 ```
 
@@ -266,15 +267,15 @@ The longitude variable appears to be somewhat normally distributed in its histog
 ```{r Longitude, results = 'asis'}
 
 # Quick summary of the DEVICE_GEO_LONG variable.
-summary_table(cumulative_ad_data, "DEVICE_GEO_LONG") %>%
+summary_table(ad_clean, "DEVICE_GEO_LONG") %>%
   kable("html", caption = "Summary Statistics for Longitude") %>%
   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 
 # Histogram of Price
-pretty_histogram(cumulative_ad_data, "DEVICE_GEO_LONG")
+pretty_histogram(ad_clean, "DEVICE_GEO_LONG")
 
 # Boxplot of Price
-pretty_boxplot(cumulative_ad_data, "DEVICE_GEO_LONG", "Longitude")
+pretty_boxplot(ad_clean, "DEVICE_GEO_LONG", "Longitude")
 
 ```
 
@@ -290,8 +291,8 @@ pretty_boxplot(cumulative_ad_data, "DEVICE_GEO_LONG", "Longitude")
 In Device Type, 2 categories dominate the rest: Personal Computers and Tablets. Accounting for 93.5% of the data, those two devices have a large influence on the dataset as a whole. The lowest type listed is "connected device" accounting for 0.07% of the Device Type variable.
 
 ```{r Device Type, results = 'asis'}
-pretty_barplot(cumulative_ad_data, "DEVICE_TYPE", "")
-pretty_freq(cumulative_ad_data, "DEVICE_TYPE")
+pretty_barplot(ad_clean, "DEVICE_TYPE", "")
+pretty_freq(ad_clean, "DEVICE_TYPE")
 ```
 
 ### Device Geo City
@@ -299,7 +300,7 @@ pretty_freq(cumulative_ad_data, "DEVICE_TYPE")
 The most frequently appearing city in this dataset is Portland, by a large margin. Portland accounts for almost 60% of the data, with the next closest being Salem, Beaverton and Hillsboro, each at approximately 3% each. With the density of Portland's population, it has a large influence on the bids data compared to any of the other cities included.
 
 ```{r Geo City, results = 'asis'}
-pretty_freq(cumulative_ad_data, "DEVICE_GEO_CITY")
+pretty_freq(ad_clean, "DEVICE_GEO_CITY")
 ```
 
 ### Device Geo Zip
@@ -307,7 +308,7 @@ pretty_freq(cumulative_ad_data, "DEVICE_GEO_CITY")
 The zipcode variable is much more evenly distributed, with the largest zip code being only 10% of the data. The higher counts of zipcode entries are from about 24,000 to 45,000, and the smallest zipcodes have counts of just 1.
 
 ```{r Zipcode, results = 'asis', echo = FALSE}
-pretty_freq(cumulative_ad_data, "DEVICE_GEO_ZIP")
+pretty_freq(ad_clean, "DEVICE_GEO_ZIP")
 ```
 
 ### Size
@@ -317,15 +318,15 @@ pretty_freq(cumulative_ad_data, "DEVICE_GEO_ZIP")
 We can see from the barplot of BID_WON, that there are significantly more losing bids than winning. While the interest in the dataset is in the relation to winning a bid and its price, it is interesting that there are almost 3 times as many losses as there are wins.
 
 ```{r Bid Won, results = 'asis', echo = FALSE}
-pretty_barplot(cumulative_ad_data, "BID_WON")
-pretty_freq(cumulative_ad_data, "BID_WON")
+pretty_barplot(ad_clean, "BID_WON")
+pretty_freq(ad_clean, "BID_WON")
 ```
 ### Device Geo Region
 
 As stated earlier in this document, all datapoints fall within the borders of Oregon, confining analysis to that specific region.
 
 ```{r Geo Region, results = 'asis', echo = FALSE}
-pretty_freq(cumulative_ad_data, "DEVICE_GEO_REGION")
+pretty_freq(ad_clean, "DEVICE_GEO_REGION")
 ```
 
 
@@ -337,7 +338,7 @@ There are some very high values in the PRICE variable that pull values away from
 
 ```{r Price v Response Time}
 # Scatterplot
-pretty_xyplot(cumulative_ad_data, "RESPONSE_TIME", "PRICE", "Response Time (ms)", "Price")
+pretty_xyplot(ad_clean, "RESPONSE_TIME", "PRICE", "Response Time (ms)", "Price")
 
 ```
 
@@ -346,21 +347,21 @@ pretty_xyplot(cumulative_ad_data, "RESPONSE_TIME", "PRICE", "Response Time (ms)"
 In the scatterplot of Latitude vs Price, we can see a slight increase in price as the latitude shifts toward the 45.5 area. Here we see an increase in points, which is possibly related to that location being higher in population density. We can also see a similar pattern to the Price vs Response Time graph with values being significantly higher than the other points. Again, this could be a "second round" of bidding in the situation the original bid was rejected.
 
 ```{r Price v Lat, results = 'asis', echo = FALSE}
-pretty_xyplot(cumulative_ad_data, "DEVICE_GEO_LAT", "PRICE", "Latitude", "Price")
+pretty_xyplot(ad_clean, "DEVICE_GEO_LAT", "PRICE", "Latitude", "Price")
 ```
 ### Price/Long
 
 Similar to the latitude plot, we can see a large number of the points clustered at approximately -122.5. This is most likely due to high population density at that point. We also continue to see the pattern of higher priced bids above the lower distribution, indicating a second, higher set of bids from those locations.
 
 ```{r Price v Longitude, results = 'asis', echo = FALSE}
-pretty_xyplot(cumulative_ad_data, "DEVICE_GEO_LONG", "PRICE", "Longitude", "Price")
+pretty_xyplot(ad_clean, "DEVICE_GEO_LONG", "PRICE", "Longitude", "Price")
 ```
 ### Latitude/Response Time
 
 This scatterplot has data points in a pretty similar pattern across the differing latitudes. There is a significant focus around 45.5, but the data seems well distributed.
 
 ```{r Latitude v Response Time, results = 'asis', echo = FALSE}
-pretty_xyplot(cumulative_ad_data, "DEVICE_GEO_LAT", "RESPONSE_TIME", "Latitude", "Response Time (ms)")
+pretty_xyplot(ad_clean, "DEVICE_GEO_LAT", "RESPONSE_TIME", "Latitude", "Response Time (ms)")
 ```
 
 ### Longitude/Response Time
@@ -368,7 +369,7 @@ pretty_xyplot(cumulative_ad_data, "DEVICE_GEO_LAT", "RESPONSE_TIME", "Latitude",
 In this graph, there is a spike of higher response time values at longitude -123. This could be an indicator of a specific location having slower response times than others.
 
 ```{r Longitude v Response Time, results = 'asis', echo = FALSE}
-pretty_xyplot(cumulative_ad_data, "DEVICE_GEO_LONG", "RESPONSE_TIME", "Longitude", "Response Time (ms)")
+pretty_xyplot(ad_clean, "DEVICE_GEO_LONG", "RESPONSE_TIME", "Longitude", "Response Time (ms)")
 ```
 
 ## Numerical vs Categorical
@@ -379,10 +380,10 @@ We can perform a t-test and see that there is a significant different in the mea
 ```{r Price v. Bid Wins}
 
 # T test of means
-t.test(PRICE ~ BID_WON, data = cumulative_ad_data)
+t.test(PRICE ~ BID_WON, data = ad_clean)
 
 # Boxplot
-ggplot(cumulative_ad_data, aes(x = cumulative_ad_data$BID_WON, y = cumulative_ad_data$PRICE)) + 
+ggplot(ad_clean, aes(x = ad_clean$BID_WON, y = ad_clean$PRICE)) + 
     geom_boxplot(
         fill = "#FF7F50",
         color = "black",
@@ -390,7 +391,7 @@ ggplot(cumulative_ad_data, aes(x = cumulative_ad_data$BID_WON, y = cumulative_ad
         outlier.alpha = 0.6,
         width = 0.3
     ) +
-    coord_cartesian(ylim = quantile(cumulative_ad_data$PRICE, c(0.05, 0.95), na.rm = TRUE)) +
+    coord_cartesian(ylim = quantile(ad_clean$PRICE, c(0.05, 0.95), na.rm = TRUE)) +
     labs(
         title = paste("Boxplot of Price by Bid Win/Loss"),
         x = ("Bid Win/Loss"),
@@ -410,7 +411,7 @@ The boxplot of Device Type vs Price shows that the categories *Tablet*, *Persona
 
 ```{r Device Type v Price}
 # Boxplot
-ggplot(cumulative_ad_data, aes(x = cumulative_ad_data$DEVICE_TYPE, y = cumulative_ad_data$PRICE)) + 
+ggplot(ad_clean, aes(x = ad_clean$DEVICE_TYPE, y = ad_clean$PRICE)) + 
     geom_boxplot(
         fill = "#FF7F50",
         color = "black",
@@ -418,7 +419,7 @@ ggplot(cumulative_ad_data, aes(x = cumulative_ad_data$DEVICE_TYPE, y = cumulativ
         outlier.alpha = 0.6,
         width = 0.3
     ) +
-    coord_cartesian(ylim = quantile(cumulative_ad_data$PRICE, c(0.05, 0.95), na.rm = TRUE)) +
+    coord_cartesian(ylim = quantile(ad_clean$PRICE, c(0.05, 0.95), na.rm = TRUE)) +
     labs(
         title = paste("Boxplot of Price by Device Type"),
         x = ("Device Type"),
@@ -444,7 +445,7 @@ All of the device types have similar median response times, save for the *connec
 
 
 ```{r Response Time/Price, echo = FALSE}
-ggplot(cumulative_ad_data, aes(x = cumulative_ad_data$DEVICE_TYPE, y = cumulative_ad_data$RESPONSE_TIME)) + 
+ggplot(ad_clean, aes(x = ad_clean$DEVICE_TYPE, y = ad_clean$RESPONSE_TIME)) + 
     geom_boxplot(
         fill = "#FF7F50",
         color = "black",
@@ -452,7 +453,7 @@ ggplot(cumulative_ad_data, aes(x = cumulative_ad_data$DEVICE_TYPE, y = cumulativ
         outlier.alpha = 0.6,
         width = 0.3
     ) +
-    coord_cartesian(ylim = quantile(cumulative_ad_data$RESPONSE_TIME, c(0.05, 0.95), na.rm = TRUE)) +
+    coord_cartesian(ylim = quantile(ad_clean$RESPONSE_TIME, c(0.05, 0.95), na.rm = TRUE)) +
     labs(
         title = paste("Boxplot of Response Time by Device Type"),
         x = ("Device Type"),
