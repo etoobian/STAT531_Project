@@ -3,67 +3,59 @@
 #  PROJECT DATA I/O UTILITIES
 # ----------------------------------------------------------------------------
 # PURPOSE:
-#   This script provides simple, reusable tools for working with the
-#   project dataset:
+#   This script provides reusable tools for loading, summarizing, and exporting 
+#   the project dataset. Sourcing this file only defines functions.
+#   To load data, call `load_ad_data()`.
 #
 #   1. `load_ad_data()`
-#        - Loads the main project dataset from a parquet file.
-#        - When you source this file, the data is loaded automatically
-#          and stored as `ad_data` in your R session.
-#        - `load_ad_data` can now be called to lad other datasets.
+#        - Loads a dataset from a parquet file.
+#        - Defaults to loading the main project dataset (local copy only):
+#            "Project/data/bids_data_vDTR.parquet"
+#        - Optional: `preview = TRUE` prints first five rows.
 #
 #   2. `summarize_ad_data()`
-#        - Creates a quick summary table of each column:
+#        - Returns a summary table for each column:
 #            * column name
 #            * data type
 #            * number of missing / non-missing values
 #            * number of unique values
 #
 #   3. `export_ad_data()`
-#        - Saves a dataframe (usually a cleaned version of `ad_data`)
-#          to a parquet file in a safe way:
-#            * requires a version name
-#            * will NOT overwrite existing files unless you explicitly
-#              set overwrite = TRUE
+#        - Writes a dataframe (typically a cleaned version) to a parquet file:
+#            * requires a version name (e.g. "clean_v1")
+#            * writes to "Project/data/processed" by default
+#            * will NOT overwrite existing files unless "overwrite = TRUE"
 #
 # ----------------------------------------------------------------------------
-# USAGE: (from repo root in R / RStudio)
+# TYPICAL USAGE: (from repo root in R / RStudio)
 #
-#   1. Load this script and the data (ad_data is created automatically)
+#   1. Load utilities
 #          `source("Project/scripts/data_io.R")`
 #
-#   2. Can now inspect or work with data, e.g.:
-#          `head(ad_data)`
+#   2. Load raw data (with optional quick preview):
+#          `ad_raw <- load_ad_data(preview = TRUE)`
 #
-#   3. Get a summary of columns
+#   3. Summarize columns
 #          ```
-#          summary_tbl <- summarize_ad_data(ad_data)
+#          summary_tbl <- summarize_ad_data(ad_raw)
 #          View(summary_tbl) # or print(summary_tbl)
 #          ```
 #
-#   4. Load other datasets (if needed)
-#          ```
-#          load_ad_data()
-#            data_folder = "Project/data/processed",  # Data directory 
-#            data_file   = "file_to_load.parquet    # Name of data file to load
-#          )
-#          ```
-#
-#   5. Export a cleaned / processed dataset
+#   4. Export a cleaned / processed dataset (after running cleaning pipeline)
 #       - `version` MUST be provided
-#       - existing files are NOT overwritten unless overwrite = TRUE
+#       - existing files are NOT overwritten unless `overwrite = TRUE`
 #          ```
 #          export_ad_data(
-#            ad_data,
-#            version   = "clean_v1",             # choose a unique version name
+#            df        = ad_clean,
+#            version   = "clean_v1",                # choose unique version name
 #            out_dir   = "Project/data/processed",  # omit to leave as default
 #            base_name = "bids_data"                # omit to leave as default
 #          )
 #          ```
-#       - If you want to overwrite an existing file:
+#       - To overwrite an existing file:
 #          ```
 #          export_ad_data(
-#            ad_data,
+#            df        = ad_clean,
 #            version   = "clean_v1",        
 #            overwrite = TRUE
 #          )
@@ -72,16 +64,14 @@
 # ----------------------------------------------------------------------------
 # NOTES:
 #
-#   - Data does NOT persist across R sessions:
-#       * If you restart R, you must run source("Project/scripts/data_io.R")
-#         again to recreate `ad_data`.
-#   - Default input file:
-#       * `Project/data/bids_data_vDTR.parquet`
-#       * Change `default_data_folder` or `default_input_data_file` below
-#         if the location or name of the main parquet file changes.
+#   - Working directory:
+#       * Use `STAT531_Project.Rproj` and knit Rmds with Knit directory
+#         set to the Project Directory.
 #
-#   - Working directory matters:
-#       * Use `getwd()` to confirm you are at the repo root before sourcing.
+#   - Default locations:
+#       * Raw data:        `Project/data/bids_data_vDTR.parquet`
+#       * Processed data:  `Project/data/processed/`
+#
 # ----------------------------------------------------------------------------
 
 
