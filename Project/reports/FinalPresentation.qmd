@@ -166,9 +166,9 @@ Issues pertaining to certain columns, like PRICE, were crucial to remedy because
 
 ## Cleaning Strategy
 
-- Principle: enforce realistic Oregon bounds and correct shifted values  
-- Implementation: detect shifted observations; adjust values; re-check ranges  
-- Example (conceptual): mutate longitude values and validate them
+- Principle: Convert columns to their intended type and enforce sufficient formatting.
+- Implementation: Compare types to data dictionary; remove delimeters; alleviate potential points of coercion; convert to correct data type.
+- Example: Verify Data Type of PRICE → Identify Points of Coercion → Alleviate Given Points → Convert PRICE to the Numeric Data Type.
 
 ::: notes
 Professor's Section 3.2 — Cleaning Strategy:
@@ -181,7 +181,33 @@ Why It was Problem:
 - Misrepresents geographic locations  
 - Misleads EDA maps and summaries  
 - Could bias location-based conclusions
+
+Cleaning Strategy:
+- Principle: enforce realistic Oregon bounds and correct shifted values  
+- Implementation: detect shifted observations; adjust values; re-check ranges  
+- Example (conceptual): mutate longitude values and validate them
 :::
+
+---
+
+# Issue 2: (Replace With Real Issue Title)
+
+## What We Observed (Problem)
+
+- Brief description of the second issue  
+  (for example: "Inconsistent device types due to typos and mixed casing")  
+
+## Why It Matters
+
+- Breaks grouping and summarization  
+- Makes plots and tables harder to interpret  
+- Reduces comparability across analyses
+
+## Cleaning Strategy  (Fix Summary)
+
+- Principle: standardize categories while preserving information  
+- Implementation: string normalization and recoding with case_when  
+- Documentation of recoding decisions for reproducibility
 
 ---
 
