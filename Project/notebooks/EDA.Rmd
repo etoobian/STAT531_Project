@@ -193,7 +193,7 @@ Looking at a pairs plot we can gain a bit of insight into what the relations are
 
 Using the *information_gain()* function, we can try to look at how significantly variables reduce the uncertainty of the target variable BID_WON. The outcome shows only AUCTION_ID, PUBLISHER_ID, and PRICE as high information gain parameters. Almost all the other variables have lower (but similar to each other) information gain except for the Region variable. This makes sense, given that our data is confined to Oregon.
 
-```{r}
+```{r, echo = FALSE}
 ## Pairs generator for the numerical data
 # TIMESTAMP gave issues when running this function,
 # so I left it out.
