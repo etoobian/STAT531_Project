@@ -13,7 +13,7 @@ editor: visual
 ---
 
 
-# Title Slide
+# Opening Slide
 
 - **Project:** Oregon Ad Bidding Analysis  
 - **Team:** TECK Squad — *Chris G., Takeshi S., Esther T., Khloud Z.*  
@@ -54,12 +54,17 @@ Can be skipped if time is tight.
 ## Dataset Context
 
 - Parquet dataset of Oregon digital ad auctions
-    - Each row represents **a single line bid within a Prebid Auction**.
-    - The Prebid server handles online ad auctions where multiple bidders submit CPM bids.
-    - Each auction can have multiple bidders and each bidder may bid on multiple sizes.
-    - Each row corresponds to **one bidder's response for one size within an auction**.
-- Includes timestamps, geolocation, device info, publisher data  
+    - A prebid server handles online ad auctions where bidders submit CPM bids.
+    - Individual bidders may bid on multiple sizes
+    - Each row represents **a bid within a prebid auction**.
+- Includes metadata such as:
+    - Timestamps
+    - Geolocation
+    - Device Type
+  
+:::note
 - Contains intentionally inserted data-quality issues  
+:::
 
 ## Guiding Questions (examples)
 
