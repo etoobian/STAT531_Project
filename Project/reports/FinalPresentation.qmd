@@ -122,10 +122,10 @@ Refer to Team Docs for greater depth of detail while presenting?
 
 ## Key Issues Identified (Overview)
 
-- Missing Information.
 - Text and Value Inconsistencies.
-- Duplicates and Near-duplicates  
-- Outliers and Implausible Values
+- Implausible Values and Sentinels.
+- Missing Information.
+- Duplicates and Near-duplicates.
 
 ::: notes
 Professor's Section 3.1 — Key Issues You Found.
@@ -167,8 +167,74 @@ Issues pertaining to certain columns, like PRICE, were crucial to remedy because
 ## Cleaning Strategy
 
 - Principle: Convert columns to their intended type and enforce sufficient formatting.
-- Implementation: Compare types to data dictionary; remove delimeters; alleviate potential points of coercion; convert to correct data type.
+- Implementation: Compare types to data dictionary; remove delimiters; alleviate potential points of coercion; convert to correct data type.
 - Example: Verify Data Type of PRICE → Identify Points of Coercion → Alleviate Given Points → Convert PRICE to the Numeric Data Type.
+
+---
+
+# Issue 2: <br>Implausible Values plus Sentinels.
+
+## Examples
+
+Examples of Implausible Values:
+
+- The PRICE column contains negative values.
+- The DEVICE_GEO_LONG column contains values that exist outside of Oregon's border.
+
+Sentinels:
+
+- The generic sentinel value is -999, seen in columns such as:
+    - PRICE
+    - DEVICE_GEO_ZIP
+
+## Why It Matters
+
+Similar to the prior issue, with some additions:
+
+- These columns are crucial for the exploration of the guiding questions.
+- The inclusion of implausible and/or sentinel values can greatly skew any final conclusions.
+
+## Cleaning Strategy  (Fix Summary)
+
+- Principle: Correct, if possible, or remove sentinel values and implausible values.
+- Implementation: Identify firm restrictions/bounds and impossible values; identify potential sentinel values; check respective values with bounds in mind; recover, if possible, or remove rows with implausible/sentinel values.
+- Example: Verify that PRICE is Positive → Identify Negative Values → Delineate Between Sentinel and Implausible → Verify that Sentinel Values Can't be Recovered → Verify Distribution of Remaining Implausible Values to Test Recoverability → Recover Values.
+
+---
+
+# Issue 3: <br>Missing Information.
+
+## Examples
+
+- Brief description issue.
+
+## Why It Matters
+
+- Detail why we should fix the issues.
+
+## Cleaning Strategy  (Fix Summary)
+
+- Principle: Idea 
+- Implementation: Implement Idea 
+- Example: One example of how Idea was Implemented.
+
+---
+
+# Issue 4: <br>Duplicates and Near-Duplicates
+
+## Examples
+
+- Brief description issue. 
+
+## Why It Matters
+
+- Detail why we should fix the issues.
+
+## Cleaning Strategy  (Fix Summary)
+
+- Principle: Idea 
+- Implementation: Implement Idea 
+- Example: One example of how Idea was Implemented.
 
 ::: notes
 Professor's Section 3.2 — Cleaning Strategy:
@@ -187,48 +253,6 @@ Cleaning Strategy:
 - Implementation: detect shifted observations; adjust values; re-check ranges  
 - Example (conceptual): mutate longitude values and validate them
 :::
-
----
-
-# Issue 2: (Replace With Real Issue Title)
-
-## What We Observed (Problem)
-
-- Brief description of the second issue  
-  (for example: "Inconsistent device types due to typos and mixed casing")  
-
-## Why It Matters
-
-- Breaks grouping and summarization  
-- Makes plots and tables harder to interpret  
-- Reduces comparability across analyses
-
-## Cleaning Strategy  (Fix Summary)
-
-- Principle: standardize categories while preserving information  
-- Implementation: string normalization and recoding with case_when  
-- Documentation of recoding decisions for reproducibility
-
----
-
-# Issue 2: (Replace With Real Issue Title)
-
-## What We Observed (Problem)
-
-- Brief description of the second issue  
-  (for example: "Inconsistent device types due to typos and mixed casing")  
-
-## Why It Matters
-
-- Breaks grouping and summarization  
-- Makes plots and tables harder to interpret  
-- Reduces comparability across analyses
-
-## Cleaning Strategy  (Fix Summary)
-
-- Principle: standardize categories while preserving information  
-- Implementation: string normalization and recoding with case_when  
-- Documentation of recoding decisions for reproducibility
 
 ::: notes
 From Prof:  
