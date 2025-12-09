@@ -1,0 +1,412 @@
+---
+title: "STAT 531 — Final Presentation"
+subtitle: "Oregon Ad Bidding: Data Cleaning, EDA, and Team Workflow"
+author: "TECK Squad — Chris G., Takeshi S., Esther T., Khloud Z."
+format:
+  revealjs:
+    slide-number: true
+    incremental: true
+    theme: simple
+    transition: fade
+    chalkboard: false
+editor: visual
+---
+
+
+# Title Slide
+
+- **Project:** Oregon Ad Bidding Analysis  
+- **Team:** TECK Squad — *Chris G., Takeshi S., Esther T., Khloud Z.*  
+- **GitHub repository:** <https://github.com/etoobian/STAT531_Project/>
+- **Summary:** A collaborative workflow demonstrating data cleaning, reproducibility, and exploratory analysis on Oregon advertising auction data.
+
+::: notes
+Professor's requirement:
+- Project title
+- Team members
+- Repo link
+- One-sentence summary of project's focus
+:::
+
+---
+
+# Team Banner
+
+## TECK Squad
+
+- **T** — Takeshi  
+- **E** — Esther  
+- **C** — Chris  
+- **K** — Khloud  
+
+Previously known as **KTC (Kentucky Thighed Chicken)** before the team reformed.
+
+::: notes
+Optional slide.
+Can add pic if we make one. (KTC Chicken??  New one??)
+Can be skipped if time is tight.
+:::
+
+---
+
+# The Data & Initial Plan  (< 5 min)
+
+## Dataset Context
+
+- Parquet dataset of Oregon digital ad auctions
+    - Each row represents **a single line bid within a Prebid Auction**.
+    - The Prebid server handles online ad auctions where multiple bidders submit CPM bids.
+    - Each auction can have multiple bidders and each bidder may bid on multiple sizes.
+    - Each row corresponds to **one bidder's response for one size within an auction**.
+- Includes timestamps, geolocation, device info, publisher data  
+- Contains intentionally inserted data-quality issues  
+
+## Guiding Questions (examples)
+
+- What patterns appear across time, device type, and geography?  
+- How does missingness or inconsistency affect analysis?  
+- What behaviors or trends characterize Oregon's ad ecosystem?  
+
+## Why These Questions Matter (examples)
+
+- Ethical concerns around targeting and bias  
+- Interpretability and decision-making  
+- Understanding data reliability and uncertainty
+
+::: notes
+Professor's requirement (Section 2):
+- Basic data set context
+- Guiding questions we developed
+- Why these guiding questions matter
+:::
+
+---
+
+# Team Workflow & Roles
+
+## Roles & Responsibilities  (Just a start, refine as needed)
+
+- **Chris** — EDA, visualizations, guiding question refinement
+- **Takeshi** — Cleaning, documentation, 
+- **Esther** — GitHub coordination, project structure, reproducibility workflow, cleaning, EDA, final presentation
+- **Khloud** — Cleaning, ...
+
+## Coordination Tools  (add details from team docs)
+
+- **GitHub:** Feature branches → PRs → reviews → merge  
+- **Jira / Kanban:** Task assignments, subtasks, progress tracking  
+- **Commit Habits:** Small atomic commits, descriptive messages
+
+::: notes
+Professor's requirement (Section 2):
+- The roles you assigned within the team and how you coordinated work:
+    – GitHub workflow (branches, pull requests, commits)
+    – Jira/Kanban tasks, deadlines, progress tracking
+    - NOTE: Roles/coordination will be detailed in the next slide group
+Use this slide to emphasize collaboration practices, not code.
+:::
+
+---
+
+# Data Cleaning Process  (6-8 min)
+
+## Key Issues Identified (Overview)
+
+- Missingness patterns across multiple columns  
+- Text inconsistencies (typos, casing, spelling variants)  
+- Type mismatches (numbers stored as text, dates as strings)  
+- Duplicates and near-duplicates  
+- Outliers / implausible values (e.g., coordinates outside Oregon)  
+- Structural inconsistencies (unexpected categories, inconsistent naming)
+
+::: notes
+Professor's Section 3.1 — Key Issues You Found.
+Goal: show variety and importance of issues before deep-diving.
+:::
+
+---
+
+# Issue 1: (Replace With Real Issue Title)
+
+## What We Observed
+
+- Brief description of the issue  
+  (for example: "Longitude values shifted by +10 degrees for a subset of rows")  
+
+## Why It Was a Problem
+
+- Misrepresents geographic locations  
+- Misleads EDA maps and summaries  
+- Could bias location-based conclusions
+
+## Cleaning Strategy
+
+- Principle: enforce realistic Oregon bounds and correct shifted values  
+- Implementation: detect shifted observations; adjust values; re-check ranges  
+- Example (conceptual): mutate longitude values and validate them
+
+::: notes
+Professor's Section 3.2 — Cleaning Strategy:
+- What you observed
+- Why it was a problem
+- Principle behind your fix
+- Concise code or pseudo-code (keep it light)
+:::
+
+---
+
+# Issue 2: (Replace With Real Issue Title)
+
+## What We Observed (Problem)
+
+- Brief description of the second issue  
+  (for example: "Inconsistent device types due to typos and mixed casing")  
+
+## Why It Matters
+
+- Breaks grouping and summarization  
+- Makes plots and tables harder to interpret  
+- Reduces comparability across analyses
+
+## Cleaning Strategy  (Fix Summary)
+
+- Principle: standardize categories while preserving information  
+- Implementation: string normalization and recoding with case_when  
+- Documentation of recoding decisions for reproducibility
+
+::: notes
+From Prof:  
+- For each issue:
+- What you observed
+- Why it was a problem
+- Principle behind your fix (e.g., “We chose this imputation strategy because...”)
+- Concise R code or pseudo-code
+Focus on justifying decisions, not on full code dumps."
+
+Repeat this pattern for all Issues if needed, or
+combine smaller issues on a single slide.
+:::
+
+---
+
+# Reproducibility & Workflow
+
+## Git + File Structure
+
+- Project root with clear directories:  
+  - data/ (local, git-ignored)  
+  - scripts/ (modular R scripts)  
+  - docs/ (Rmd and Quarto files)  
+  - figs/ (saved plots)  
+- Consistent naming conventions (snake_case)
+
+## Documentation Practices
+
+- Quarto slides for final presentation  
+- R Markdown for analysis steps and lab-style documentation  
+- Commit history shows contributions from all team members  
+- PRs used for review and discussion
+
+::: notes
+Professor's Section 3.3 — Reproducibility and Workflow:
+- Git usage (branches, PRs, conflicts)
+- Script modularity and readability
+- Rmd/Quarto
+- Naming conventions and folder structure
+:::
+
+---
+
+# Exploratory Data Analysis    (7 - 10 min)
+
+## Overview Patterns  (likely split into multiple slides or infor below)
+
+::: columns
+::: columns
+### Figures (Placeholders)
+
+- Placeholder: Overall distributions figure  
+- Placeholder: Key relationship plot  
+- Placeholder: Missingness heatmap
+
+(Example: save as figs/eda_overview_distributions.png,  
+figs/eda_overview_relationships.png, figs/eda_missingness.png)
+
+:::
+::: column
+### Interpretation Notes
+
+- Describe main distribution shapes and any skew  
+- Highlight major relationships (e.g., device vs outcome)  
+- Summarize missingness profile and any surprising gaps  
+- Note any patterns that motivated deeper guiding questions  
+
+:::
+:::
+
+::: notes
+EDA Overview
+- High-level distributions
+- Relationships
+- Missingness summaries
+Professor's Sections 4.1 and 4.3:
+- Show distributions, relationships, missingness, and surprising patterns
+- Ensure clear labels, good color choices, no clutter and interpretation w/ each visual
+This slide uses side-by-side layout for plots and narrative.
+:::
+
+---
+
+# Deep Dive: Guiding Question 1
+
+## Question and Visuals
+
+::: columns
+::: column
+### Guiding Question 1 (example)
+
+- State the question clearly  
+  (for example: "How does device type vary by time of day?")  
+
+#### Figure Placeholder
+
+- Insert main plot here (e.g., time-of-day vs device type)  
+- File suggestion: figs/gq1_main_plot.png
+
+:::
+::: column
+### Interpretation
+
+- Describe the pattern shown in the figure  
+- Connect back to the guiding question explicitly  
+- Mention how cleaning decisions (e.g., device-type standardization)
+  were necessary for this figure to be meaningful  
+- Note any caveats or surprising findings  
+
+:::
+:::
+
+::: notes
+Professor's Section 4.2 — Deep Dives on Guiding Questions:
+- State the question
+- Show relevant figures
+- Interpret results
+- Connect to earlier cleaning decisions
+:::
+
+---
+
+# Deep Dive: Guiding Question 2
+
+## Question and Visuals
+
+::: columns
+::: column
+### Guiding Question 2
+
+- State the question clearly  
+  (for example: "Are ad impressions concentrated in particular regions of Oregon?")  
+
+#### Figure Placeholder
+
+- Insert main map or spatial plot here  
+- File suggestion: figs/gq2_map_plot.png
+
+:::
+::: column
+### Interpretation
+
+- Summarize spatial concentration or lack thereof  
+- Discuss how coordinate cleaning affected conclusions  
+- Note any hotspots, gaps, or anomalies  
+- Comment briefly on ethical or fairness implications if relevant  
+
+:::
+:::
+
+::: notes
+For each:
+• State the question
+• Show relevant figures
+• Interpret results clearly
+• Connect to cleaning decisions
+
+Same structure as Guiding Question 1, maintaining consistent layout:
+plots on left, interpretation on right.
+:::
+
+---
+
+# Key Findings   (2-3 min)
+
+## Summary of Insights
+
+- 3–5 major findings from the cleaned and explored data  
+- One key insight about data quality and cleaning impact  
+- One insight about behavior or patterns in the ad ecosystem  
+- One insight about limitations or uncertainties in the data  
+
+::: notes
+Professor's Section 5 — Insight Summary:
+- Summarize 3-5 most important / key findings
+- Explain what the data suggests overall
+- Mention uncertainties or next steps
+Keep bullets crisp and non-technical.
+:::
+
+---
+
+# Collaboration Reflection   (2-3 min)
+
+## What Went Well
+
+- Effective use of GitHub, branches, and PRs  
+- Clear division of labor and ownership  
+- Helpful use of Jira/Kanban for tracking progress  
+
+## Challenges and Lessons
+
+- Merge conflicts and how they were resolved  
+- Aligning on cleaning decisions and documentation style  
+- Time management and coordination across schedules  
+
+::: notes
+Professor's Section 6 — Collaboration Reflection:
+- What went wellin workflow
+- What was challenging
+- Lessons learned for future projects
+- Role of GitHub, Jira, RStudio in collaboration
+:::
+
+---
+
+
+# Final Slide: Repository Checklist   (1 min)
+
+## GitHub Repo Contents
+
+- Clean and informative README  
+- Data-cleaning scripts  
+- EDA notebooks (Rmd and/or qmd)  
+- Clear folder structure: data/, scripts/, figs/, docs/  
+- Kanban board snapshot (exported image or link)  
+- Evidence of teamwork: PRs, commit history, multiple authors  
+
+::: notes
+Professor's Section 7 — GitHub Repository Checklist.
+Confirm your repo includes:
+• Clean README
+• Data cleaning scripts
+• EDA scripts (.qmd or .Rmd)
+• Clear folder structure (data/, R/, figs/)
+• Kanban snapshot
+• Evidence of teamwork (commit history, pull requests, etc.)
+:::
+
+::: notes
+Presentation Logistics
+Timing
+• Total: 20–30 minutes
+• Leave 3 min for questions
+• Practice pacing
+:::
