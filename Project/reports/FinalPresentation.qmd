@@ -96,11 +96,14 @@ Professor's requirement (Section 2):
 - **Esther** — GitHub/Project Coordinator, ED Analyst, Reproducibility Enforcer.
 - **Khloud** — Data Cleaner, Presentation Editor.
 
-## Coordination Tools  (add details from team docs)
+## Coordination Tools
 
-- **GitHub:** Feature branches → PRs → reviews → merge  
-- **Jira / Kanban:** Task assignments, subtasks, progress tracking  
-- **Commit Habits:** Small atomic commits, descriptive messages
+- **GitHub:** Checkout to Branch → PRs → Reviews → Merge.
+- **Jira/Kanban:** Task/Subtask Alloting, Progress Tracking.  
+- **Discord:** Quick Updates, Online Meeting Location.
+- **Commit Habits:** Consistent Commits, Detailed Messages.
+
+Through the combination of Github, Jira, and a rigid commit/PR routine outlined by checklists/workflows that we agreed upon ensured we ran into minimal issues with the completion of this project.
 
 ::: notes
 Professor's requirement (Section 2):
@@ -109,6 +112,8 @@ Professor's requirement (Section 2):
     – Jira/Kanban tasks, deadlines, progress tracking
     - NOTE: Roles/coordination will be detailed in the next slide group
 Use this slide to emphasize collaboration practices, not code.
+
+Refer to Team Docs for greater depth of detail while presenting?
 :::
 
 ---
@@ -117,16 +122,21 @@ Use this slide to emphasize collaboration practices, not code.
 
 ## Key Issues Identified (Overview)
 
+- Missing Information.
+- Text and Type Inconsistencies.
+- Duplicates and near-duplicates  
+- Outliers and Implausible Values
+
+::: notes
+Professor's Section 3.1 — Key Issues You Found.
+Goal: show variety and importance of issues before deep-diving.
+
 - Missingness patterns across multiple columns  
 - Text inconsistencies (typos, casing, spelling variants)  
 - Type mismatches (numbers stored as text, dates as strings)  
 - Duplicates and near-duplicates  
 - Outliers / implausible values (e.g., coordinates outside Oregon)  
 - Structural inconsistencies (unexpected categories, inconsistent naming)
-
-::: notes
-Professor's Section 3.1 — Key Issues You Found.
-Goal: show variety and importance of issues before deep-diving.
 :::
 
 ---
