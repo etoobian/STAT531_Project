@@ -6,7 +6,7 @@ format:
   revealjs:
     slide-number: true
     incremental: true
-    theme: simple
+    theme: beige
     transition: fade
     chalkboard: false
 editor: visual
@@ -63,7 +63,7 @@ Can be skipped if time is tight.
     - Device Type
   
 :::note
-- Contains intentionally inserted data-quality issues  
+ Contains intentionally inserted data-quality issues  
 :::
 
 ## Guiding Questions (examples)
@@ -89,7 +89,7 @@ Professor's requirement (Section 2):
 
 # Team Workflow & Roles
 
-## Roles & Responsibilities  (Just a start, refine as needed)
+## Roles & Responsibilities
 
 - **Chris** — ED Analyst, Visualizer, Guiding Question Refinement
 - **Takeshi** — Data Cleaner, Scribe, Presentation Editor.
@@ -123,8 +123,8 @@ Refer to Team Docs for greater depth of detail while presenting?
 ## Key Issues Identified (Overview)
 
 - Missing Information.
-- Text and Type Inconsistencies.
-- Duplicates and near-duplicates  
+- Text and Value Inconsistencies.
+- Duplicates and Near-duplicates  
 - Outliers and Implausible Values
 
 ::: notes
@@ -141,18 +141,28 @@ Goal: show variety and importance of issues before deep-diving.
 
 ---
 
-# Issue 1: (Replace With Real Issue Title)
+# Issue 1: <br>Type and Value Inconsistencies
 
-## What We Observed
+## Examples
 
-- Brief description of the issue  
-  (for example: "Longitude values shifted by +10 degrees for a subset of rows")  
+Examples of Type Inconsistencies:
+
+- The PRICE column was of the character type.
+- The RESPONSE_TIME column was of the character type.
+
+Examples of Value Inconsistencies:
+
+- The TIMESTAMP column has three different formats:
+    - "YYYY/MM/DD...", "YYYY-MM-DD..." and "NA..."
+- The RESPONSE_TIME column had different prefix delimeters:
+    - "RESPONSE_TIME:" and "RESSPONSE_TIME:".
 
 ## Why It Was a Problem
 
-- Misrepresents geographic locations  
-- Misleads EDA maps and summaries  
-- Could bias location-based conclusions
+Issues pertaining to certain columns, like PRICE, were crucial to remedy because:
+
+- These columns are crucial for exploring the guiding questions.
+- Directly contradicted the data dictionary provided by the client.
 
 ## Cleaning Strategy
 
@@ -166,6 +176,11 @@ Professor's Section 3.2 — Cleaning Strategy:
 - Why it was a problem
 - Principle behind your fix
 - Concise code or pseudo-code (keep it light)
+
+Why It was Problem:
+- Misrepresents geographic locations  
+- Misleads EDA maps and summaries  
+- Could bias location-based conclusions
 :::
 
 ---
