@@ -143,6 +143,10 @@ Goal: show variety and importance of issues before deep-diving.
 
 # Issue 1: <br>Type and Value Inconsistencies
 
+## Description
+
+The type refers to the data type of a column and value refers to individual rows seen within the data set. Throughout the data set, we have encountered many inconsistencies, which for some, are distinguished using the data dictionary provided by the client.
+
 ## Examples
 
 Examples of Type Inconsistencies:
@@ -172,7 +176,11 @@ Issues pertaining to certain columns, like PRICE, were crucial to remedy because
 
 ---
 
-# Issue 2: <br>Implausible Values plus Sentinels.
+# Issue 2: <br>Implausible Values and Sentinels.
+
+## Description
+
+Implausible values are values that otherwise, through the inherent existence of the respective column, can't exist. In most cases, sentinel values are also made to be implausible values, and therefore, there is also a need to distinguish between the two.
 
 ## Examples
 
@@ -204,6 +212,10 @@ Similar to the prior issue, with some additions:
 
 # Issue 3: <br>Missing Information.
 
+## Description
+
+- Brief Description
+
 ## Examples
 
 - Brief description issue.
@@ -221,6 +233,10 @@ Similar to the prior issue, with some additions:
 ---
 
 # Issue 4: <br>Duplicates and Near-Duplicates
+
+## Description
+
+- Brief Description
 
 ## Examples
 
