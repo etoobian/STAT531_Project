@@ -78,11 +78,6 @@ Professor's requirement (Section 2):
 - Basic data set context
 - Guiding questions we developed
 - Why these guiding questions matter
-- The roles you assigned within the team and how you coordinated work:
-    – GitHub workflow (branches, pull requests, commits)
-    – Jira/Kanban tasks, deadlines, progress tracking
-    - NOTE: Roles/coordination will be detailed in the next slide group
-Target: under 5 minutes total.
 :::
 
 ---
@@ -91,10 +86,10 @@ Target: under 5 minutes total.
 
 ## Roles & Responsibilities  (Just a start, refine as needed)
 
-- **Chris** — EDA, visualizations, guiding question refinement  
+- **Chris** — EDA, visualizations, guiding question refinement
 - **Takeshi** — Cleaning, documentation, 
-- **Esther** — GitHub coordination, project structure, reproducibility workflow   
-- **Khloud** — Cleaning support, 
+- **Esther** — GitHub coordination, project structure, reproducibility workflow, cleaning, EDA, final presentation
+- **Khloud** — Cleaning, ...
 
 ## Coordination Tools  (add details from team docs)
 
@@ -104,9 +99,10 @@ Target: under 5 minutes total.
 
 ::: notes
 Professor's requirement (Section 2):
-- Roles within team
-- GitHub workflow
-- Jira/Kanban usage
+- The roles you assigned within the team and how you coordinated work:
+    – GitHub workflow (branches, pull requests, commits)
+    – Jira/Kanban tasks, deadlines, progress tracking
+    - NOTE: Roles/coordination will be detailed in the next slide group
 Use this slide to emphasize collaboration practices, not code.
 :::
 
