@@ -401,8 +401,8 @@ TECK Squad — Chris G., Takeshi S., Esther T., Khloud Z.
 
 </section></section>
 <section>
-<section id="the-data-initial-plan" class="title-slide slide level1 center">
-<h1>The Data &amp; Initial Plan</h1>
+<section id="the-data-initial-plan-5-min" class="title-slide slide level1 center">
+<h1>The Data &amp; Initial Plan (&lt; 5 min)</h1>
 
 </section>
 <section id="dataset-context" class="slide level2">
@@ -440,7 +440,7 @@ TECK Squad — Chris G., Takeshi S., Esther T., Khloud Z.
 <li class="fragment">Understanding data reliability and uncertainty</li>
 </ul>
 <aside class="notes">
-<p>Professor’s requirement (Section 2): - Basic data set context - Guiding questions - Why the questions matter - Roles/coordination will be detailed in the next slide group Target: under 5 minutes total.</p>
+<p>Professor’s requirement (Section 2): - Basic data set context - Guiding questions we developed - Why these guiding questions matter - The roles you assigned within the team and how you coordinated work: – GitHub workflow (branches, pull requests, commits) – Jira/Kanban tasks, deadlines, progress tracking - NOTE: Roles/coordination will be detailed in the next slide group Target: under 5 minutes total.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -453,263 +453,6 @@ TECK Squad — Chris G., Takeshi S., Esther T., Khloud Z.
           display:block!important;
       }</style></aside>
 </section>
-<section id="workflow-roles" class="slide level2">
-<h2>Workflow &amp; Roles</h2>
-<ul>
-<li class="fragment">Team task division
-<ul>
-<li class="fragment">who focused on what (cleaning, EDA, writeup, infra)</li>
-</ul></li>
-<li class="fragment">Jira / Kanban usage
-<ul>
-<li class="fragment">how we used tickets and subtasks</li>
-</ul></li>
-<li class="fragment">GitHub workflow
-<ul>
-<li class="fragment">branches, PRs, reviews</li>
-<li class="fragment">avoiding rebases that rewrite history</li>
-</ul></li>
-</ul>
-</section>
-<section id="data-issues-identified" class="slide level2">
-<h2>Data Issues Identified</h2>
-<ul>
-<li class="fragment">Missingness (which columns, patterns)</li>
-<li class="fragment">Typos &amp; formatting issues</li>
-<li class="fragment">Type mismatches (e.g.&nbsp;numeric vs character)</li>
-<li class="fragment">Duplicates</li>
-<li class="fragment">Outliers / implausible values</li>
-</ul>
-</section>
-<section id="cleaning-decisions-issue-type-1" class="slide level2">
-<h2>Cleaning Decisions — Issue Type 1</h2>
-<h3 id="problem">Problem</h3>
-<ul>
-<li class="fragment">Short description of the issue<br>
-(e.g.&nbsp;shifted longitudes or weird timestamps)</li>
-</ul>
-<h3 id="why-it-matters">Why it Matters</h3>
-<ul>
-<li class="fragment">How it could break analysis or mislead EDA</li>
-<li class="fragment">Ethical / interpretive implications if relevant</li>
-</ul>
-<h3 id="fix-summary">Fix Summary</h3>
-<ul>
-<li class="fragment">How we detected it</li>
-<li class="fragment">How we fixed it (code-level briefly)</li>
-<li class="fragment">Any tradeoffs / remaining uncertainty</li>
-</ul>
-</section>
-<section id="cleaning-decisions-issue-type-2" class="slide level2">
-<h2>Cleaning Decisions — Issue Type 2</h2>
-<h3 id="problem-1">Problem</h3>
-<ul>
-<li class="fragment">Short description of second issue<br>
-(e.g.&nbsp;inconsistent device types, bogus IDs)</li>
-</ul>
-<h3 id="why-it-matters-1">Why it Matters</h3>
-<ul>
-<li class="fragment">Impact on modeling / summaries</li>
-</ul>
-<h3 id="fix-summary-1">Fix Summary</h3>
-<ul>
-<li class="fragment">Detection approach</li>
-<li class="fragment">Cleaning / recoding approach</li>
-</ul>
-</section>
-<section id="reproducibility" class="slide level2">
-<h2>Reproducibility</h2>
-<ul>
-<li class="fragment">Folder structure
-<ul>
-<li class="fragment"><code>/Project/scripts</code>, <code>/Project/data</code>, <code>/Project/docs</code>, etc.</li>
-</ul></li>
-<li class="fragment">RMarkdown / Quarto workflow
-<ul>
-<li class="fragment">where the main analysis doc lives</li>
-</ul></li>
-<li class="fragment">Git + commit history
-<ul>
-<li class="fragment">small commits, meaningful messages, PR reviews</li>
-</ul></li>
-</ul>
-</section>
-<section id="eda-overview" class="slide level2">
-<h2>EDA Overview</h2>
-<ul>
-<li class="fragment">High-level distributions
-<ul>
-<li class="fragment">histograms, bar charts of key features</li>
-</ul></li>
-<li class="fragment">Relationships
-<ul>
-<li class="fragment">e.g.&nbsp;device type vs outcome, geography vs outcome</li>
-</ul></li>
-<li class="fragment">Missingness
-<ul>
-<li class="fragment">overall patterns (maybe just one high-level plot)</li>
-</ul></li>
-</ul>
-</section>
-<section id="deep-dive-guiding-question-1" class="slide level2">
-<h2>Deep Dive — Guiding Question 1</h2>
-<ul>
-<li class="fragment">Plot(s)
-<ul>
-<li class="fragment">small multiples or one key figure</li>
-</ul></li>
-<li class="fragment">Interpretation
-<ul>
-<li class="fragment">2–4 concise bullets explaining what we learned</li>
-<li class="fragment">explicitly answer the guiding question</li>
-</ul></li>
-</ul>
-</section>
-<section id="deep-dive-guiding-question-2" class="slide level2">
-<h2>Deep Dive — Guiding Question 2</h2>
-<ul>
-<li class="fragment">Plot(s)</li>
-<li class="fragment">Interpretation
-<ul>
-<li class="fragment">same structure as Guiding Question 1</li>
-</ul></li>
-</ul>
-</section>
-<section id="key-findings" class="slide level2">
-<h2>Key Findings</h2>
-<ul>
-<li class="fragment">3–5 concrete insights
-<ul>
-<li class="fragment">one about data quality</li>
-<li class="fragment">one about behavior / patterns in the ads</li>
-<li class="fragment">one about ethics / bias or fairness</li>
-<li class="fragment">one about limitations of what we <em>can</em> say</li>
-</ul></li>
-</ul>
-</section>
-<section id="reflection" class="slide level2">
-<h2>Reflection</h2>
-<ul>
-<li class="fragment">Teamwork lessons
-<ul>
-<li class="fragment">what worked well</li>
-<li class="fragment">what was painful (and how we’d fix it)</li>
-</ul></li>
-<li class="fragment">Tools &amp; workflows
-<ul>
-<li class="fragment">most useful R and Git/GitHub pieces</li>
-</ul></li>
-<li class="fragment">Challenges
-<ul>
-<li class="fragment">biggest surprises in the data</li>
-<li class="fragment">biggest tech challenge</li>
-</ul></li>
-</ul>
-</section>
-<section id="limitations-future-work" class="slide level2">
-<h2>Limitations &amp; Future Work</h2>
-<ul>
-<li class="fragment">What our analysis <em>cannot</em> say</li>
-<li class="fragment">Data or methods we wish we had</li>
-<li class="fragment">Natural next steps for someone continuing the project</li>
-</ul>
-</section>
-<section id="final-summary" class="slide level2">
-<h2>Final Summary</h2>
-<ul>
-<li class="fragment">2–3 main takeaways (short!)</li>
-<li class="fragment">Where to find:
-<ul>
-<li class="fragment">Code &amp; documentation (GitHub)</li>
-<li class="fragment">Cleaned data location (local path expectations)</li>
-</ul></li>
-</ul>
-</section>
-<section id="workflow-roles-1" class="slide level2">
-<h2>Workflow &amp; Roles</h2>
-<ul>
-<li class="fragment">Team task division</li>
-<li class="fragment">Jira / Kanban usage</li>
-<li class="fragment">GitHub workflow (branches, PRs)</li>
-</ul>
-</section>
-<section id="data-issues-identified-1" class="slide level2">
-<h2>Data Issues Identified</h2>
-<ul>
-<li class="fragment">Missingness</li>
-<li class="fragment">Typos &amp; formatting issues</li>
-<li class="fragment">Type mismatches</li>
-<li class="fragment">Duplicates</li>
-<li class="fragment">Outliers</li>
-</ul>
-</section>
-<section id="cleaning-decisions" class="slide level2">
-<h2>Cleaning Decisions</h2>
-<h3 id="issue-type-1">Issue type 1</h3>
-<ul>
-<li class="fragment">Problem</li>
-<li class="fragment">Why problem matters</li>
-<li class="fragment">Fix summary</li>
-</ul>
-<h3 id="issue-type-2">Issue type 2</h3>
-<ul>
-<li class="fragment">Same structure…</li>
-</ul>
-</section>
-<section id="reproducibility-1" class="slide level2">
-<h2>Reproducibility</h2>
-<ul>
-<li class="fragment">Folder structure</li>
-<li class="fragment">RMarkdown/Quarto workflow</li>
-<li class="fragment">Commit history evidence</li>
-</ul>
-</section>
-<section id="eda-overview-1" class="slide level2">
-<h2>EDA Overview</h2>
-<ul>
-<li class="fragment">High-level distributions</li>
-<li class="fragment">Relationships</li>
-<li class="fragment">Missingness summaries</li>
-</ul>
-</section>
-<section id="deep-dive-guiding-question-1-1" class="slide level2">
-<h2>Deep Dive: Guiding Question 1</h2>
-<ul>
-<li class="fragment">Plot(s)</li>
-<li class="fragment">Interpretation</li>
-</ul>
-</section>
-<section id="deep-dive-guiding-question-2-1" class="slide level2">
-<h2>Deep Dive: Guiding Question 2</h2>
-<ul>
-<li class="fragment">Plot(s)</li>
-<li class="fragment">Interpretation</li>
-</ul>
-</section>
-<section id="key-findings-1" class="slide level2">
-<h2>Key Findings</h2>
-<ul>
-<li class="fragment">3–5 insights</li>
-</ul>
-</section>
-<section id="reflection-1" class="slide level2">
-<h2>Reflection</h2>
-<ul>
-<li class="fragment">Teamwork lessons</li>
-<li class="fragment">Tools</li>
-<li class="fragment">Challenges</li>
-</ul>
-</section>
-<section id="limitations-future-work-1" class="slide level2">
-<h2>Limitations &amp; Future Work</h2>
-</section>
-<section id="final-summary-1" class="slide level2">
-<h2>Final Summary</h2>
-<ul>
-<li class="fragment">Main takeaways</li>
-<li class="fragment">Link to repo</li>
-</ul>
-</section>
 <section class="slide level2">
 
 </section></section>
@@ -718,20 +461,19 @@ TECK Squad — Chris G., Takeshi S., Esther T., Khloud Z.
 <h1>Team Workflow &amp; Roles</h1>
 
 </section>
-<section id="roles-responsibilities" class="slide level2">
-<h2>Roles &amp; Responsibilities</h2>
+<section id="roles-responsibilities-just-a-start-refine-as-needed" class="slide level2">
+<h2>Roles &amp; Responsibilities (Just a start, refine as needed)</h2>
 <ul>
-<li class="fragment"><strong>Chris</strong> — EDA lead, visualization, guiding question refinement<br>
+<li class="fragment"><strong>Chris</strong> — EDA, visualizations, guiding question refinement<br>
 </li>
-<li class="fragment"><strong>Takeshi</strong> — Cleaning logic, documentation, reproducibility workflow<br>
+<li class="fragment"><strong>Takeshi</strong> — Cleaning, documentation,</li>
+<li class="fragment"><strong>Esther</strong> — GitHub coordination, project structure, reproducibility workflow<br>
 </li>
-<li class="fragment"><strong>Esther</strong> — GitHub coordination, PR reviews, Quarto, project structure<br>
-</li>
-<li class="fragment"><strong>Khloud</strong> — EDA support, cleaning validation, written analysis summaries</li>
+<li class="fragment"><strong>Khloud</strong> — Cleaning support,</li>
 </ul>
 </section>
-<section id="coordination-tools" class="slide level2">
-<h2>Coordination Tools</h2>
+<section id="coordination-tools-add-details-from-team-docs" class="slide level2">
+<h2>Coordination Tools (add details from team docs)</h2>
 <ul>
 <li class="fragment"><strong>GitHub:</strong> Feature branches → PRs → reviews → merge<br>
 </li>
@@ -757,8 +499,8 @@ TECK Squad — Chris G., Takeshi S., Esther T., Khloud Z.
 
 </section></section>
 <section>
-<section id="data-cleaning-process" class="title-slide slide level1 center">
-<h1>Data Cleaning Process</h1>
+<section id="data-cleaning-process-6-8-min" class="title-slide slide level1 center">
+<h1>Data Cleaning Process (6-8 min)</h1>
 
 </section>
 <section id="key-issues-identified-overview" class="slide level2">
@@ -846,14 +588,14 @@ TECK Squad — Chris G., Takeshi S., Esther T., Khloud Z.
 <h1>Issue 2: (Replace With Real Issue Title)</h1>
 
 </section>
-<section id="what-we-observed-1" class="slide level2">
-<h2>What We Observed</h2>
+<section id="what-we-observed-problem" class="slide level2">
+<h2>What We Observed (Problem)</h2>
 <ul>
 <li class="fragment">Brief description of the second issue<br>
 (for example: “Inconsistent device types due to typos and mixed casing”)</li>
 </ul>
 </section>
-<section id="why-it-matters-2" class="slide level2">
+<section id="why-it-matters" class="slide level2">
 <h2>Why It Matters</h2>
 <ul>
 <li class="fragment">Breaks grouping and summarization<br>
@@ -863,8 +605,8 @@ TECK Squad — Chris G., Takeshi S., Esther T., Khloud Z.
 <li class="fragment">Reduces comparability across analyses</li>
 </ul>
 </section>
-<section id="cleaning-strategy-1" class="slide level2">
-<h2>Cleaning Strategy</h2>
+<section id="cleaning-strategy-fix-summary" class="slide level2">
+<h2>Cleaning Strategy (Fix Summary)</h2>
 <ul>
 <li class="fragment">Principle: standardize categories while preserving information<br>
 </li>
@@ -873,7 +615,9 @@ TECK Squad — Chris G., Takeshi S., Esther T., Khloud Z.
 <li class="fragment">Documentation of recoding decisions for reproducibility</li>
 </ul>
 <aside class="notes">
-<p>You can repeat this pattern for Issue 3 if needed, or combine less important issues on a single slide.</p>
+<p>From Prof:<br>
+- For each issue: - What you observed - Why it was a problem - Principle behind your fix (e.g., “We chose this imputation strategy because…”) - Concise R code or pseudo-code Focus on justifying decisions, not on full code dumps.”</p>
+<p>Repeat this pattern for all Issues if needed, or combine smaller issues on a single slide.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -923,7 +667,7 @@ TECK Squad — Chris G., Takeshi S., Esther T., Khloud Z.
 <li class="fragment">PRs used for review and discussion</li>
 </ul>
 <aside class="notes">
-<p>Professor’s Section 3.3 — Reproducibility and Workflow: - Git usage (branches, PRs, conflicts) - Script modularity - Rmd/Quarto - Naming and folder structure</p>
+<p>Professor’s Section 3.3 — Reproducibility and Workflow: - Git usage (branches, PRs, conflicts) - Script modularity and readability - Rmd/Quarto - Naming conventions and folder structure</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -940,14 +684,14 @@ TECK Squad — Chris G., Takeshi S., Esther T., Khloud Z.
 
 </section></section>
 <section>
-<section id="exploratory-data-analysis-overview" class="title-slide slide level1 center">
-<h1>Exploratory Data Analysis — Overview</h1>
+<section id="exploratory-data-analysis-7---10-min" class="title-slide slide level1 center">
+<h1>Exploratory Data Analysis (7 - 10 min)</h1>
 
 </section>
-<section id="overview-patterns" class="slide level2">
-<h2>Overview Patterns</h2>
+<section id="overview-patterns-likely-split-into-multiple-slides-or-infor-below" class="slide level2">
+<h2>Overview Patterns (likely split into multiple slides or infor below)</h2>
 <div class="columns">
-<div class="column">
+<div class="columns">
 <h3 id="figures-placeholders">Figures (Placeholders)</h3>
 <ul>
 <li class="fragment">Placeholder: Overall distributions figure<br>
@@ -972,7 +716,7 @@ figs/eda_overview_relationships.png, figs/eda_missingness.png)</p>
 </div>
 </div>
 <aside class="notes">
-<p>Professor’s Sections 4.1 and 4.3: - Show distributions, relationships, missingness, surprising patterns - Ensure clear labels, good color choices, and interpretation This slide uses side-by-side layout for plots and narrative.</p>
+<p>EDA Overview - High-level distributions - Relationships - Missingness summaries Professor’s Sections 4.1 and 4.3: - Show distributions, relationships, missingness, and surprising patterns - Ensure clear labels, good color choices, no clutter and interpretation w/ each visual This slide uses side-by-side layout for plots and narrative.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -989,7 +733,7 @@ figs/eda_overview_relationships.png, figs/eda_missingness.png)</p>
 
 </section></section>
 <section>
-<section id="deep-dive-guiding-question-1-2" class="title-slide slide level1 center">
+<section id="deep-dive-guiding-question-1" class="title-slide slide level1 center">
 <h1>Deep Dive: Guiding Question 1</h1>
 
 </section>
@@ -997,7 +741,7 @@ figs/eda_overview_relationships.png, figs/eda_missingness.png)</p>
 <h2>Question and Visuals</h2>
 <div class="columns">
 <div class="column">
-<h3 id="guiding-question-1">Guiding Question 1</h3>
+<h3 id="guiding-question-1-example">Guiding Question 1 (example)</h3>
 <ul>
 <li class="fragment">State the question clearly<br>
 (for example: “How does device type vary by time of day?”)</li>
@@ -1039,7 +783,7 @@ figs/eda_overview_relationships.png, figs/eda_missingness.png)</p>
 
 </section></section>
 <section>
-<section id="deep-dive-guiding-question-2-2" class="title-slide slide level1 center">
+<section id="deep-dive-guiding-question-2" class="title-slide slide level1 center">
 <h1>Deep Dive: Guiding Question 2</h1>
 
 </section>
@@ -1072,6 +816,7 @@ figs/eda_overview_relationships.png, figs/eda_missingness.png)</p>
 </div>
 </div>
 <aside class="notes">
+<p>For each: • State the question • Show relevant figures • Interpret results clearly • Connect to cleaning decisions</p>
 <p>Same structure as Guiding Question 1, maintaining consistent layout: plots on left, interpretation on right.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -1089,8 +834,8 @@ figs/eda_overview_relationships.png, figs/eda_missingness.png)</p>
 
 </section></section>
 <section>
-<section id="key-findings-2" class="title-slide slide level1 center">
-<h1>Key Findings</h1>
+<section id="key-findings-2-3-min" class="title-slide slide level1 center">
+<h1>Key Findings (2-3 min)</h1>
 
 </section>
 <section id="summary-of-insights" class="slide level2">
@@ -1105,7 +850,7 @@ figs/eda_overview_relationships.png, figs/eda_missingness.png)</p>
 <li class="fragment">One insight about limitations or uncertainties in the data</li>
 </ul>
 <aside class="notes">
-<p>Professor’s Section 5 — Insight Summary: - Summarize key findings - Explain what the data suggests overall - Mention uncertainties or next steps Keep bullets crisp and non-technical.</p>
+<p>Professor’s Section 5 — Insight Summary: - Summarize 3-5 most important / key findings - Explain what the data suggests overall - Mention uncertainties or next steps Keep bullets crisp and non-technical.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -1122,8 +867,8 @@ figs/eda_overview_relationships.png, figs/eda_missingness.png)</p>
 
 </section></section>
 <section>
-<section id="collaboration-reflection" class="title-slide slide level1 center">
-<h1>Collaboration Reflection</h1>
+<section id="collaboration-reflection-2-3-min" class="title-slide slide level1 center">
+<h1>Collaboration Reflection (2-3 min)</h1>
 
 </section>
 <section id="what-went-well" class="slide level2">
@@ -1146,7 +891,7 @@ figs/eda_overview_relationships.png, figs/eda_missingness.png)</p>
 <li class="fragment">Time management and coordination across schedules</li>
 </ul>
 <aside class="notes">
-<p>Professor’s Section 6 — Collaboration Reflection: - What went well - What was challenging - Lessons learned - Role of GitHub, Jira, RStudio in collaboration</p>
+<p>Professor’s Section 6 — Collaboration Reflection: - What went wellin workflow - What was challenging - Lessons learned for future projects - Role of GitHub, Jira, RStudio in collaboration</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -1163,8 +908,8 @@ figs/eda_overview_relationships.png, figs/eda_missingness.png)</p>
 
 </section></section>
 <section>
-<section id="final-slide-repository-checklist" class="title-slide slide level1 center">
-<h1>Final Slide: Repository Checklist</h1>
+<section id="final-slide-repository-checklist-1-min" class="title-slide slide level1 center">
+<h1>Final Slide: Repository Checklist (1 min)</h1>
 
 </section>
 <section id="github-repo-contents" class="slide level2">
@@ -1183,7 +928,7 @@ figs/eda_overview_relationships.png, figs/eda_missingness.png)</p>
 <li class="fragment">Evidence of teamwork: PRs, commit history, multiple authors</li>
 </ul>
 <aside class="notes">
-<p>Professor’s Section 7 — GitHub Repository Checklist. Use this slide to explicitly confirm that all required repo components exist.</p>
+<p>Professor’s Section 7 — GitHub Repository Checklist. Confirm your repo includes: • Clean README • Data cleaning scripts • EDA scripts (.qmd or .Rmd) • Clear folder structure (data/, R/, figs/) • Kanban snapshot • Evidence of teamwork (commit history, pull requests, etc.)</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -1195,115 +940,8 @@ figs/eda_overview_relationships.png, figs/eda_missingness.png)</p>
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
-</section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="team-task-assignment-to-be-removed-later" class="title-slide slide level1 center">
-<h1>Team Task Assignment (To Be Removed Later)</h1>
-
-</section>
-<section id="slide-ownership-and-responsibilities" class="slide level2">
-<h2>Slide Ownership and Responsibilities</h2>
-<table>
-<colgroup>
-<col style="width: 51%">
-<col style="width: 18%">
-<col style="width: 19%">
-<col style="width: 9%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Slide/Section</th>
-<th>Primary Owner</th>
-<th>Backup/Support</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Title Slide &amp; Team Banner</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td>Data &amp; Initial Plan</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>Workflow &amp; Roles</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td>Key Issues Overview</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>Issue 1 Detailed Slide</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td>Issue 2 Detailed Slide</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>Reproducibility &amp; Workflow</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td>EDA Overview (Overview Patterns slide)</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>Deep Dive: Guiding Question 1</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td>Deep Dive: Guiding Question 2</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>Key Findings</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td>Collaboration Reflection</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>Repository Checklist</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody>
-</table>
 <aside class="notes">
-<p>Internal planning slide for the team only. Fill this table as you assign work, then delete the slide before final submission.</p>
+<p>Presentation Logistics Timing • Total: 20–30 minutes • Leave 3 min for questions • Practice pacing</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
