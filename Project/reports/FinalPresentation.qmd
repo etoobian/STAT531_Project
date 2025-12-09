@@ -91,10 +91,10 @@ Professor's requirement (Section 2):
 
 ## Roles & Responsibilities  (Just a start, refine as needed)
 
-- **Chris** — EDA, visualizations, guiding question refinement
-- **Takeshi** — Cleaning, documentation, 
-- **Esther** — GitHub coordination, project structure, reproducibility workflow, cleaning, EDA, final presentation
-- **Khloud** — Cleaning, ...
+- **Chris** — ED Analyst, Visualizer, Guiding Question Refinement
+- **Takeshi** — Data Cleaner, Scribe, Presentation Editor.
+- **Esther** — GitHub/Project Coordinator, ED Analyst, Reproducibility Enforcer.
+- **Khloud** — Data Cleaner, Presentation Editor.
 
 ## Coordination Tools  (add details from team docs)
 
