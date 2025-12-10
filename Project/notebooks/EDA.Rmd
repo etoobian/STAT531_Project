@@ -780,10 +780,14 @@ ggplot() +
 
 # Key Findings
 
-# Conclusion?
+## Conclusion
 
-- Summary
+The analysis indicates that most bids are low in price, with a few extreme outliers producing a right-skewed distribution. Winning bids are consistently higher than losing bids, confirming that win rate is strongly associated with price. Device type and geographic location both influence bid price and response time, with Personal Computers and Tablets dominating the dataset. Although response time shows only minor variation across devices and regions, some outliers could affect bidding outcomes. High population areas, such as Portland, account for the majority of bids, yet median prices in these regions remain moderate.
 
-- Limitations
 
-- Future Analysis
+## Limitations
+
+The analysis is limited by the dataset being restricted to Oregon, which may reduce the generalizability of findings to other regions. The high concentration of observations from Portland could skew overall results. Outliers in both price and response time introduce bias to mean-based measures, necessitating the use of medians for more robust insights. Additionally, two device type categories have some overlap, which may prevent a full understanding of the nuances in hardware or network performance.
+
+## Future Analysis
+Future analyses could explore the causal factors influencing bid success, including device performance and response times. Expanding the dataset to cover a longer time period would allow for the investigation of temporal patterns in bidding behavior. Additionally, examining interaction effects between variables such as device type, geographic location, time of day, and bid price could provide deeper insights into the dynamics driving successful bids.
