@@ -67,8 +67,7 @@ summary_table <- function(data, var) {
     Median = round(median(x, na.rm = TRUE), 3),
     Mean = round(mean(x, na.rm = TRUE), 3),
     `3rd Q` = round(quantile(x, 0.75, na.rm = TRUE), 3),
-    Max = max(x, na.rm = TRUE),
-    `NA count` = sum(is.na(x))
+    Max = max(x, na.rm = TRUE)
   )
 }
 
@@ -219,7 +218,7 @@ pretty_xyplot <- function(data, xvar, yvar, x_label = NULL, y_label = NULL) {
 
 ## Numerical Variables
 
-Using the information_gain() function, we can evaluate how much each variable reduces uncertainty in predicting the target variable *BID_WON*. The analysis indicates that *AUCTION_ID*, *PUBLISHER_ID*, and *PRICE* contribute the most information gain, while nearly all other variables exhibit relatively low, and roughly similar, values. Notably, the Region variable provides minimal information gain, which is expected given that the dataset is entirely restricted to Oregon.
+Using the information_gain() function, we can evaluate how much each variable reduces uncertainty in predicting the target variable *PRICE*. The analysis indicates that *REQUESTED_SIZES*, *BID_WON*, and *AUCTION_ID* contribute the most information gain, while nearly all other variables exhibit relatively low, and roughly similar, values. Notably, the Region variable provides minimal information gain, which is expected given that the dataset is entirely restricted to Oregon.
 
 ```{r, echo = FALSE}
 # Testing for "Predictive Power"
@@ -232,7 +231,7 @@ information_gain(PRICE ~ ., data = ad_clean) %>%
 
 ### Price
 
-The histogram of bid prices is heavily peaked on the left, indicating that most bids are low in value. The summary statistics reveal several extreme outliers that create a right-skewed distribution, with prices reaching up to $141.25. The boxplot highlights a median bid price of approximately $0.20, with an interquartile range from $0.07 to $0.57, showing that the vast majority of bids are below $1.
+The histogram of bid prices is peaks greatly to the left of the plot, indicating that most bids are low in value. The summary statistics reveal several extreme outliers that create a right-skewed distribution, with prices reaching up to $141.25. The boxplot highlights a median bid price of approximately $0.20, with an interquartile range from $0.07 to $0.57, showing that the vast majority of bids are below $1.
 
 ```{r Price, results = 'asis', echo = FALSE}
 
@@ -250,11 +249,11 @@ pretty_boxplot(ad_clean, "PRICE", "Price in Dollars")
 
 ### Response Time
 
-The histogram of the *Response Time* variable exhibits a right-skewed distribution, with the majority of observations falling between 50 and 400 milliseconds. The mean response time is 201 milliseconds. The boxplot shows a median of 164 milliseconds and an interquartile range of 110 to 257 milliseconds. While the boxplot truncates numerous outliers, these higher values are evident in the histogram. Overall, the system typically responds quickly, with a smaller subset of observations exhibiting longer response times.
+The histogram of the *Response Time* variable exhibits a right-skewed distribution, with the mean response time of 201 milliseconds and a majority of observations falling between 50 and 400 milliseconds. The boxplot shows a median of 164 milliseconds and an interquartile range of 110 to 257 milliseconds. While the boxplot truncates numerous outliers, these higher values are evident in the histogram. Overall, the system typically responds quickly, with a smaller subset of observations exhibiting longer response times.
 
 ```{r, results = 'asis', echo = FALSE}
 
-# Histogram of Price
+# Histogram of Response Time
 pretty_histogram(ad_clean, "RESPONSE_TIME")
 
 # Quick summary of the RESPONSE_TIME variable.
@@ -262,7 +261,7 @@ summary_table(ad_clean, "RESPONSE_TIME") %>%
   kable("html", caption = "Summary Statistics for Response Time") %>%
   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 
-# Boxplot of Price
+# Boxplot of Response Time
 pretty_boxplot(ad_clean, "RESPONSE_TIME", "Response Time in ms")
 ```
 
@@ -272,7 +271,7 @@ The majority of latitude values fall between 45 and 46 degrees, with the minimum
 
 ```{r Latitude, results = 'asis', echo = FALSE}
 
-# Histogram of Price
+# Histogram of Latitude
 pretty_histogram(ad_clean, "DEVICE_GEO_LAT")
 
 # Quick summary of the DEVICE_GEO_LATITUDE variable.
@@ -280,29 +279,29 @@ summary_table(ad_clean, "DEVICE_GEO_LAT") %>%
   kable("html", caption = "Summary Statistics for Latitude") %>%
   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 
-# Boxplot of Price
+# Boxplot of Latitude
 pretty_boxplot(ad_clean, "DEVICE_GEO_LAT", "Latitude")
 
 ```
 
-<!-- ### Device Geo Longitude -->
+### Device Geo Longitude
 
-<!-- The histogram of the longitude variable suggests an approximately normal distribution. A few outliers extend toward -118 degrees, but the majority of observations are concentrated around -122.5 degrees. The boxplot indicates a median longitude of -122.83, with an interquartile range from -122.83 to -122.59. This narrow span of 0.24 degrees captures the central 50% of the longitude values. -->
+The histogram of the longitude variable suggests an approximately normal distribution. A few outliers extend toward -118 degrees, but the majority of observations are concentrated around -122.5 degrees. The boxplot indicates a median longitude of -122.83, with an interquartile range from -122.83 to -122.59. This narrow span of 0.24 degrees captures the central 50% of the longitude values.
 
-<!-- ```{r Longitude, results = 'asis', echo = FALSE} -->
+```{r Longitude, results = 'asis', echo = FALSE}
 
-<!-- # Histogram of Price -->
-<!-- pretty_histogram(ad_clean, "DEVICE_GEO_LONG") -->
+# Histogram of Longitude
+pretty_histogram(ad_clean, "DEVICE_GEO_LONG")
 
-<!-- # Quick summary of the DEVICE_GEO_LONG variable. -->
-<!-- summary_table(ad_clean, "DEVICE_GEO_LONG") %>% -->
-<!--   kable("html", caption = "Summary Statistics for Longitude") %>% -->
-<!--   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover")) -->
+# Quick summary of the DEVICE_GEO_LONG variable.
+summary_table(ad_clean, "DEVICE_GEO_LONG") %>%
+  kable("html", caption = "Summary Statistics for Longitude") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 
-<!-- # Boxplot of Price -->
-<!-- pretty_boxplot(ad_clean, "DEVICE_GEO_LONG", "Longitude") -->
+# Boxplot of Latitude
+pretty_boxplot(ad_clean, "DEVICE_GEO_LONG", "Longitude")
 
-<!-- ``` -->
+```
 
 ## Categorical Variables
 
@@ -364,28 +363,96 @@ pretty_freq(ad_clean, "DEVICE_GEO_REGION")
 ## Numerical vs Numerical
 ### Price and Response Time
 
-Several extreme values in the price variable deviate from the overall distribution. There appears to be a potential relationship where longer response times are associated with lower bid prices, suggesting that slower bidders may enter lower initial bids and subsequently lose to faster competitors. Additionally, some points are clearly separated from the main distribution, likely representing bidders who either submitted higher-priced bids initially or were able to quickly adjust and rebid at a higher price within the same auction.
+Several extreme values in the price variable deviate from the overall distribution. There appears to be a potential relationship where longer response times are associated with lower bid prices, suggesting that slower bidders may enter lower initial bids and subsequently lose to faster competitors. Additionally, some points are clearly separated from the main distribution, likely representing bidders who either submitted higher-priced bids initially or were able to quickly adjust and rebid at a higher price within the same auction. In the visualization depicting average price and response time by the top 5 publishers, most show a higher price in the 300 to 600 millisecond range. Beyond that point, the price of bid begins to diminish as response time increases, but the largest publisher remains steady at its high price during that time. Three of the top 5 also exhibit an increase in price of bid just after the initial response period, while the other two publishers show average bids of higher value in shorter response times.
 
 ```{r Price v Response Time, echo = FALSE}
 # Scatterplot
 pretty_xyplot(ad_clean, "RESPONSE_TIME", "PRICE", "Response Time (ms)", "Price")
 
+
+# Scatterplot w/ Publisher
+## sort
+top_publishers <- ad_clean %>%
+  filter(!is.na(RESPONSE_TIME), !is.na(PRICE), !is.na(PUBLISHER_ID)) %>%
+  count(PUBLISHER_ID, sort = TRUE) %>%
+  slice_head(n = 5) %>%
+  pull(PUBLISHER_ID)
+## summary
+ad_summary <- ad_clean %>%
+  filter(PUBLISHER_ID %in% top_publishers) %>%
+  mutate(time_bin = cut(RESPONSE_TIME, breaks = seq(0, max(RESPONSE_TIME, na.rm = TRUE), by = 300))) %>%
+  group_by(PUBLISHER_ID, time_bin) %>%
+  summarise(mean_price = mean(PRICE, na.rm = TRUE), .groups = "drop")
+
+## scatterplot
+ggplot(ad_summary, aes(x = time_bin, y = mean_price, group = PUBLISHER_ID, color = PUBLISHER_ID)) +
+  geom_line(size = 1) +
+  geom_point(size = 2, alpha = 0.7) +
+  facet_wrap(~ PUBLISHER_ID, ncol = 2, scales = "free_y") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        strip.text = element_text(size = 12, face = "bold")) +
+  labs(
+    title = "Average Price by Response Time (Top 5 Publishers)",
+    x = "Response Time",
+    y = "Mean Price"
+  )
+
 ```
 
 ### Price and Latitude
 
-The scatterplot of latitude versus price suggests a slight increase in bid prices around the 45.5-degree latitude mark. The higher concentration of points in this area are likely to be related to greater population density. Additionally, we observe a pattern similar to the Price versus Response Time graph, with some bids significantly higher than the main distribution. These points may represent a "second round" of bidding, where initial lower bids were rejected and subsequently raised.
+The scatterplot of latitude versus price suggests a slight increase in bid prices around the 45.5-degree latitude mark. The higher concentration of points in this area are likely to be related to greater population density. Additionally, we observe a pattern similar to the Price versus Response Time graph, with some bids significantly higher than the main distribution. These points may represent a "second round" of bidding, where initial lower bids were rejected and subsequently raised. Plotting the mean price against lattitude bins, there is a clear spike in price at latitude 43.2, with large variance in the surrounding area. The mean price between 44.3 and 46.2 seems to be relatively stable by comparison, which shows there could be a geographic influence on price of bids.
 
 ```{r Price v Latitude, results = 'asis', echo = FALSE}
+# Scatterplot
 pretty_xyplot(ad_clean, "DEVICE_GEO_LAT", "PRICE", "Latitude", "Price")
+
+# Mean Price
+ad_clean %>%
+  mutate(lat_bin = cut(DEVICE_GEO_LAT, breaks = 15)) %>%  
+  group_by(lat_bin) %>%
+  summarise(mean_price = mean(PRICE, na.rm = TRUE),
+            n = n()) %>%
+  ggplot(aes(x = lat_bin, y = mean_price, group = 1)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Average Price Across Latitude",
+    x = "Latitude",
+    y = "Mean Price"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ### Price and Longitude
 
-Similar to the latitude plot, a large cluster of points is observed around -122.5 degrees longitude, likely reflecting areas of higher population density. Additionally, the pattern of higher-priced bids above the main distribution persists, suggesting a secondary set of elevated bids originating from these locations.
+Similar to the latitude plot, a large cluster of points is observed around -122.5 degrees longitude, likely reflecting areas of higher population density. Additionally, the pattern of higher-priced bids above the main distribution persists, suggesting a secondary set of elevated bids originating from these locations. When aggregating PRICE by longitude groups, it is clear that the price fluctuates. This variance further supports the possibility that regional effects are contributing to price differences.
 
 ```{r Price v Longitude, results = 'asis', echo = FALSE}
+# Scatterplot
 pretty_xyplot(ad_clean, "DEVICE_GEO_LONG", "PRICE", "Longitude", "Price")
+
+# Mean Price
+ad_clean %>%
+  mutate(long_bin = cut(DEVICE_GEO_LONG, breaks = 15)) %>%  
+  group_by(long_bin) %>%
+  summarise(mean_price = mean(PRICE, na.rm = TRUE),
+            n = n()) %>%
+  ggplot(aes(x = long_bin, y = mean_price, group = 1)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Average Price Across Longitude",
+    x = "Longitude",
+    y = "Mean Price"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
 ```
 
 ### Latitude and Response Time
@@ -393,6 +460,7 @@ pretty_xyplot(ad_clean, "DEVICE_GEO_LONG", "PRICE", "Longitude", "Price")
 The scatterplot of Latitude versus Response Time exhibits a generally consistent distribution of points across different latitudes, with the exception of a spike on the right side. There is a notable concentration of points around 45.5 degrees, and several other locations show outliers with unusually long response times.
 
 ```{r Latitude v Response Time, results = 'asis', echo = FALSE}
+# Scatterplot
 pretty_xyplot(ad_clean, "DEVICE_GEO_LAT", "RESPONSE_TIME", "Latitude", "Response Time (ms)")
 ```
 
@@ -407,7 +475,7 @@ pretty_xyplot(ad_clean, "DEVICE_GEO_LONG", "RESPONSE_TIME", "Longitude", "Respon
 ## Numerical vs Categorical
 ### Price and Bid Won
 
-A t-test, yielding an extremely significant p-value (2.2e-16), confirms a statistically significant difference in mean prices between won and lost bids. The accompanying boxplot illustrates the distribution of bid prices by outcome, clearly highlighting the separation between the two groups. For readability, the plot has been zoomed in to emphasize differences in median values and overall distribution. Notably, the median price of winning bids is substantially higher than that of losing bids, with a wider interquartile range, and the IQRs of the two groups do not overlap.
+A t-test, yielding an extremely significant p-value (2.2e-16), confirms a statistically significant difference in mean prices between won and lost bids. The accompanying boxplot illustrates the distribution of bid prices by outcome, clearly highlighting the separation between the two groups. For readability, the plot has been zoomed in to emphasize differences in median values and overall distribution. Notably, the median price of winning bids is substantially higher than that of losing bids, with a wider interquartile range, and the IQRs of the two groups do not overlap. 
 
 ```{r Price v Bid Wins t test, eval = FALSE, echo = FALSE}
 # T test of means
@@ -418,7 +486,7 @@ t.test(PRICE ~ BID_WON, data = ad_clean)
 
 # Boxplot
 ggplot(ad_clean, aes(x = ad_clean$BID_WON, y = ad_clean$PRICE)) + 
-    geom_boxplot(
+    geom_violin(
         fill = "#FF7F50",
         color = "black",
         outlier.color = "red",
@@ -437,6 +505,10 @@ ggplot(ad_clean, aes(x = ad_clean$BID_WON, y = ad_clean$PRICE)) +
         panel.grid.minor = element_blank(),
         axis.text.x = element_blank()
     )
+
+
+
+
 ```
 
 ### Price and Device Type
@@ -723,31 +795,6 @@ This heatmap visualizes Device Type activity across the available time window. C
 
 # Convert to PST
 pst_time <- as.POSIXct(ad_clean$TIMESTAMP, tz = "America/Los_Angeles")
-
-
-ad_clean %>%
-  mutate(
-    time_bin = floor_date(pst_time, "5 minutes"),
-    DEVICE_TYPE = factor(DEVICE_TYPE)
-  ) %>%
-  count(DEVICE_TYPE, time_bin) %>%
-  ggplot(aes(x = time_bin, y = DEVICE_TYPE, fill = n)) +
-  geom_tile() +
-  scale_x_datetime(
-    date_labels = "%I:%M %p",
-    date_breaks = "60 min",
-    expand = c(0,0)
-  ) +
-  scale_fill_viridis_c() +
-  labs(
-    title = "Device Type Activity Across Time",
-    x = "Time (PST)",
-    y = "Device Type",
-    fill = "Count"
-  ) +
-  coord_equal() +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 # # Heatmap of Device by Timestamp
