@@ -36,6 +36,7 @@ ad_clean <- clean_ad_data(load_ad_data())
 #source("C:/Users/chris/Downloads/final_data_cleaning.R") # Temporary for knit
 #ad_clean <- cumulative_ad_data # Temporary for knit
 
+
 ```
 
 
