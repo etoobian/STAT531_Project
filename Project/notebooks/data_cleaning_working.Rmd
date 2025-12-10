@@ -113,6 +113,8 @@ We summarize all variables numerically and inspect missingness patterns using th
 summarize_ad_data(ad_raw)
 ```
 
+The only variables with missing data are `DEVICE_GEO_CITY` and `DEVICE_GEO_ZIP`, with **21,198 missing rows** each.
+
 ---
 
 ## Expected vs. Actual Data Types
@@ -221,22 +223,156 @@ In addition, some geographic and categorical fields (**`DEVICE_GEO_REGION`**, **
 
 # **FULL DATASET**
 
+This section examines the dataset at the row level to ensure there are no duplicated records and to understand whether the available columns can uniquely identify each row. According to the data dictionary, the true grain of the full dataset is:
+
+> **(AUCTION_ID, bidder/seat, SIZE, \dots)**
+
+However, bidder- and seat-level identifiers are **not included** in this subset, so we do not expect any single column or simple composite key to uniquely identify each record.
+
 ---
 
 ## Duplicated rows
 
-We check for exact duplicate rows in `ad_raw` and drop them if present.
+We test for full-row duplicates.
 
-- Check for exact duplicate rows
-- Eliminate & update log
+```{r full-duplicates, results='hold'}
+# Count total rows and distinct rows across all columns
+n_raw      <- nrow(ad_raw)
+n_distinct <- ad_raw %>% distinct() %>% nrow()
+n_dups     <- n_raw - n_distinct
+
+cat("Total rows:                       ", n_raw, "\n")
+cat("Distinct rows (all columns):      ", n_distinct, "\n")
+cat("Exact duplicate rows (by count):  ", n_dups, "\n")
+```
+
+**Decision:** Drop exact duplicates, while keeping one copy of each unique row.
+
+We implement our decision for handling full-row duplicates and add to data log:
+
+```{r full-dup-clean, results='hold'}
+# Remove exact full-row duplicates (keep one copy)
+ad_clean <- ad_raw %>%  distinct()
+
+cleaning_log <- cleaning_log %>%
+  add_row(
+    step_id = "G1",
+    variable = "ALL",
+    issue = "Exact duplicate rows present",
+    decision = "Dropped full duplicate rows using distinct()",
+    rows_affected = n_dups
+  )
+```
 
 ---
 
 ## Keys
 
-We confirm the expected grain and check uniqueness of key fields (e.g., `AUCTION_ID` and combinations with bidder/seat/size, as appropriate for this subset).
+Since bidder/seat identifiers are missing, no single column is expected to uniquely identify a record.
+We begin by testing the most intuitive composite key:
 
-- Check key uniqueness (e.g., `AUCTION_ID` + other IDs if relevant)
+> (`AUCTION_ID`, `SIZE`, `PRICE`)
+
+```{r key-check-intial}
+simple_unique <- ad_clean %>%
+  distinct(AUCTION_ID, SIZE, PRICE) %>%
+  nrow()
+
+cat("Unique composite (AUCTION_ID, SIZE, PRICE): ", simple_unique)
+```
+
+The dataset contains `r nrow(ad_clean)` rows after duplicate removal,  
+but only `r simple_unique` unique combinations of (`AUCTION_ID`, `SIZE`, `PRICE`).  
+Thus, this composite key does **not** uniquely identify rows.
+
+We create a helper function to allow us to search for a combination which will work as a key. 
+
+**NOTE:** To avoid computational blow-up, we focus only on the most likely variables and limit our number of variables per composite key to 4:
+
+```{r composite-key-helper}
+check_candidate_keys <- function(data, cols, max_size = 4, show_full = TRUE) {
+  results <- list()
+  idx <- 1L
+  
+  for (k in seq_len(max_size)) {
+    combos <- combn(cols, k, simplify = FALSE)
+    
+    for (combo in combos) {
+      n_unique <- data %>%
+        distinct(across(all_of(combo))) %>%
+        nrow()
+      
+      results[[idx]] <- tibble(
+        combo   = paste(combo, collapse = " + "),
+        size    = k,
+        n_rows  = nrow(data),
+        n_unique = n_unique,
+        is_key  = (n_unique == nrow(data))
+      )
+      idx <- idx + 1L
+    }
+  }
+  
+  results <- bind_rows(results)
+  
+  if (show_full) {
+    # Full table (shown if needed for further exploration)
+    results %>%
+      arrange(desc(is_key), size, desc(n_unique))
+  } else {
+    # Compact summary
+    results %>%
+      group_by(size) %>%
+      summarise(
+        num_combos   = n(),
+        num_keys     = sum(is_key),
+        max_n_unique = max(n_unique),
+        .groups = "drop"
+      ) %>%
+      arrange(size)
+  }
+}
+```
+
+We then use this function to check the most likely candidate variables:
+
+```{r composite-key-search}
+composite_candidates <- c(
+  "AUCTION_ID",
+  "SIZE",
+  "PRICE",
+  "RESPONSE_TIME",
+  "BID_WON",
+  "PUBLISHER_ID",
+  "DEVICE_TYPE",
+  "DEVICE_GEO_CITY",
+  "DEVICE_GEO_ZIP",
+  "DEVICE_GEO_LAT",
+  "DEVICE_GEO_LONG",
+  "TIMESTAMP"
+)
+
+key_results <- check_candidate_keys(
+  data     = ad_clean,
+  cols     = composite_candidates,
+  max_size = 4,
+  show_full = FALSE
+)
+
+key_results
+```
+
+From these results, we can see that no combination (up to four variables) of these candidate variables will create a composite key to uniquely identify the rows of this dataset.
+
+---
+
+## Summary
+
+  - Exact duplicate rows were removed (`r n_dups` rows).
+  - No reasonable variable or combination of variables uniquely identifies each row.  
+  This is consistent with the data dictionary, which indicates that the true grain requires `bidder/seat`-level fields not present in this subset.
+
+We proceed using **`ad_clean`** as our working dataset for variable-level cleaning.
 
 ---
 
@@ -284,7 +420,12 @@ We confirm the expected grain and check uniqueness of key fields (e.g., `AUCTION
   - Display cleaning_log table.
   
   
-  
-  
+
   
 ---
+---
+---
+---
+
+  
+  
