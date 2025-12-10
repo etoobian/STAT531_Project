@@ -4,7 +4,7 @@ author: "TECK Squad"
 date: "December 12, 2025"
 output:
   rmdformats::readthedown:
-    toc_depth: 2        
+    toc_depth: 3        
     code_folding: hide
 fontsize: 11pt
 geometry: margin=1in
@@ -18,6 +18,7 @@ suppressPackageStartupMessages({
   library(tidyverse)
   library(arrow)
   library(dplyr)
+  library(stringr)
   #library(rprojroot)
   library(knitr)
   library(kableExtra)
@@ -269,7 +270,7 @@ log_change(
     step_id = "G1",
     variable = "ALL",
     issue = "Exact duplicate rows present",
-    decision = "Dropped full duplicate rows using distinct()",
+    decision = "Dropped full duplicate rows keeping one copy.",
     rows_affected = n_dups
   )
 ```
@@ -388,24 +389,248 @@ We proceed using **`ad_clean`** as our working dataset for variable-level cleani
 
 ---
 
+# **VARIABLE-LEVEL CLEANING**
+
+The following sections clean each variable (or group of related variables) in an order that follows the data dictionary.  
+For each variable, we document:
+
+  - The expected type and meaning  
+  - Exploration of raw values  
+  - Cleaning decisions  
+  - Updates to the data-cleaning log  
+  - A post-clean summary  
+
+---
+
+## **TIME VARIABLES:** `TIMESTAMP` \& `DATE_UTC`
+
+### Description
+
+- `TIMESTAMP`  
+  - **Type:** `TIMESTAMP_NTZ`  
+  - **Meaning:** Event time (UTC) when the log row was recorded 
+  - **Expectation:** A full datetime (date + time), treated as UTC
+  - **Actual:** `character`
+  - **Missing:** None
+
+- `DATE_UTC`  
+  - **Type:** `DATE`  
+  - **Meaning:** Calendar date (UTC) used for partitioning / grouping
+  - **Expectation:** A date consistent with the date portion of `TIMESTAMP`
+  - **Actual:** `character`
+  - **Missing:** None
+
+### Exploration
+
+Sample a few `TIMESTAMP` values:
+```{r timestamp-sample}
+set.seed(42)
+sample(ad_clean$TIMESTAMP, size = 20)
+```
+
+
+```{r timestamp-count-format, results='hold'}
+dash_rows       <- str_detect(ad_clean$TIMESTAMP, "-") %>%  sum()
+slash_rows      <- str_detect(ad_clean$TIMESTAMP, "/") %>%  sum()
+na_date_rows    <- str_detect(ad_clean$TIMESTAMP, "^NA") %>%  sum()
+
+cat("Rows with '-' in date portion:   ", dash_rows,  "\n")
+cat("Rows with '/' in date portion:   ", slash_rows, "\n")
+cat("Rows starting with 'NA ' date:   ", na_date_rows, "\n")
+cat("These three account for all rows:", 
+    dash_rows + slash_rows + na_date_rows == nrow(ad_clean))
+```
+
+**Observations**
+
+  - `r dash_rows` of `TIMESTAMP` values use a dash-separated date (e.g., `"2025-10-12 14:03:27"`).
+  - `r slash_rows` uses a slash-separated format (e.g., `"10/12/2025 14:03:27"`).  
+  - `r na_date_rows` appear with an `NA` date and a valid time-of-day (e.g., `"NA 14:03:27"`).  
+  - The raw columns themselves do **not** contain missing values: all rows have some string in `TIMESTAMP` and `DATE_UTC`. 
+
+**Decisions:**
+
+  - Recover missing dates in `TIMESTAMP` via `DATE_UTC`
+  - Parse `TIMESTAMP` into a POSIXct (UTC) variable with multiple formats.
+  - Convert `DATE_UTC` to *Date* type, keeping raw string as-is.
+  
+### Cleaning
+
+Recover `TIMESTAMP` where the date part was missing but time-of-day exists, using `DATE_UTC` as the date source:
+
+```{r timestamp-recover-date}
+# Extract date and time components
+ad_clean <- ad_clean %>%
+  mutate(
+    ts_date_raw = str_extract(TIMESTAMP, "^[^ ]+"),
+    ts_time_raw = str_extract(TIMESTAMP, "\\d{1,2}:\\d{1,2}:\\d{1,2}")
+  )
+
+# Fix rows where the date is 'NA', keeping all others as-is
+ad_clean <- ad_clean %>%
+  mutate(TIMESTAMP_fixed = case_when(
+    ts_date_raw == "NA" & !is.na(DATE_UTC) & !is.na(ts_time_raw) ~
+      paste(DATE_UTC, ts_time_raw),
+    TRUE ~ TIMESTAMP
+  ))
+```
+
+Parse the fixed `TIMESTAMP` into POSIXct:
+
+```{r timestamp-parse}
+ad_clean <- ad_clean %>%
+  mutate(TIMESTAMP_clean = lubridate::parse_date_time(
+    TIMESTAMP_fixed,
+    orders = c("ymd HMS", "mdy HMS"),
+    tz = "UTC"
+  ))
+
+n_na_ts <- sum(is.na(ad_clean$TIMESTAMP_clean))
+cat("Rows with NA in TIMESTAMP_clean after parsing: ", n_na_ts, "\n")
+```
+
+Convert `DATE_UTC` to Date:
+
+```{r date_utc-to-date}
+ad_clean <- ad_clean %>%
+  mutate(DATE_UTC_clean = as.Date(DATE_UTC))
+
+cat("Rows with NA in DATE_UTC_clean: ", sum(is.na(ad_clean$DATE_UTC_clean)), "\n")
+```
+
+Log entries for time variables:
+
+```{r time-log}
+log_change(
+  step_id = "T1",
+  variable = "TIMESTAMP",
+  issue = "Inconsistent TIMESTAMP formats, including 'NA' date tokens.",
+  decision = "Recover 'NA' dates using `DATE_UTC`; parsed to POSIXct (UTC).",
+  rows_affected = nrow(ad_clean)
+)
+
+log_change(
+  step_id = "T2",
+  variable = "DATE_UTC",
+  issue = "DATE_UTC stored as character.",
+  decision = "Converted to Date type.",
+  rows_affected = nrow(ad_clean)
+)
+```
+
+**Summary**
+
+  - `TIMESTAMP`: 
+      - Inconsistently formatted (mixture of dash- vs. slash-separated dates and a small number of entries with an `NA` date token).
+      - We repaired rows with an `NA` date by using the date from `DATE_UTC`, then parsed the corrected string into `TIMESTAMP_clean` (POSIXct, UTC).  
+
+  - `DATE_UTC`:
+      - Converted from character to `DATE_UTC_clean` (Date type).  
+      
+  - No rows were dropped as part of Time Variables cleaning steps.
+
+
+---
+
+## **IDENTIFIERS:** `AUCTION_ID` \& `PUBLISHER_ID`
+
+---
+
+## **DEVICE ATTRIBUTE:** `DEVICE_TYPE`
+
+---
+
+## **GEOLOCATION FIELDS:** `DEVICE_GEO_REGION`, `DEVICE_GEO_CITY` \& `DEVICE_GEO_ZIP`
+## **GEOLOCATION FIELDS:** `DEVICE_GEO_LAT` \& `DEVICE_GEO_LONG`
+
+---
+
+## **AD SIZES:** `REQUESTED_SIZES` \& `SIZE`
+
+---
+
+## **PRICING:** `PRICE`
+
+---
+
+## **LATENCY METRIC:** `RESPONSE_TIME`
+
+---
+
+## **OUTCOME:** `BID_WON`
+
+
+---
+
+---
+
+
 # **VARIABLE**
-   
-## Description
 
-  - Description & expected type/constraints (from dictionary).
-   - Use the dictionary to define expectations.
-   
-## Exploration
+### Description
 
-  - values, distributions, weird codes, NA patterns.
+- `VARIABLE`  
+  - **Type:** `TYPE`  
+  - **Meaning:** Event time (UTC) when the log row was recorded 
+  - **Expectation:** A full datetime (date + time), treated as UTC
+  - **Actual:** `character`
+  - **Missing:** None
+
+- `DATE_UTC`  
+  - **Type:** `DATE`  
+  - **Meaning:** Calendar date (UTC) used for partitioning / grouping
+  - **Expectation:** A date consistent with the date portion of `TIMESTAMP`
+  - **Actual:** `character`
+  - **Missing:** None
+
+### Exploration
+
+
+**Observations**
+
+  - `r dash_rows` of `TIMESTAMP` values use a dash-separated date (e.g., `"2025-10-12 14:03:27"`).
+  - `r slash_rows` uses a slash-separated format (e.g., `"10/12/2025 14:03:27"`).  
+  - `r na_date_rows` appear with an `NA` date and a valid time-of-day (e.g., `"NA 14:03:27"`).  
+  - The raw columns themselves do **not** contain missing values: all rows have some string in `TIMESTAMP` and `DATE_UTC`. 
+
+**Decisions:**
+
+  - Recover missing dates in `TIMESTAMP` via `DATE_UTC`
+  - Parse `TIMESTAMP` into a POSIXct (UTC) variable with multiple formats.
+  - Convert `DATE_UTC` to *Date* type, keeping raw string as-is.
+
 
 ## Cleaning
+Log entries for time variables:
 
-   -type conversion, recodes, outlier handling, bounds checks, etc.
+```{r time-log}
+log_change(
+  step_id = "T1",
+  variable = "TIMESTAMP",
+  issue = "Inconsistent TIMESTAMP formats, including 'NA' date tokens.",
+  decision = "Recover 'NA' dates using `DATE_UTC`; parsed to POSIXct (UTC).",
+  rows_affected = nrow(ad_clean)
+)
 
-## Summary
+log_change(
+  step_id = "T2",
+  variable = "DATE_UTC",
+  issue = "DATE_UTC stored as character.",
+  decision = "Converted to Date type.",
+  rows_affected = nrow(ad_clean)
+)
+```
 
-   -Add to cleaning_log if we changed anything.
+**Summary**
+
+  - `TIMESTAMP`: 
+      - Inconsistently formatted (mixture of dash- vs. slash-separated dates and a small number of entries with an `NA` date token).
+      - We repaired rows with an `NA` date by using the date from `DATE_UTC`, then parsed the corrected string into `TIMESTAMP_clean` (POSIXct, UTC).  
+
+  - `DATE_UTC`:
+      - Converted from character to `DATE_UTC_clean` (Date type).  
+      
+  - No rows were dropped as part of Time Variables cleaning steps.
    
 ---
 
@@ -456,5 +681,5 @@ Each prefix corresponds to a logical group of variables in the dataset.
 | GEO    | Geolocation      | DEVICE_GEO_{REGION, CITY, ZIP,  LAT, LONG} |
 | SZ     | Ad Sizes         | SIZE, REQUESTED_SIZES                      |
 | PR     | Pricing          | PRICE                                      |
-| RT     | Performance      | RESPONSE_TIME                              |
+| RT     | Latency          | RESPONSE_TIME                              |
 | BW     | Outcome          | BID_WON                                    |
