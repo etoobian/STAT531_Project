@@ -173,6 +173,7 @@ summarize_ad_data <- function(df) {
   tibble::tibble(
     column        = names(df),
     type          = vapply(df, function(x) class(x)[1], character(1)),
+    length        = vapply(df, function(x) length(x), integer(1)),
     n_missing     = vapply(df, function(x) sum(is.na(x)), integer(1)),
     n_non_missing = vapply(df, function(x) sum(!is.na(x)), integer(1)),
     n_unique      = vapply(df, function(x) dplyr::n_distinct(x), integer(1))

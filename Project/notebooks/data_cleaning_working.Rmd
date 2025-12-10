@@ -18,7 +18,9 @@ suppressPackageStartupMessages({
   library(tidyverse)
   library(arrow)
   library(dplyr)
-  library(rprojroot)
+  #library(rprojroot)
+  library(knitr)
+  library(kableExtra)
   
   #library(broom)
   #library(car)
@@ -69,31 +71,157 @@ This notebook documents the full data-cleaning workflow for the Oregon ad biddin
 
   - **Input:** raw parquet data loaded via `load_ad_data()` (see `Project/scripts/data_io.R`).
   - **Output:** a cleaned analysis-ready dataset saved under `Project/data/...`.
-  - This document is designed to be **reproducible** and to clearly justify all data-cleaning decisions.
 
 ---
+
 ---
 
-# **Initial Data Overview**
+# **DATA OVERVIEW**
 
-## Dimensions and structure
+- According to the data dictionary, each row represents **one bidder’s response for one requested size within a single ad auction**, meaning:
+  - Each `AUCTION_ID` appears multiple times  
+  - There may be several responses for the same ad size within the same auction  
+
+---
+
+## Dimensions and Structure
 
 We begin with a high-level look at the raw dataset.
 
-- How many rows / columns?
-- Basic structure: `glimpse()`, `head()`
+```{r overview-dims, message=FALSE, 'hold'=TRUE}
+# Dimensions
+n_rows <- nrow(ad_raw)
+n_cols <- ncol(ad_raw)
+
+dim_table <- tibble(
+  Metric = c("Number of Rows", "Number of Columns"),
+             Value = c(n_rows, n_cols)
+)
+
+dim_table %>%
+  kable(caption = "Dataset Dimentions") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped"))
+```
+
+---
 
 ## Basic summaries
 
-We summarise variables and examine missingness using the helper from `data_io.R`.
+We summarize all variables numerically and inspect missingness patterns using the helper summary function defined in `data_io.R`.
 
-- `summary()`/`skimr::skim()`-style overview
-- NA counts per column (via `data_io.R` function ``summarize_ad_data()`)
+```{r overview-summary}
+summarize_ad_data(ad_raw)
+```
 
 ---
+
+## Expected vs. Actual Data Types
+
+We can compare expected data types as given by the data dictionary to the actual type of each variable in the data:
+
+```{r overview-expected-vs-actual, message=FALSE}
+expected_types <- tibble(
+  Variable = c(
+    "TIMESTAMP",
+    "DATE_UTC",
+    "AUCTION_ID",
+    "PUBLISHER_ID",
+    "DEVICE_TYPE",
+    "DEVICE_GEO_COUNTRY",
+    "DEVICE_GEO_REGION",
+    "DEVICE_GEO_CITY",
+    "DEVICE_GEO_ZIP",
+    "DEVICE_GEO_LAT",
+    "DEVICE_GEO_LONG",
+    "REQUESTED_SIZES",
+    "SIZE",
+    "PRICE",
+    "RESPONSE_TIME",
+    "BID_WON"
+  ), 
+  Expected_Class = c(
+    "datetime",          # TIMESTAMP_NTZ
+    "date",              # DATE
+    "categorical",       # Auction ID
+    "categorical",       # Publisher ID
+    "categorical",       # desktop/mobile/tablet
+    "categorical",       # 2-letter country
+    "categorical",       # 2-letter USPS region
+    "categorical",       # City name
+    "categorical",       # ZIP / ZIP+4 string
+    "numeric",           # Latitude
+    "numeric",           # Longitude
+    "categorical",       # List of sizes
+    "categorical",       # Single size
+    "numeric",           # CPM bid
+    "numeric",           # Response time in ms
+    "boolean"            # TRUE/FALSE winner
+  ),
+  Expected_Detail = c(
+    "TIMESTAMP_NTZ (UTC event time)",
+    "DATE (UTC calendar date)",
+    "VARCHAR (auction identifier)",
+    "VARCHAR (publisher/site identifier)",
+    "VARCHAR, (device category, string)",
+    "VARCHAR(2) (ISO 2-letter country code)",
+    "VARCHAR(2) (USPS state/region postal code)",
+    "VARCHAR, (city name, string)",
+    "VARCHAR(10) (ZIP or ZIP+4)",
+    "FLOAT (latitude of device)",
+    "FLOAT (longitude of device)",
+    "VARCHAR/ARRAY (all requested sizes, ex: '300x250, 320x50')",
+    "VARCHAR (size for this bid, ex: `300x250')",
+    "NUMBER(12,6) (CPM bid in USD)",
+    "NUMBER(10,0) (bidder latency in ms)",
+    "BOOLEAN (if bid won, TRUE/FALSE)"
+  )
+)
+
+expected_types <- expected_types %>%
+  arrange(factor(
+    Expected_Class,
+    levels = c("numeric", "categorical", "datetime", "date", "boolean")
+  ))
+
+actual_types <- tibble(
+  Variable = names(ad_raw),
+  Actual_Type = sapply(ad_raw, class)
+)
+
+comparison <- expected_types %>%
+  left_join(actual_types, by = "Variable")
+
+comparison %>%
+  kable(caption = "Expected vs Actual Types (Data Dictionary vs Raw Data)") %>%
+    kable_styling(full_width = FALSE, bootstrap_options = c("striped"))
+```
+
+Many of these are suspicious or inconsistent with the data dictionary:
+  
+  - **`PRICE`** and **`RESPONSE_TIME`** 
+      - Expected *numeric* $\to$ Stored as `character`
+      - Likely due to *non-numeric characters* or inconsistent formatting.
+  - **`DEVICE_TYPE`**
+      - Expected descriptive *string* $\to$ Stored as an `integer` code
+      - Implies an encoded representation without a visible lookup table.
+  - **`DEVICE_GEO_COUNTRY`** 
+      - Expected per dictionary $\to$ Not present in this data subset
+  - **`TIMESTAMP`** and **`DATE_UTC`** 
+      - Expected *datetime/date* $\to$ Stored as `character`
+      - Will need to be converted prior to any time-based analysis.
+  - **`BID_WON`** 
+      - Expected *boolean* $to$ Stored as `character`
+      - Will require re-coding to `logical` (TRUE/FALSE) type.
+
+In addition, some geographic and categorical fields (**`DEVICE_GEO_REGION`**, **`DEVICE_GEO_CITY`**, and **`DEVICE_GEO_ZIP`**) appear broadly consistent with expected classes, but will need to be fully analysed for any messy real-world values such as **inconsistent casing**, **invalid state codes**, or **irregular ZIP formats**. These issues will be fully examined and addressed in the variable-level cleaning sections that follow.
+
+---
+
 ---
 
 # **FULL DATASET**
+
+---
 
 ## Duplicated rows
 
@@ -102,6 +230,8 @@ We check for exact duplicate rows in `ad_raw` and drop them if present.
 - Check for exact duplicate rows
 - Eliminate & update log
 
+---
+
 ## Keys
 
 We confirm the expected grain and check uniqueness of key fields (e.g., `AUCTION_ID` and combinations with bidder/seat/size, as appropriate for this subset).
@@ -109,6 +239,7 @@ We confirm the expected grain and check uniqueness of key fields (e.g., `AUCTION
 - Check key uniqueness (e.g., `AUCTION_ID` + other IDs if relevant)
 
 ---
+
 ---
 
 # **VARIABLE**
@@ -131,7 +262,9 @@ We confirm the expected grain and check uniqueness of key fields (e.g., `AUCTION
    -Add to cleaning_log if we changed anything.
    
 ---
+
 ---
+
 # **CLEANED DATASET**
 
 ## Assemble `ad_clean`
@@ -143,8 +276,15 @@ We confirm the expected grain and check uniqueness of key fields (e.g., `AUCTION
 ## Save via `data_io.R` function `export_ad_data()`
 
 ---
+
 ---
 
 # **DATA LOG**
 
   - Display cleaning_log table.
+  
+  
+  
+  
+  
+---
