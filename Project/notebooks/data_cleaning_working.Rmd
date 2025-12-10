@@ -61,6 +61,17 @@ cleaning_log <- tibble::tibble(
   decision = character(),
   rows_affected = integer()
 )
+
+log_change <- function(step_id, variable, issue, decision, rows_affected = NA_integer_) {
+  cleaning_log <<- cleaning_log %>%
+    add_row(
+      step_id       = step_id,
+      variable      = variable,
+      issue         = issue,
+      decision      = decision,
+      rows_affected = rows_affected
+    )
+}
 ```
 
 ---
@@ -254,8 +265,7 @@ We implement our decision for handling full-row duplicates and add to data log:
 # Remove exact full-row duplicates (keep one copy)
 ad_clean <- ad_raw %>%  distinct()
 
-cleaning_log <- cleaning_log %>%
-  add_row(
+log_change(
     step_id = "G1",
     variable = "ALL",
     issue = "Exact duplicate rows present",
@@ -417,15 +427,34 @@ We proceed using **`ad_clean`** as our working dataset for variable-level cleani
 
 # **DATA LOG**
 
-  - Display cleaning_log table.
-  
-  
+The table below records all data-cleaning actions taken throughout this notebook.  
+Each entry corresponds to a specific issue that was identified and the decision made to address it.
 
-  
----
----
----
----
+## Log
 
-  
-  
+```{r data-log-display}
+cleaning_log %>%
+  dplyr::arrange(step_id) %>%
+  knitr::kable(
+    caption = "Summary of Data-Cleaning Decisions",
+    align   = "l"
+  ) %>%
+  kableExtra::kable_styling(full_width = FALSE, bootstrap_options = "striped")
+```
+
+## Log Key
+
+The prefixes below are used in the `step_id` field of the data-cleaning log.  
+Each prefix corresponds to a logical group of variables in the dataset.
+
+| Prefix | Group            | Variables Included                         |
+|--------|------------------|--------------------------------------------|
+| G      | Global           | Entire Dataset                             |
+| T      | Time             | TIMESTAMP, DATE_UTC                        |
+| ID     | Identifiers      | AUCTION_ID, PUBLISHER_ID                   |
+| DT     | Device           | DEVICE_TYPE                                |
+| GEO    | Geolocation      | DEVICE_GEO_{REGION, CITY, ZIP,  LAT, LONG} |
+| SZ     | Ad Sizes         | SIZE, REQUESTED_SIZES                      |
+| PR     | Pricing          | PRICE                                      |
+| RT     | Performance      | RESPONSE_TIME                              |
+| BW     | Outcome          | BID_WON                                    |

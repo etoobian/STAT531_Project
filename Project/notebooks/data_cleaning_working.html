@@ -1618,7 +1618,11 @@ margin-left: 0 !important;
       <code>export_ad_data()</code></a></li>
       </ul></li>
       <li><a href="#data-log" id="toc-data-log"><strong>DATA
-      LOG</strong></a></li>
+      LOG</strong></a>
+      <ul>
+      <li><a href="#log" id="toc-log">Log</a></li>
+      <li><a href="#log-key" id="toc-log-key">Log Key</a></li>
+      </ul></li>
       </ul>
     </div>
     <div id="postamble" data-toggle="wy-nav-shift" class="status">
@@ -2125,7 +2129,7 @@ are no duplicated records and to understand whether the available
 columns can uniquely identify each row. According to the data
 dictionary, the true grain of the full dataset is:</p>
 <blockquote>
-<p><strong>(AUCTION_ID, bidder/seat, size, )</strong></p>
+<p><strong>(AUCTION_ID, bidder/seat, SIZE, )</strong></p>
 </blockquote>
 <p>However, bidder- and seat-level identifiers are <strong>not
 included</strong> in this subset, so we do not expect any single column
@@ -2152,14 +2156,13 @@ data log:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Remove exact full-row duplicates (keep one copy)</span></span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_raw <span class="sc">%&gt;%</span>  <span class="fu">distinct</span>()</span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>cleaning_log <span class="ot">&lt;-</span> cleaning_log <span class="sc">%&gt;%</span></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="fu">add_row</span>(</span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>    <span class="at">step_id =</span> <span class="st">&quot;G1&quot;</span>,</span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>    <span class="at">variable =</span> <span class="st">&quot;ALL&quot;</span>,</span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>    <span class="at">issue =</span> <span class="st">&quot;Exact duplicate rows present&quot;</span>,</span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>    <span class="at">decision =</span> <span class="st">&quot;Dropped full duplicate rows using distinct()&quot;</span>,</span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>    <span class="at">rows_affected =</span> n_dups</span>
-<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>  )</span></code></pre></div>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>    <span class="at">step_id =</span> <span class="st">&quot;G1&quot;</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>    <span class="at">variable =</span> <span class="st">&quot;ALL&quot;</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>    <span class="at">issue =</span> <span class="st">&quot;Exact duplicate rows present&quot;</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>    <span class="at">decision =</span> <span class="st">&quot;Dropped full duplicate rows using distinct()&quot;</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>    <span class="at">rows_affected =</span> n_dups</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  )</span></code></pre></div>
 <hr />
 </div>
 <div id="keys" class="section level2">
@@ -2181,11 +2184,11 @@ but only 438001 unique combinations of (<code>AUCTION_ID</code>,
 <code>SIZE</code>, <code>PRICE</code>).<br />
 Thus, this composite key does <strong>not</strong> uniquely identify
 rows.</p>
-<p>We can create a helper function to allow us to search available
-variables for a combination which will work as a key. To avoid
-computational blow-up, we focus only on variables which logically make
-the most sense and limit our number of variables per composite key to
-4:</p>
+<p>We create a helper function to allow us to search for a combination
+which will work as a key.</p>
+<p><strong>NOTE:</strong> To avoid computational blow-up, we focus only
+on the most likely variables and limit our number of variables per
+composite key to 4:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>check_candidate_keys <span class="ot">&lt;-</span> <span class="cf">function</span>(data, cols, <span class="at">max_size =</span> <span class="dv">4</span>, <span class="at">show_full =</span> <span class="cn">TRUE</span>) {</span>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  results <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
 <span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  idx <span class="ot">&lt;-</span> <span class="dv">1</span><span class="dt">L</span></span>
@@ -2262,9 +2265,7 @@ variables:</p>
 ## 4     4        495        0       441172</code></pre>
 <p>From these results, we can see that no combination (up to four
 variables) of these candidate variables will create a composite key to
-uniquely identify the rows of this dataset. The <strong>maximum number
-of unique rows in any combination was 441,172</strong>, but our dataset
-with no full-row duplicates is <code>r nrow(ad_clean)</code>.</p>
+uniquely identify the rows of this dataset.</p>
 <hr />
 </div>
 <div id="summary" class="section level2">
@@ -2329,9 +2330,128 @@ working dataset for variable-level cleaning.</p>
 </div>
 <div id="data-log" class="section level1">
 <h1><strong>DATA LOG</strong></h1>
-<ul>
-<li>Display cleaning_log table.</li>
-</ul>
+<p>The table below records all data-cleaning actions taken throughout
+this notebook.<br />
+Each entry corresponds to a specific issue that was identified and the
+decision made to address it.</p>
+<div id="log" class="section level2">
+<h2>Log</h2>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>cleaning_log <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(step_id) <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Summary of Data-Cleaning Decisions&quot;</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>    <span class="at">align   =</span> <span class="st">&quot;l&quot;</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>, <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>)</span></code></pre></div>
+<table class="table table-striped" style="color: black; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Summary of Data-Cleaning Decisions
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+step_id
+</th>
+<th style="text-align:left;">
+variable
+</th>
+<th style="text-align:left;">
+issue
+</th>
+<th style="text-align:left;">
+decision
+</th>
+<th style="text-align:left;">
+rows_affected
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+G1
+</td>
+<td style="text-align:left;">
+ALL
+</td>
+<td style="text-align:left;">
+Exact duplicate rows present
+</td>
+<td style="text-align:left;">
+Dropped full duplicate rows using distinct()
+</td>
+<td style="text-align:left;">
+2434
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="log-key" class="section level2">
+<h2>Log Key</h2>
+<p>The prefixes below are used in the <code>step_id</code> field of the
+data-cleaning log.<br />
+Each prefix corresponds to a logical group of variables in the
+dataset.</p>
+<table>
+<thead>
+<tr>
+<th>Prefix</th>
+<th>Group</th>
+<th>Variables Included</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G</td>
+<td>Global</td>
+<td>Entire Dataset</td>
+</tr>
+<tr>
+<td>T</td>
+<td>Time</td>
+<td>TIMESTAMP, DATE_UTC</td>
+</tr>
+<tr>
+<td>ID</td>
+<td>Identifiers</td>
+<td>AUCTION_ID, PUBLISHER_ID</td>
+</tr>
+<tr>
+<td>DT</td>
+<td>Device</td>
+<td>DEVICE_TYPE</td>
+</tr>
+<tr>
+<td>GEO</td>
+<td>Geolocation</td>
+<td>CITY, ZIP, REGION, LAT, LONG</td>
+</tr>
+<tr>
+<td>SZ</td>
+<td>Ad Sizes</td>
+<td>SIZE, REQUESTED_SIZES</td>
+</tr>
+<tr>
+<td>PR</td>
+<td>Pricing</td>
+<td>PRICE</td>
+</tr>
+<tr>
+<td>RT</td>
+<td>Performance</td>
+<td>RESPONSE_TIME</td>
+</tr>
+<tr>
+<td>BW</td>
+<td>Outcome</td>
+<td>BID_WON</td>
+</tr>
+</tbody>
+</table>
+<p>This key provides structure for the <code>cleaning_log</code> and
+helps track the sequence and type of cleaning performed.</p>
+</div>
 </div>
 </div>
 
