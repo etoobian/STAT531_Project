@@ -1,0 +1,150 @@
+---
+title: "`Project/notebooks/data_cleaning.R`"
+author: "TECK Squad"
+date: "December 12, 2025"
+output:
+  rmdformats::readthedown:
+    toc_depth: 2        
+    code_folding: hide
+fontsize: 11pt
+geometry: margin=1in
+editor_options:
+  chunk_output_type: console
+---
+  
+```{r setup, include=FALSE}
+# ---- Setup ----
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(arrow)
+  library(dplyr)
+  library(rprojroot)
+  
+  #library(broom)
+  #library(car)
+  #library(latex2exp)
+  #library(MPV)
+  #library(glmnet)
+})
+
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center",
+  fig.width = 6.5,
+  fig.height = 4
+)
+theme_set(theme_bw(base_size = 12))
+
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+
+# ---- Helper functions ----
+fmt   <- function(x, d = 3)
+  round(x, d)
+fmt_e <-
+  function(x, digits = 3)
+    formatC(x, format = "e", digits = digits)
+
+# ---- Load data I/O utilities and raw data ----
+source("Project/scripts/data_io.R")
+# Raw data from parquet via `data_io.R`
+ad_raw <- load_ad_data(preview = FALSE)
+
+# ---- Data Log setup ----
+cleaning_log <- tibble::tibble(
+  step_id = character(),
+  variable = character(),
+  issue = character(),
+  decision = character(),
+  rows_affected = integer()
+)
+```
+
+---
+
+# **Purpose**
+
+This notebook documents the full data-cleaning workflow for the Oregon ad bidding dataset.
+
+  - **Input:** raw parquet data loaded via `load_ad_data()` (see `Project/scripts/data_io.R`).
+  - **Output:** a cleaned analysis-ready dataset saved under `Project/data/...`.
+  - This document is designed to be **reproducible** and to clearly justify all data-cleaning decisions.
+
+---
+---
+
+# **Initial Data Overview**
+
+## Dimensions and structure
+
+We begin with a high-level look at the raw dataset.
+
+- How many rows / columns?
+- Basic structure: `glimpse()`, `head()`
+
+## Basic summaries
+
+We summarise variables and examine missingness using the helper from `data_io.R`.
+
+- `summary()`/`skimr::skim()`-style overview
+- NA counts per column (via `data_io.R` function ``summarize_ad_data()`)
+
+---
+---
+
+# **FULL DATASET**
+
+## Duplicated rows
+
+We check for exact duplicate rows in `ad_raw` and drop them if present.
+
+- Check for exact duplicate rows
+- Eliminate & update log
+
+## Keys
+
+We confirm the expected grain and check uniqueness of key fields (e.g., `AUCTION_ID` and combinations with bidder/seat/size, as appropriate for this subset).
+
+- Check key uniqueness (e.g., `AUCTION_ID` + other IDs if relevant)
+
+---
+---
+
+# **VARIABLE**
+   
+## Description
+
+  - Description & expected type/constraints (from dictionary).
+   - Use the dictionary to define expectations.
+   
+## Exploration
+
+  - values, distributions, weird codes, NA patterns.
+
+## Cleaning
+
+   -type conversion, recodes, outlier handling, bounds checks, etc.
+
+## Summary
+
+   -Add to cleaning_log if we changed anything.
+   
+---
+---
+# **CLEANED DATASET**
+
+## Assemble `ad_clean`
+
+## # Post-Cleaning Inspection
+
+  - Final sanity checks on NA structure, bounds, duplicates
+
+## Save via `data_io.R` function `export_ad_data()`
+
+---
+---
+
+# **DATA LOG**
+
+  - Display cleaning_log table.
