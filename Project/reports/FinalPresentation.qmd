@@ -197,49 +197,40 @@ Similar to the prior issue, with some additions:
 # Issue 3: <br>Missing Information.
 
 ## Description
-Missing information refers to fields recorded as NA or left blank across several variables, such as timestamps, geolocation, and price.
-## Examples
--Missing timestamps for some bids.
+
+Missing information refers to fields recorded as NA or left blank across several variables, such as timestamps, geolocation, and price. \## Examples -Missing timestamps for some bids.
 
 -Missing latitude/longitude preventing location analysis.
 
--Missing price values reducing usable observations.
-## Why It Matters
--Reduces the number of rows we can analyze.
+-Missing price values reducing usable observations. \## Why It Matters -Reduces the number of rows we can analyze.
 
 -Creates potential bias if missingness is systematic.
 
--Limits our ability to answer key guiding questions.
-## Cleaning Strategy (Fix Summary)
--Identified missing patterns across columns.
+-Limits our ability to answer key guiding questions. \## Cleaning Strategy (Fix Summary) -Identified missing patterns across columns.
 
 -Removed rows with missing values in essential fields (e.g., timestamp, price).
 
--Kept non-critical missing values as NA to avoid unnecessary data loss.
-------------------------------------------------------------------------
+## -Kept non-critical missing values as NA to avoid unnecessary data loss.
 
 # Issue 4: <br>Duplicates and Near-Duplicates
 
 ## Description
-Duplicate or almost-identical rows appeared in the dataset due to repeated
-## Examples
+
+Duplicate or almost-identical rows appeared in the dataset due to repeated \## Examples
 
 Same bid repeated with the same timestamp, device type, and location.
 
 Rows identical except for minor, non-important differences.
 
 ## Why It Matters
+
 Inflates the number of observations.
 
-Distorts EDA summaries and leads to misleading conclusions.
-## Cleaning Strategy (Fix Summary)
-Removed exact duplicates.
+Distorts EDA summaries and leads to misleading conclusions. \## Cleaning Strategy (Fix Summary) Removed exact duplicates.
 
 Identified near-duplicates through grouping on key fields.
 
-Kept only one unique row per bid event.
-::: notes
-Professor's Section 3.2 — Cleaning Strategy: - What you observed - Why it was a problem - Principle behind your fix - Concise code or pseudo-code (keep it light)
+Kept only one unique row per bid event. ::: notes Professor's Section 3.2 — Cleaning Strategy: - What you observed - Why it was a problem - Principle behind your fix - Concise code or pseudo-code (keep it light)
 
 Why It was Problem: - Misrepresents geographic locations\
 - Misleads EDA maps and summaries\
@@ -247,8 +238,7 @@ Why It was Problem: - Misrepresents geographic locations\
 
 Cleaning Strategy: - Principle: enforce realistic Oregon bounds and correct shifted values\
 - Implementation: detect shifted observations; adjust values; re-check ranges\
-- Example (conceptual): mutate longitude values and validate them
-:::
+- Example (conceptual): mutate longitude values and validate them :::
 
 ::: notes
 From Prof:\
@@ -402,15 +392,15 @@ Professor's Section 5 — Insight Summary: - Summarize 3-5 most important / key 
 
 ## What Went Well
 
--   Effective use of GitHub, branches, and PRs\
--   Clear division of labor and ownership\
--   Helpful use of Jira/Kanban for tracking progress
+-   Effective use of GitHub, branches, and PRs.
+-   Clear division of labor and ownership.
+-   Helpful use of Jira/Kanban for tracking progress.
 
 ## Challenges and Lessons
 
--   Merge conflicts and how they were resolved\
--   Aligning on cleaning decisions and documentation style\
--   Time management and coordination across schedules
+-   Merge conflicts and how they were resolved.
+-   Aligning on cleaning decisions and documentation style.
+-   Time management and coordination across schedules.
 
 ::: notes
 Professor's Section 6 — Collaboration Reflection: - What went wellin workflow - What was challenging - Lessons learned for future projects - Role of GitHub, Jira, RStudio in collaboration
