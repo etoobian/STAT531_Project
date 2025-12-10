@@ -14,8 +14,8 @@ editor: visual
 
 # Opening Slide
 
--   **Project:** Oregon Ad Bidding Analysis\
--   **Team:** TECK Squad — *Chris G., Takeshi S., Esther T., Khloud Z.*\
+-   **Project:** Oregon Ad Bidding Analysis
+-   **Team:** TECK Squad — *Chris G., Takeshi S., Esther T., Khloud Z.*
 -   **GitHub repository:** <https://github.com/etoobian/STAT531_Project/>
 -   **Summary:** A collaborative workflow demonstrating data cleaning, reproducibility, and exploratory analysis on Oregon advertising auction data.
 
@@ -29,9 +29,9 @@ Professor's requirement: - Project title - Team members - Repo link - One-senten
 
 ## TECK Squad
 
--   **T** — Takeshi\
--   **E** — Esther\
--   **C** — Chris\
+-   **T** — Takeshi
+-   **E** — Esther
+-   **C** — Chris
 -   **K** — Khloud
 
 Previously known as **KTC (Kentucky Thighed Chicken)** before the team reformed.
@@ -61,14 +61,14 @@ Contains intentionally inserted data-quality issues
 
 ## Guiding Questions (examples)
 
--   What patterns appear across time, device type, and geography?\
--   How does missingness or inconsistency affect analysis?\
+-   What patterns appear across time, device type, and geography?
+-   How does missingness or inconsistency affect analysis?
 -   What behaviors or trends characterize Oregon's ad ecosystem?
 
 ## Why These Questions Matter (examples)
 
--   Ethical concerns around targeting and bias\
--   Interpretability and decision-making\
+-   Ethical concerns around targeting and bias
+-   Interpretability and decision-making
 -   Understanding data reliability and uncertainty
 
 ::: notes
@@ -89,7 +89,7 @@ Professor's requirement (Section 2): - Basic data set context - Guiding question
 ## Coordination Tools
 
 -   **GitHub:** Checkout to Branch → PRs → Reviews → Merge.
--   **Jira/Kanban:** Task/Subtask Alloting, Progress Tracking.\
+-   **Jira/Kanban:** Task/Subtask Alloting, Progress Tracking.
 -   **Discord:** Quick Updates, Online Meeting Location.
 -   **Commit Habits:** Consistent Commits, Detailed Messages.
 
@@ -115,11 +115,11 @@ Refer to Team Docs for greater depth of detail while presenting?
 ::: notes
 Professor's Section 3.1 — Key Issues You Found. Goal: show variety and importance of issues before deep-diving.
 
--   Missingness patterns across multiple columns\
--   Text inconsistencies (typos, casing, spelling variants)\
--   Type mismatches (numbers stored as text, dates as strings)\
--   Duplicates and near-duplicates\
--   Outliers / implausible values (e.g., coordinates outside Oregon)\
+-   Missingness patterns across multiple columns
+-   Text inconsistencies (typos, casing, spelling variants)
+-   Type mismatches (numbers stored as text, dates as strings)
+-   Duplicates and near-duplicates
+-   Outliers / implausible values (e.g., coordinates outside Oregon)
 -   Structural inconsistencies (unexpected categories, inconsistent naming)
 :::
 
@@ -198,15 +198,15 @@ Similar to the prior issue, with some additions:
 
 ## Description
 
-Missing information refers to fields recorded as NA or left blank across several variables, such as timestamps, geolocation, and price. \## Examples -Missing timestamps for some bids.
+Missing information refers to fields recorded as NA or left blank across several variables, such as timestamps, geolocation, and price. ## Examples -Missing timestamps for some bids.
 
 -Missing latitude/longitude preventing location analysis.
 
--Missing price values reducing usable observations. \## Why It Matters -Reduces the number of rows we can analyze.
+-Missing price values reducing usable observations. ## Why It Matters -Reduces the number of rows we can analyze.
 
 -Creates potential bias if missingness is systematic.
 
--Limits our ability to answer key guiding questions. \## Cleaning Strategy (Fix Summary) -Identified missing patterns across columns.
+-Limits our ability to answer key guiding questions. ## Cleaning Strategy (Fix Summary) -Identified missing patterns across columns.
 
 -Removed rows with missing values in essential fields (e.g., timestamp, price).
 
@@ -216,7 +216,8 @@ Missing information refers to fields recorded as NA or left blank across several
 
 ## Description
 
-Duplicate or almost-identical rows appeared in the dataset due to repeated \## Examples
+Duplicate or almost-identical rows appeared in the dataset due to repeated 
+# Examples
 
 Same bid repeated with the same timestamp, device type, and location.
 
@@ -226,22 +227,22 @@ Rows identical except for minor, non-important differences.
 
 Inflates the number of observations.
 
-Distorts EDA summaries and leads to misleading conclusions. \## Cleaning Strategy (Fix Summary) Removed exact duplicates.
+Distorts EDA summaries and leads to misleading conclusions.Cleaning Strategy (Fix Summary) Removed exact duplicates.
 
 Identified near-duplicates through grouping on key fields.
 
 Kept only one unique row per bid event. ::: notes Professor's Section 3.2 — Cleaning Strategy: - What you observed - Why it was a problem - Principle behind your fix - Concise code or pseudo-code (keep it light)
 
-Why It was Problem: - Misrepresents geographic locations\
-- Misleads EDA maps and summaries\
+Why It was Problem: - Misrepresents geographic locations
+- Misleads EDA maps and summaries
 - Could bias location-based conclusions
 
-Cleaning Strategy: - Principle: enforce realistic Oregon bounds and correct shifted values\
-- Implementation: detect shifted observations; adjust values; re-check ranges\
+Cleaning Strategy: - Principle: enforce realistic Oregon bounds and correct shifted values
+- Implementation: detect shifted observations; adjust values; re-check ranges
 - Example (conceptual): mutate longitude values and validate them :::
 
 ::: notes
-From Prof:\
+From Prof:
 - For each issue: - What you observed - Why it was a problem - Principle behind your fix (e.g., “We chose this imputation strategy because...”) - Concise R code or pseudo-code Focus on justifying decisions, not on full code dumps."
 
 Repeat this pattern for all Issues if needed, or combine smaller issues on a single slide.
@@ -254,17 +255,17 @@ Repeat this pattern for all Issues if needed, or combine smaller issues on a sin
 ## Git + File Structure
 
 -   Project root with clear directories:
-    -   data/ (local, git-ignored)\
-    -   scripts/ (modular R scripts)\
-    -   docs/ (Rmd and Quarto files)\
-    -   figs/ (saved plots)\
+    -   data/ (local, git-ignored)
+    -   scripts/ (modular R scripts)
+    -   docs/ (Rmd and Quarto files)
+    -   figs/ (saved plots)
 -   Consistent naming conventions (snake_case)
 
 ## Documentation Practices
 
--   Quarto slides for final presentation\
--   R Markdown for analysis steps and lab-style documentation\
--   Commit history shows contributions from all team members\
+-   Quarto slides for final presentation
+-   R Markdown for analysis steps and lab-style documentation
+-   Commit history shows contributions from all team members
 -   PRs used for review and discussion
 
 ::: notes
@@ -281,20 +282,20 @@ Professor's Section 3.3 — Reproducibility and Workflow: - Git usage (branches,
 ::: columns
 ### Figures (Placeholders)
 
--   Placeholder: Overall distributions figure\
--   Placeholder: Key relationship plot\
+-   Placeholder: Overall distributions figure
+-   Placeholder: Key relationship plot
 -   Placeholder: Missingness heatmap
 
-(Example: save as figs/eda_overview_distributions.png,\
+(Example: save as figs/eda_overview_distributions.png,
 figs/eda_overview_relationships.png, figs/eda_missingness.png)
 :::
 
 ::: column
 ### Interpretation Notes
 
--   Describe main distribution shapes and any skew\
--   Highlight major relationships (e.g., device vs outcome)\
--   Summarize missingness profile and any surprising gaps\
+-   Describe main distribution shapes and any skew
+-   Highlight major relationships (e.g., device vs outcome)
+-   Summarize missingness profile and any surprising gaps
 -   Note any patterns that motivated deeper guiding questions
 :::
 :::::
@@ -313,21 +314,21 @@ EDA Overview - High-level distributions - Relationships - Missingness summaries 
 ::: column
 ### Guiding Question 1 (example)
 
--   State the question clearly\
+-   State the question clearly
     (for example: "How does device type vary by time of day?")
 
 #### Figure Placeholder
 
--   Insert main plot here (e.g., time-of-day vs device type)\
+-   Insert main plot here (e.g., time-of-day vs device type)
 -   File suggestion: figs/gq1_main_plot.png
 :::
 
 ::: column
 ### Interpretation
 
--   Describe the pattern shown in the figure\
--   Connect back to the guiding question explicitly\
--   Mention how cleaning decisions (e.g., device-type standardization) were necessary for this figure to be meaningful\
+-   Describe the pattern shown in the figure
+-   Connect back to the guiding question explicitly
+-   Mention how cleaning decisions (e.g., device-type standardization) were necessary for this figure to be meaningful
 -   Note any caveats or surprising findings
 :::
 :::::
@@ -346,21 +347,21 @@ Professor's Section 4.2 — Deep Dives on Guiding Questions: - State the questio
 ::: column
 ### Guiding Question 2
 
--   State the question clearly\
+-   State the question clearly
     (for example: "Are ad impressions concentrated in particular regions of Oregon?")
 
 #### Figure Placeholder
 
--   Insert main map or spatial plot here\
+-   Insert main map or spatial plot here
 -   File suggestion: figs/gq2_map_plot.png
 :::
 
 ::: column
 ### Interpretation
 
--   Summarize spatial concentration or lack thereof\
--   Discuss how coordinate cleaning affected conclusions\
--   Note any hotspots, gaps, or anomalies\
+-   Summarize spatial concentration or lack thereof
+-   Discuss how coordinate cleaning affected conclusions
+-   Note any hotspots, gaps, or anomalies
 -   Comment briefly on ethical or fairness implications if relevant
 :::
 :::::
@@ -377,9 +378,9 @@ Same structure as Guiding Question 1, maintaining consistent layout: plots on le
 
 ## Summary of Insights
 
--   3–5 major findings from the cleaned and explored data\
--   One key insight about data quality and cleaning impact\
--   One insight about behavior or patterns in the ad ecosystem\
+-   3–5 major findings from the cleaned and explored data
+-   One key insight about data quality and cleaning impact
+-   One insight about behavior or patterns in the ad ecosystem
 -   One insight about limitations or uncertainties in the data
 
 ::: notes
@@ -412,11 +413,11 @@ Professor's Section 6 — Collaboration Reflection: - What went wellin workflow 
 
 ## GitHub Repo Contents
 
--   Clean and informative README\
--   Data-cleaning scripts\
--   EDA notebooks (Rmd and/or qmd)\
--   Clear folder structure: data/, scripts/, figs/, docs/\
--   Kanban board snapshot (exported image or link)\
+-   Clean and informative README
+-   Data-cleaning scripts
+-   EDA notebooks (Rmd and/or qmd)
+-   Clear folder structure: data, scripts, figs, docs
+-   Kanban board snapshot (exported image or link)
 -   Evidence of teamwork: PRs, commit history, multiple authors
 
 ::: notes
