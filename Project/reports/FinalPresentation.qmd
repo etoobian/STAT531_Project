@@ -221,23 +221,23 @@ Missing information refers to fields recorded as NA or left blank across several
 # Issue 4: <br>Duplicates and Near-Duplicates
 
 ## Description
-
--   Brief Description
-
+Duplicate or almost-identical rows appeared in the dataset due to repeated
 ## Examples
 
--   Brief description issue.
+Same bid repeated with the same timestamp, device type, and location.
+
+Rows identical except for minor, non-important differences.
 
 ## Why It Matters
+Inflates the number of observations.
 
--   Detail why we should fix the issues.
-
+Distorts EDA summaries and leads to misleading conclusions.
 ## Cleaning Strategy (Fix Summary)
+Removed exact duplicates.
 
--   Principle: Idea
--   Implementation: Implement Idea
--   Example: One example of how Idea was Implemented.
+Identified near-duplicates through grouping on key fields.
 
+Kept only one unique row per bid event.
 ::: notes
 Professor's Section 3.2 — Cleaning Strategy: - What you observed - Why it was a problem - Principle behind your fix - Concise code or pseudo-code (keep it light)
 
