@@ -12,134 +12,118 @@ format:
 editor: visual
 ---
 
-
 # Opening Slide
 
-- **Project:** Oregon Ad Bidding Analysis  
-- **Team:** TECK Squad — *Chris G., Takeshi S., Esther T., Khloud Z.*  
-- **GitHub repository:** <https://github.com/etoobian/STAT531_Project/>
-- **Summary:** A collaborative workflow demonstrating data cleaning, reproducibility, and exploratory analysis on Oregon advertising auction data.
+-   **Project:** Oregon Ad Bidding Analysis\
+-   **Team:** TECK Squad — *Chris G., Takeshi S., Esther T., Khloud Z.*\
+-   **GitHub repository:** <https://github.com/etoobian/STAT531_Project/>
+-   **Summary:** A collaborative workflow demonstrating data cleaning, reproducibility, and exploratory analysis on Oregon advertising auction data.
 
 ::: notes
-Professor's requirement:
-- Project title
-- Team members
-- Repo link
-- One-sentence summary of project's focus
+Professor's requirement: - Project title - Team members - Repo link - One-sentence summary of project's focus
 :::
 
----
+------------------------------------------------------------------------
 
 # Team Banner
 
 ## TECK Squad
 
-- **T** — Takeshi  
-- **E** — Esther  
-- **C** — Chris  
-- **K** — Khloud  
+-   **T** — Takeshi\
+-   **E** — Esther\
+-   **C** — Chris\
+-   **K** — Khloud
 
 Previously known as **KTC (Kentucky Thighed Chicken)** before the team reformed.
 
 ::: notes
-Optional slide.
-Can add pic if we make one. (KTC Chicken??  New one??)
-Can be skipped if time is tight.
+Optional slide. Can add pic if we make one. (KTC Chicken?? New one??) Can be skipped if time is tight.
 :::
 
----
+------------------------------------------------------------------------
 
-# The Data & Initial Plan  (< 5 min)
+# The Data & Initial Plan (\< 5 min)
 
 ## Dataset Context
 
-- Parquet dataset of Oregon digital ad auctions
-    - A prebid server handles online ad auctions where bidders submit CPM bids.
-    - Individual bidders may bid on multiple sizes
-    - Each row represents **a bid within a prebid auction**.
-- Includes metadata such as:
-    - Timestamps
-    - Geolocation
-    - Device Type
-  
-:::note
- Contains intentionally inserted data-quality issues  
+-   Parquet dataset of Oregon digital ad auctions
+    -   A prebid server handles online ad auctions where bidders submit CPM bids.
+    -   Individual bidders may bid on multiple sizes
+    -   Each row represents **a bid within a prebid auction**.
+-   Includes metadata such as:
+    -   Timestamps
+    -   Geolocation
+    -   Device Type
+
+::: note
+Contains intentionally inserted data-quality issues
 :::
 
 ## Guiding Questions (examples)
 
-- What patterns appear across time, device type, and geography?  
-- How does missingness or inconsistency affect analysis?  
-- What behaviors or trends characterize Oregon's ad ecosystem?  
+-   What patterns appear across time, device type, and geography?\
+-   How does missingness or inconsistency affect analysis?\
+-   What behaviors or trends characterize Oregon's ad ecosystem?
 
 ## Why These Questions Matter (examples)
 
-- Ethical concerns around targeting and bias  
-- Interpretability and decision-making  
-- Understanding data reliability and uncertainty
+-   Ethical concerns around targeting and bias\
+-   Interpretability and decision-making\
+-   Understanding data reliability and uncertainty
 
 ::: notes
-Professor's requirement (Section 2):
-- Basic data set context
-- Guiding questions we developed
-- Why these guiding questions matter
+Professor's requirement (Section 2): - Basic data set context - Guiding questions we developed - Why these guiding questions matter
 :::
 
----
+------------------------------------------------------------------------
 
 # Team Workflow & Roles
 
 ## Roles & Responsibilities
 
-- **Chris** — ED Analyst, Visualizer, Guiding Question Refinement
-- **Takeshi** — Data Cleaner, Scribe, Presentation Editor.
-- **Esther** — GitHub/Project Coordinator, ED Analyst, Reproducibility Enforcer.
-- **Khloud** — Data Cleaner, Presentation Editor.
+-   **Chris** — ED Analyst, Visualizer, Guiding Question Refinement
+-   **Takeshi** — Data Cleaner, Scribe, Presentation Editor.
+-   **Esther** — GitHub/Project Coordinator, ED Analyst, Reproducibility Enforcer.
+-   **Khloud** — Data Cleaner, Presentation Editor.
 
 ## Coordination Tools
 
-- **GitHub:** Checkout to Branch → PRs → Reviews → Merge.
-- **Jira/Kanban:** Task/Subtask Alloting, Progress Tracking.  
-- **Discord:** Quick Updates, Online Meeting Location.
-- **Commit Habits:** Consistent Commits, Detailed Messages.
+-   **GitHub:** Checkout to Branch → PRs → Reviews → Merge.
+-   **Jira/Kanban:** Task/Subtask Alloting, Progress Tracking.\
+-   **Discord:** Quick Updates, Online Meeting Location.
+-   **Commit Habits:** Consistent Commits, Detailed Messages.
 
 Through the combination of Github, Jira, and a rigid commit/PR routine outlined by checklists/workflows that we agreed upon ensured we ran into minimal issues with the completion of this project.
 
 ::: notes
-Professor's requirement (Section 2):
-- The roles you assigned within the team and how you coordinated work:
-    – GitHub workflow (branches, pull requests, commits)
-    – Jira/Kanban tasks, deadlines, progress tracking
-    - NOTE: Roles/coordination will be detailed in the next slide group
-Use this slide to emphasize collaboration practices, not code.
+Professor's requirement (Section 2): - The roles you assigned within the team and how you coordinated work: – GitHub workflow (branches, pull requests, commits) – Jira/Kanban tasks, deadlines, progress tracking - NOTE: Roles/coordination will be detailed in the next slide group Use this slide to emphasize collaboration practices, not code.
 
 Refer to Team Docs for greater depth of detail while presenting?
 :::
 
----
+------------------------------------------------------------------------
 
-# Data Cleaning Process  (6-8 min)
+# Data Cleaning Process (6-8 min)
 
 ## Key Issues Identified (Overview)
 
-- Text and Value Inconsistencies.
-- Implausible Values and Sentinels.
-- Missing Information.
-- Duplicates and Near-duplicates.
+-   Text and Value Inconsistencies.
+-   Implausible Values and Sentinels.
+-   Missing Information.
+-   Duplicates and Near-duplicates.
 
 ::: notes
-Professor's Section 3.1 — Key Issues You Found.
-Goal: show variety and importance of issues before deep-diving.
+Professor's Section 3.1 — Key Issues You Found. Goal: show variety and importance of issues before deep-diving.
 
-- Missingness patterns across multiple columns  
-- Text inconsistencies (typos, casing, spelling variants)  
-- Type mismatches (numbers stored as text, dates as strings)  
-- Duplicates and near-duplicates  
-- Outliers / implausible values (e.g., coordinates outside Oregon)  
-- Structural inconsistencies (unexpected categories, inconsistent naming)
+-   Missingness patterns across multiple columns\
+-   Text inconsistencies (typos, casing, spelling variants)\
+-   Type mismatches (numbers stored as text, dates as strings)\
+-   Duplicates and near-duplicates\
+-   Outliers / implausible values (e.g., coordinates outside Oregon)\
+-   Structural inconsistencies (unexpected categories, inconsistent naming)
 :::
 
----
+------------------------------------------------------------------------
 
 # Issue 1: <br>Type and Value Inconsistencies
 
@@ -151,30 +135,30 @@ The type refers to the data type of a column and value refers to individual rows
 
 Examples of Type Inconsistencies:
 
-- The PRICE column was of the character type.
-- The RESPONSE_TIME column was of the character type.
+-   The PRICE column was of the character type.
+-   The RESPONSE_TIME column was of the character type.
 
 Examples of Value Inconsistencies:
 
-- The TIMESTAMP column has three different formats:
-    - "YYYY/MM/DD...", "YYYY-MM-DD..." and "NA..."
-- The RESPONSE_TIME column had different prefix delimeters:
-    - "RESPONSE_TIME:" and "RESSPONSE_TIME:".
+-   The TIMESTAMP column has three different formats:
+    -   "YYYY/MM/DD...", "YYYY-MM-DD..." and "NA..."
+-   The RESPONSE_TIME column had different prefix delimeters:
+    -   "RESPONSE_TIME:" and "RESSPONSE_TIME:".
 
 ## Why It Was a Problem
 
 Issues pertaining to certain columns, like PRICE, were crucial to remedy because:
 
-- These columns are crucial for exploring the guiding questions.
-- Directly contradicted the data dictionary provided by the client.
+-   These columns are crucial for exploring the guiding questions.
+-   Directly contradicted the data dictionary provided by the client.
 
 ## Cleaning Strategy
 
-- Principle: Convert columns to their intended type and enforce sufficient formatting.
-- Implementation: Compare types to data dictionary; remove delimiters; alleviate potential points of coercion; convert to correct data type.
-- Example: Verify Data Type of PRICE → Identify Points of Coercion → Alleviate Given Points → Convert PRICE to the Numeric Data Type.
+-   Principle: Convert columns to their intended type and enforce sufficient formatting.
+-   Implementation: Compare types to data dictionary; remove delimiters; alleviate potential points of coercion; convert to correct data type.
+-   Example: Verify Data Type of PRICE → Identify Points of Coercion → Alleviate Given Points → Convert PRICE to the Numeric Data Type.
 
----
+------------------------------------------------------------------------
 
 # Issue 2: <br>Implausible Values and Sentinels.
 
@@ -186,323 +170,269 @@ Implausible values are values that otherwise, through the inherent existence of 
 
 Examples of Implausible Values:
 
-- The PRICE column contains negative values.
-- The DEVICE_GEO_LONG column contains values that exist outside of Oregon's border.
+-   The PRICE column contains negative values.
+-   The DEVICE_GEO_LONG column contains values that exist outside of Oregon's border.
 
 Sentinels:
 
-- The generic sentinel value is -999, seen in columns such as:
-    - PRICE
-    - DEVICE_GEO_ZIP
+-   The generic sentinel value is -999, seen in columns such as:
+    -   PRICE
+    -   DEVICE_GEO_ZIP
 
 ## Why It Matters
 
 Similar to the prior issue, with some additions:
 
-- These columns are crucial for the exploration of the guiding questions.
-- The inclusion of implausible and/or sentinel values can greatly skew any final conclusions.
+-   These columns are crucial for the exploration of the guiding questions.
+-   The inclusion of implausible and/or sentinel values can greatly skew any final conclusions.
 
-## Cleaning Strategy  (Fix Summary)
+## Cleaning Strategy (Fix Summary)
 
-- Principle: Correct, if possible, or remove sentinel values and implausible values.
-- Implementation: Identify firm restrictions/bounds and impossible values; identify potential sentinel values; check respective values with bounds in mind; recover, if possible, or remove rows with implausible/sentinel values.
-- Example: Verify that PRICE is Positive → Identify Negative Values → Delineate Between Sentinel and Implausible → Verify that Sentinel Values Can't be Recovered → Verify Distribution of Remaining Implausible Values to Test Recoverability → Recover Values.
+-   Principle: Correct, if possible, or remove sentinel values and implausible values.
+-   Implementation: Identify firm restrictions/bounds and impossible values; identify potential sentinel values; check respective values with bounds in mind; recover, if possible, or remove rows with implausible/sentinel values.
+-   Example: Verify that PRICE is Positive → Identify Negative Values → Delineate Between Sentinel and Implausible → Verify that Sentinel Values Can't be Recovered → Verify Distribution of Remaining Implausible Values to Test Recoverability → Recover Values.
 
----
+------------------------------------------------------------------------
 
 # Issue 3: <br>Missing Information.
 
 ## Description
-
-- Brief Description
-
+Missing information refers to fields recorded as NA or left blank across several variables, such as timestamps, geolocation, and price.
 ## Examples
+-Missing timestamps for some bids.
 
-- Brief description issue.
+-Missing latitude/longitude preventing location analysis.
 
+-Missing price values reducing usable observations.
 ## Why It Matters
+-Reduces the number of rows we can analyze.
 
-- Detail why we should fix the issues.
+-Creates potential bias if missingness is systematic.
 
-## Cleaning Strategy  (Fix Summary)
+-Limits our ability to answer key guiding questions.
+## Cleaning Strategy (Fix Summary)
+-Identified missing patterns across columns.
 
-- Principle: Idea 
-- Implementation: Implement Idea 
-- Example: One example of how Idea was Implemented.
+-Removed rows with missing values in essential fields (e.g., timestamp, price).
 
----
+-Kept non-critical missing values as NA to avoid unnecessary data loss.
+------------------------------------------------------------------------
 
 # Issue 4: <br>Duplicates and Near-Duplicates
 
 ## Description
 
-- Brief Description
+-   Brief Description
 
 ## Examples
 
-- Brief description issue. 
+-   Brief description issue.
 
 ## Why It Matters
 
-- Detail why we should fix the issues.
+-   Detail why we should fix the issues.
 
-## Cleaning Strategy  (Fix Summary)
+## Cleaning Strategy (Fix Summary)
 
-- Principle: Idea 
-- Implementation: Implement Idea 
-- Example: One example of how Idea was Implemented.
+-   Principle: Idea
+-   Implementation: Implement Idea
+-   Example: One example of how Idea was Implemented.
 
 ::: notes
-Professor's Section 3.2 — Cleaning Strategy:
-- What you observed
-- Why it was a problem
-- Principle behind your fix
-- Concise code or pseudo-code (keep it light)
+Professor's Section 3.2 — Cleaning Strategy: - What you observed - Why it was a problem - Principle behind your fix - Concise code or pseudo-code (keep it light)
 
-Why It was Problem:
-- Misrepresents geographic locations  
-- Misleads EDA maps and summaries  
+Why It was Problem: - Misrepresents geographic locations\
+- Misleads EDA maps and summaries\
 - Could bias location-based conclusions
 
-Cleaning Strategy:
-- Principle: enforce realistic Oregon bounds and correct shifted values  
-- Implementation: detect shifted observations; adjust values; re-check ranges  
+Cleaning Strategy: - Principle: enforce realistic Oregon bounds and correct shifted values\
+- Implementation: detect shifted observations; adjust values; re-check ranges\
 - Example (conceptual): mutate longitude values and validate them
 :::
 
 ::: notes
-From Prof:  
-- For each issue:
-- What you observed
-- Why it was a problem
-- Principle behind your fix (e.g., “We chose this imputation strategy because...”)
-- Concise R code or pseudo-code
-Focus on justifying decisions, not on full code dumps."
+From Prof:\
+- For each issue: - What you observed - Why it was a problem - Principle behind your fix (e.g., “We chose this imputation strategy because...”) - Concise R code or pseudo-code Focus on justifying decisions, not on full code dumps."
 
-Repeat this pattern for all Issues if needed, or
-combine smaller issues on a single slide.
+Repeat this pattern for all Issues if needed, or combine smaller issues on a single slide.
 :::
 
----
+------------------------------------------------------------------------
 
 # Reproducibility & Workflow
 
 ## Git + File Structure
 
-- Project root with clear directories:  
-  - data/ (local, git-ignored)  
-  - scripts/ (modular R scripts)  
-  - docs/ (Rmd and Quarto files)  
-  - figs/ (saved plots)  
-- Consistent naming conventions (snake_case)
+-   Project root with clear directories:
+    -   data/ (local, git-ignored)\
+    -   scripts/ (modular R scripts)\
+    -   docs/ (Rmd and Quarto files)\
+    -   figs/ (saved plots)\
+-   Consistent naming conventions (snake_case)
 
 ## Documentation Practices
 
-- Quarto slides for final presentation  
-- R Markdown for analysis steps and lab-style documentation  
-- Commit history shows contributions from all team members  
-- PRs used for review and discussion
+-   Quarto slides for final presentation\
+-   R Markdown for analysis steps and lab-style documentation\
+-   Commit history shows contributions from all team members\
+-   PRs used for review and discussion
 
 ::: notes
-Professor's Section 3.3 — Reproducibility and Workflow:
-- Git usage (branches, PRs, conflicts)
-- Script modularity and readability
-- Rmd/Quarto
-- Naming conventions and folder structure
+Professor's Section 3.3 — Reproducibility and Workflow: - Git usage (branches, PRs, conflicts) - Script modularity and readability - Rmd/Quarto - Naming conventions and folder structure
 :::
 
----
+------------------------------------------------------------------------
 
-# Exploratory Data Analysis    (7 - 10 min)
+# Exploratory Data Analysis (7 - 10 min)
 
-## Overview Patterns  (likely split into multiple slides or infor below)
+## Overview Patterns (likely split into multiple slides or infor below)
 
-::: columns
+::::: columns
 ::: columns
 ### Figures (Placeholders)
 
-- Placeholder: Overall distributions figure  
-- Placeholder: Key relationship plot  
-- Placeholder: Missingness heatmap
+-   Placeholder: Overall distributions figure\
+-   Placeholder: Key relationship plot\
+-   Placeholder: Missingness heatmap
 
-(Example: save as figs/eda_overview_distributions.png,  
+(Example: save as figs/eda_overview_distributions.png,\
 figs/eda_overview_relationships.png, figs/eda_missingness.png)
-
 :::
+
 ::: column
 ### Interpretation Notes
 
-- Describe main distribution shapes and any skew  
-- Highlight major relationships (e.g., device vs outcome)  
-- Summarize missingness profile and any surprising gaps  
-- Note any patterns that motivated deeper guiding questions  
-
+-   Describe main distribution shapes and any skew\
+-   Highlight major relationships (e.g., device vs outcome)\
+-   Summarize missingness profile and any surprising gaps\
+-   Note any patterns that motivated deeper guiding questions
 :::
-:::
+:::::
 
 ::: notes
-EDA Overview
-- High-level distributions
-- Relationships
-- Missingness summaries
-Professor's Sections 4.1 and 4.3:
-- Show distributions, relationships, missingness, and surprising patterns
-- Ensure clear labels, good color choices, no clutter and interpretation w/ each visual
-This slide uses side-by-side layout for plots and narrative.
+EDA Overview - High-level distributions - Relationships - Missingness summaries Professor's Sections 4.1 and 4.3: - Show distributions, relationships, missingness, and surprising patterns - Ensure clear labels, good color choices, no clutter and interpretation w/ each visual This slide uses side-by-side layout for plots and narrative.
 :::
 
----
+------------------------------------------------------------------------
 
 # Deep Dive: Guiding Question 1
 
 ## Question and Visuals
 
-::: columns
+::::: columns
 ::: column
 ### Guiding Question 1 (example)
 
-- State the question clearly  
-  (for example: "How does device type vary by time of day?")  
+-   State the question clearly\
+    (for example: "How does device type vary by time of day?")
 
 #### Figure Placeholder
 
-- Insert main plot here (e.g., time-of-day vs device type)  
-- File suggestion: figs/gq1_main_plot.png
-
+-   Insert main plot here (e.g., time-of-day vs device type)\
+-   File suggestion: figs/gq1_main_plot.png
 :::
+
 ::: column
 ### Interpretation
 
-- Describe the pattern shown in the figure  
-- Connect back to the guiding question explicitly  
-- Mention how cleaning decisions (e.g., device-type standardization)
-  were necessary for this figure to be meaningful  
-- Note any caveats or surprising findings  
-
+-   Describe the pattern shown in the figure\
+-   Connect back to the guiding question explicitly\
+-   Mention how cleaning decisions (e.g., device-type standardization) were necessary for this figure to be meaningful\
+-   Note any caveats or surprising findings
 :::
-:::
+:::::
 
 ::: notes
-Professor's Section 4.2 — Deep Dives on Guiding Questions:
-- State the question
-- Show relevant figures
-- Interpret results
-- Connect to earlier cleaning decisions
+Professor's Section 4.2 — Deep Dives on Guiding Questions: - State the question - Show relevant figures - Interpret results - Connect to earlier cleaning decisions
 :::
 
----
+------------------------------------------------------------------------
 
 # Deep Dive: Guiding Question 2
 
 ## Question and Visuals
 
-::: columns
+::::: columns
 ::: column
 ### Guiding Question 2
 
-- State the question clearly  
-  (for example: "Are ad impressions concentrated in particular regions of Oregon?")  
+-   State the question clearly\
+    (for example: "Are ad impressions concentrated in particular regions of Oregon?")
 
 #### Figure Placeholder
 
-- Insert main map or spatial plot here  
-- File suggestion: figs/gq2_map_plot.png
-
+-   Insert main map or spatial plot here\
+-   File suggestion: figs/gq2_map_plot.png
 :::
+
 ::: column
 ### Interpretation
 
-- Summarize spatial concentration or lack thereof  
-- Discuss how coordinate cleaning affected conclusions  
-- Note any hotspots, gaps, or anomalies  
-- Comment briefly on ethical or fairness implications if relevant  
-
+-   Summarize spatial concentration or lack thereof\
+-   Discuss how coordinate cleaning affected conclusions\
+-   Note any hotspots, gaps, or anomalies\
+-   Comment briefly on ethical or fairness implications if relevant
 :::
-:::
+:::::
 
 ::: notes
-For each:
-• State the question
-• Show relevant figures
-• Interpret results clearly
-• Connect to cleaning decisions
+For each: • State the question • Show relevant figures • Interpret results clearly • Connect to cleaning decisions
 
-Same structure as Guiding Question 1, maintaining consistent layout:
-plots on left, interpretation on right.
+Same structure as Guiding Question 1, maintaining consistent layout: plots on left, interpretation on right.
 :::
 
----
+------------------------------------------------------------------------
 
-# Key Findings   (2-3 min)
+# Key Findings (2-3 min)
 
 ## Summary of Insights
 
-- 3–5 major findings from the cleaned and explored data  
-- One key insight about data quality and cleaning impact  
-- One insight about behavior or patterns in the ad ecosystem  
-- One insight about limitations or uncertainties in the data  
+-   3–5 major findings from the cleaned and explored data\
+-   One key insight about data quality and cleaning impact\
+-   One insight about behavior or patterns in the ad ecosystem\
+-   One insight about limitations or uncertainties in the data
 
 ::: notes
-Professor's Section 5 — Insight Summary:
-- Summarize 3-5 most important / key findings
-- Explain what the data suggests overall
-- Mention uncertainties or next steps
-Keep bullets crisp and non-technical.
+Professor's Section 5 — Insight Summary: - Summarize 3-5 most important / key findings - Explain what the data suggests overall - Mention uncertainties or next steps Keep bullets crisp and non-technical.
 :::
 
----
+------------------------------------------------------------------------
 
-# Collaboration Reflection   (2-3 min)
+# Collaboration Reflection (2-3 min)
 
 ## What Went Well
 
-- Effective use of GitHub, branches, and PRs  
-- Clear division of labor and ownership  
-- Helpful use of Jira/Kanban for tracking progress  
+-   Effective use of GitHub, branches, and PRs\
+-   Clear division of labor and ownership\
+-   Helpful use of Jira/Kanban for tracking progress
 
 ## Challenges and Lessons
 
-- Merge conflicts and how they were resolved  
-- Aligning on cleaning decisions and documentation style  
-- Time management and coordination across schedules  
+-   Merge conflicts and how they were resolved\
+-   Aligning on cleaning decisions and documentation style\
+-   Time management and coordination across schedules
 
 ::: notes
-Professor's Section 6 — Collaboration Reflection:
-- What went wellin workflow
-- What was challenging
-- Lessons learned for future projects
-- Role of GitHub, Jira, RStudio in collaboration
+Professor's Section 6 — Collaboration Reflection: - What went wellin workflow - What was challenging - Lessons learned for future projects - Role of GitHub, Jira, RStudio in collaboration
 :::
 
----
+------------------------------------------------------------------------
 
-
-# Final Slide: Repository Checklist   (1 min)
+# Final Slide: Repository Checklist (1 min)
 
 ## GitHub Repo Contents
 
-- Clean and informative README  
-- Data-cleaning scripts  
-- EDA notebooks (Rmd and/or qmd)  
-- Clear folder structure: data/, scripts/, figs/, docs/  
-- Kanban board snapshot (exported image or link)  
-- Evidence of teamwork: PRs, commit history, multiple authors  
+-   Clean and informative README\
+-   Data-cleaning scripts\
+-   EDA notebooks (Rmd and/or qmd)\
+-   Clear folder structure: data/, scripts/, figs/, docs/\
+-   Kanban board snapshot (exported image or link)\
+-   Evidence of teamwork: PRs, commit history, multiple authors
 
 ::: notes
-Professor's Section 7 — GitHub Repository Checklist.
-Confirm your repo includes:
-• Clean README
-• Data cleaning scripts
-• EDA scripts (.qmd or .Rmd)
-• Clear folder structure (data/, R/, figs/)
-• Kanban snapshot
-• Evidence of teamwork (commit history, pull requests, etc.)
+Professor's Section 7 — GitHub Repository Checklist. Confirm your repo includes: • Clean README • Data cleaning scripts • EDA scripts (.qmd or .Rmd) • Clear folder structure (data/, R/, figs/) • Kanban snapshot • Evidence of teamwork (commit history, pull requests, etc.)
 :::
 
 ::: notes
-Presentation Logistics
-Timing
-• Total: 20–30 minutes
-• Leave 3 min for questions
-• Practice pacing
+Presentation Logistics Timing • Total: 20–30 minutes • Leave 3 min for questions • Practice pacing
 :::
