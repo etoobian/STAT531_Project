@@ -20,7 +20,11 @@ editor: visual
 -   **Summary:** A collaborative workflow demonstrating data cleaning, reproducibility, and exploratory analysis on Oregon advertising auction data.
 
 ::: notes
-Professor's requirement: - Project title - Team members - Repo link - One-sentence summary of project's focus
+Professor's requirement: 
+- Project title 
+- Team members 
+- Repo link 
+- One-sentence summary of project's focus
 :::
 
 ------------------------------------------------------------------------
@@ -72,7 +76,10 @@ Contains intentionally inserted data-quality issues
 -   Understanding data reliability and uncertainty
 
 ::: notes
-Professor's requirement (Section 2): - Basic data set context - Guiding questions we developed - Why these guiding questions matter
+Professor's requirement (Section 2): 
+- Basic data set context 
+- Guiding questions we developed 
+- Why these guiding questions matter
 :::
 
 ------------------------------------------------------------------------
@@ -96,7 +103,11 @@ Professor's requirement (Section 2): - Basic data set context - Guiding question
 Through the combination of Github, Jira, and a rigid commit/PR routine outlined by checklists/workflows that we agreed upon ensured we ran into minimal issues with the completion of this project.
 
 ::: notes
-Professor's requirement (Section 2): - The roles you assigned within the team and how you coordinated work: – GitHub workflow (branches, pull requests, commits) – Jira/Kanban tasks, deadlines, progress tracking - NOTE: Roles/coordination will be detailed in the next slide group Use this slide to emphasize collaboration practices, not code.
+Professor's requirement (Section 2): 
+- The roles you assigned within the team and how you coordinated work: 
+– GitHub workflow (branches, pull requests, commits) 
+– Jira/Kanban tasks, deadlines, progress tracking 
+- NOTE: Roles/coordination will be detailed in the next slide group Use this slide to emphasize collaboration practices, not code.
 
 Refer to Team Docs for greater depth of detail while presenting?
 :::
@@ -145,7 +156,7 @@ Examples of Value Inconsistencies:
 -   The RESPONSE_TIME column had different prefix delimeters:
     -   "RESPONSE_TIME:" and "RESSPONSE_TIME:".
 
-## Why It Was a Problem
+## Why It Matters
 
 Issues pertaining to certain columns, like PRICE, were crucial to remedy because:
 
@@ -160,7 +171,7 @@ Issues pertaining to certain columns, like PRICE, were crucial to remedy because
 
 ------------------------------------------------------------------------
 
-# Issue 2: <br>Implausible Values and Sentinels.
+# Issue 2: <br>Implausible Values and Sentinels
 
 ## Description
 
@@ -194,52 +205,82 @@ Similar to the prior issue, with some additions:
 
 ------------------------------------------------------------------------
 
-# Issue 3: <br>Missing Information.
+# Issue 3: <br>Missing Information
 
 ## Description
 
-Missing information refers to fields recorded as NA or left blank across several variables, such as timestamps, geolocation, and price. ## Examples -Missing timestamps for some bids.
+Missing information refers to fields recorded as NA or left blank across one or more rows and/or columns. Furthermore, there is a need to distinguish if these missing values are a feature of the dataset or bad data.
 
--Missing latitude/longitude preventing location analysis.
+## Examples 
 
--Missing price values reducing usable observations. ## Why It Matters -Reduces the number of rows we can analyze.
+Examples of bad data entries:
 
--Creates potential bias if missingness is systematic.
+- The TIMESTAMPS column contains a format that leaves an NA in place of the date.
+- The sentinel values seen in the PRICE column are irretrievable, and are no different to NA values.
 
--Limits our ability to answer key guiding questions. ## Cleaning Strategy (Fix Summary) -Identified missing patterns across columns.
+## Why It Matters 
 
--Removed rows with missing values in essential fields (e.g., timestamp, price).
+These NA values can directly impact the analysis of certain columns, and in the case that the data is retrievable, even more so, because:
 
-## -Kept non-critical missing values as NA to avoid unnecessary data loss.
+- These NA values reduce the number of rows we can analyze.
+- Creates potential bias if the present missingness is systematic.
+- Limits our ability to answer key guiding questions. 
+
+## Cleaning Strategy (Fix Summary) 
+
+- Principle: Identify missing values and analyze for patterns and irretrievability.
+- Implementation: Check for NAs; test the individual column impact on overall dataset; choose one of three options:
+    - Drop the values.
+    - Imputation.
+    - Leave as is.
+- Example: Identify PRICE Sentinels (NAs) → Determine Retrievability and Extent → Remove Sentinels.
+
+---
 
 # Issue 4: <br>Duplicates and Near-Duplicates
 
 ## Description
 
-Duplicate or almost-identical rows appeared in the dataset due to repeated 
-# Examples
+Duplicate rows contain the exact same information for every single column. Near-duplicate rows contain the exact same information for key columns that pertain to future exploration.
 
-Same bid repeated with the same timestamp, device type, and location.
+## Examples
 
-Rows identical except for minor, non-important differences.
+Example of Near-Duplicates (excluding geolocational metadata):
+
+- Grouping by AUCTION_ID, PUBLISHER_ID, RESPONSE_TIME, PRICE and SIZE results in duplicate rows.
 
 ## Why It Matters
 
-Inflates the number of observations.
+Having duplicate/near-duplicate data:
 
-Distorts EDA summaries and leads to misleading conclusions.Cleaning Strategy (Fix Summary) Removed exact duplicates.
+- Inflates the amount of rows, which can skew results.
+- Puts to question the validity of final conclusions once analysis is performed.
 
-Identified near-duplicates through grouping on key fields.
+## Cleaning Strategy (Fix Summary) 
 
-Kept only one unique row per bid event. ::: notes Professor's Section 3.2 — Cleaning Strategy: - What you observed - Why it was a problem - Principle behind your fix - Concise code or pseudo-code (keep it light)
+- Principle: Remove duplicates/acknowledge near-duplicates.
+- Implementation: Remove duplicates; identify near-duplicates through grouping on key fields; determine potential impact of near-duplicates.
+- Example: Remove Duplicates by Taking Uniqueness.
 
-Why It was Problem: - Misrepresents geographic locations
+::: notes 
+Professor's Section 3.2 — Cleaning Strategy: 
+- What you observed 
+- Why it was a problem 
+- Principle behind your fix 
+- Concise code or pseudo-code (keep it light)
+
+Why It was Problem: 
+
+- Misrepresents geographic locations
 - Misleads EDA maps and summaries
 - Could bias location-based conclusions
 
-Cleaning Strategy: - Principle: enforce realistic Oregon bounds and correct shifted values
+Cleaning Strategy: 
+
+- Principle: enforce realistic Oregon bounds and correct shifted values
 - Implementation: detect shifted observations; adjust values; re-check ranges
-- Example (conceptual): mutate longitude values and validate them :::
+- Example (conceptual): mutate longitude values and validate them 
+:::
 
 ::: notes
 From Prof:
@@ -269,7 +310,11 @@ Repeat this pattern for all Issues if needed, or combine smaller issues on a sin
 -   PRs used for review and discussion
 
 ::: notes
-Professor's Section 3.3 — Reproducibility and Workflow: - Git usage (branches, PRs, conflicts) - Script modularity and readability - Rmd/Quarto - Naming conventions and folder structure
+Professor's Section 3.3 — Reproducibility and Workflow: 
+- Git usage (branches, PRs, conflicts) 
+- Script modularity and readability 
+- Rmd/Quarto 
+- Naming conventions and folder structure
 :::
 
 ------------------------------------------------------------------------
@@ -301,7 +346,13 @@ figs/eda_overview_relationships.png, figs/eda_missingness.png)
 :::::
 
 ::: notes
-EDA Overview - High-level distributions - Relationships - Missingness summaries Professor's Sections 4.1 and 4.3: - Show distributions, relationships, missingness, and surprising patterns - Ensure clear labels, good color choices, no clutter and interpretation w/ each visual This slide uses side-by-side layout for plots and narrative.
+EDA Overview 
+- High-level distributions 
+- Relationships 
+- Missingness summaries 
+Professor's Sections 4.1 and 4.3: 
+- Show distributions, relationships, missingness, and surprising patterns 
+- Ensure clear labels, good color choices, no clutter and interpretation w/ each visual This slide uses side-by-side layout for plots and narrative.
 :::
 
 ------------------------------------------------------------------------
@@ -334,7 +385,11 @@ EDA Overview - High-level distributions - Relationships - Missingness summaries 
 :::::
 
 ::: notes
-Professor's Section 4.2 — Deep Dives on Guiding Questions: - State the question - Show relevant figures - Interpret results - Connect to earlier cleaning decisions
+Professor's Section 4.2 — Deep Dives on Guiding Questions: 
+- State the question 
+- Show relevant figures 
+- Interpret results 
+- Connect to earlier cleaning decisions
 :::
 
 ------------------------------------------------------------------------
@@ -367,9 +422,14 @@ Professor's Section 4.2 — Deep Dives on Guiding Questions: - State the questio
 :::::
 
 ::: notes
-For each: • State the question • Show relevant figures • Interpret results clearly • Connect to cleaning decisions
+For each: 
+- State the question 
+- Show relevant figures 
+- Interpret results clearly 
+- Connect to cleaning decisions
 
-Same structure as Guiding Question 1, maintaining consistent layout: plots on left, interpretation on right.
+Same structure as Guiding Question 1, maintaining consistent layout: 
+plots on left, interpretation on right.
 :::
 
 ------------------------------------------------------------------------
@@ -384,7 +444,10 @@ Same structure as Guiding Question 1, maintaining consistent layout: plots on le
 -   One insight about limitations or uncertainties in the data
 
 ::: notes
-Professor's Section 5 — Insight Summary: - Summarize 3-5 most important / key findings - Explain what the data suggests overall - Mention uncertainties or next steps Keep bullets crisp and non-technical.
+Professor's Section 5 — Insight Summary: 
+- Summarize 3-5 most important / key findings 
+- Explain what the data suggests overall 
+- Mention uncertainties or next steps Keep bullets crisp and non-technical.
 :::
 
 ------------------------------------------------------------------------
@@ -404,7 +467,11 @@ Professor's Section 5 — Insight Summary: - Summarize 3-5 most important / key 
 -   Time management and coordination across schedules.
 
 ::: notes
-Professor's Section 6 — Collaboration Reflection: - What went wellin workflow - What was challenging - Lessons learned for future projects - Role of GitHub, Jira, RStudio in collaboration
+Professor's Section 6 — Collaboration Reflection: 
+- What went wellin workflow 
+- What was challenging 
+- Lessons learned for future projects 
+- Role of GitHub, Jira, RStudio in collaboration
 :::
 
 ------------------------------------------------------------------------
@@ -421,9 +488,19 @@ Professor's Section 6 — Collaboration Reflection: - What went wellin workflow 
 -   Evidence of teamwork: PRs, commit history, multiple authors
 
 ::: notes
-Professor's Section 7 — GitHub Repository Checklist. Confirm your repo includes: • Clean README • Data cleaning scripts • EDA scripts (.qmd or .Rmd) • Clear folder structure (data/, R/, figs/) • Kanban snapshot • Evidence of teamwork (commit history, pull requests, etc.)
+Professor's Section 7 — GitHub Repository Checklist. 
+Confirm your repo includes: -
+Clean README 
+- Data cleaning scripts 
+- EDA scripts (.qmd or .Rmd) 
+- Clear folder structure (data/, R/, figs/) 
+- Kanban snapshot 
+- Evidence of teamwork (commit history, pull requests, etc.)
 :::
 
 ::: notes
-Presentation Logistics Timing • Total: 20–30 minutes • Leave 3 min for questions • Practice pacing
+Presentation Logistics Timing 
+- Total: 20–30 minutes 
+- Leave 3 min for questions 
+- Practice pacing
 :::
