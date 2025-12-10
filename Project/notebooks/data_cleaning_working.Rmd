@@ -518,7 +518,7 @@ log_change(
 )
 ```
 
-**Summary**
+### Summary
 
   - `TIMESTAMP`: 
       - Inconsistently formatted (mixture of dash- vs. slash-separated dates and a small number of entries with an `NA` date token).
@@ -529,10 +529,170 @@ log_change(
       
   - No rows were dropped as part of Time Variables cleaning steps.
 
-
 ---
 
 ## **IDENTIFIERS:** `AUCTION_ID` \& `PUBLISHER_ID`
+
+### Description
+
+- `AUCTION_ID`  
+  - **Type (dictionary):** `VARCHAR`  
+  - **Meaning:** Unique identifier for a single auction.  
+  - **Expectation:** Repeated across multiple rows (one auction $to$ many bid lines).  
+  - **Actual:** `character`  
+  - **Missing:** None  
+
+- `PUBLISHER_ID`  
+  - **Type (dictionary):** `VARCHAR`  
+  - **Meaning:** Identifier for the publisher / site / app running the auction.  
+  - **Expectation:** Medium/high cardinality; used for grouping and filtering.  
+  - **Actual:** `character`  
+  - **Missing:** None  
+
+### Exploration
+
+These are opaque identifiers:
+
+  - We do **not** attempt to interpret or recode their values
+  - We only ensure they are well-formed and structurally consistent with the data dictionary.
+
+We begin with basic uniqueness and format checks.
+
+```{r ids-basic-explore, results='hold'}
+ad_clean %>%
+  summarise(
+    n_rows                 = n(),
+    n_auctions             = n_distinct(AUCTION_ID),
+    n_publishers           = n_distinct(PUBLISHER_ID),
+    avg_rows_per_auction   = n_rows / n_auctions,
+    avg_rows_per_publisher = n_rows / n_publishers
+  )
+```
+
+Check for leading/trailing whitespace:
+
+```{r ids-whitespace-missing, results='hold'}
+auct_ws <- sum(str_detect(ad_clean$AUCTION_ID, "^\\s|\\s$"))
+pub_ws  <- sum(str_detect(ad_clean$PUBLISHER_ID, "^\\s|\\s$"))
+
+cat("AUCTION_ID rows with whitespace:  ", auct_ws, "\n")
+cat("PUBLISHER_ID rows with whitespace:", pub_ws,  "\n")
+```
+
+  - All identifier fields appear to be free of whitespace issues.
+
+The client clarified that an auction is expected to have **exactly one** winning bid. 
+We evaluate this assumption:
+
+```{r ids-auction-outcome, results='hold'}
+auction_win_summary <- ad_clean %>%
+  group_by(AUCTION_ID) %>%
+  summarise(
+    n_rows = n(),
+    n_won  = sum(BID_WON == "TRUE",  na.rm = TRUE),
+    n_lost = sum(BID_WON == "FALSE", na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Auctions violating the "exactly one winner" rule
+auctions_multiwin <- auction_win_summary %>% filter(n_won > 1)
+auctions_zerowin  <- auction_win_summary %>% filter(n_won == 0)
+
+cat("Auctions with >1 winning bid:  ", nrow(auctions_multiwin), "\n")
+cat("Auctions with 0 winning bids:  ", nrow(auctions_zerowin),  "\n")
+```
+
+We investigate how many rows are affected by these problematic auctions:
+
+```{r problematic-auction-rows, results='hold'}
+multiwin_ids <- auctions_multiwin$AUCTION_ID
+zerowin_ids  <- auctions_zerowin$AUCTION_ID
+
+multiwin_rows <- ad_clean %>%
+  filter(AUCTION_ID %in% multiwin_ids) %>%
+  nrow()
+
+zerowin_rows <- ad_clean %>%
+  filter(AUCTION_ID %in% zerowin_ids) %>%
+  nrow()
+
+cat("Rows in multi-winner auctions: ", multiwin_rows, "\n")
+cat("Rows in zero-winner auctions:  ", zerowin_rows,  "\n")
+cat("Total problematic rows:        ", multiwin_rows + zerowin_rows, "\n")
+```
+
+**Observations**
+
+  - Multi-winner auctions: **`r nrow(auctions_multiwin)` auctions**, **`r multiwin_rows` rows**  
+  - Zero-winner auctions: **`r nrow(auctions_zerowin)` auctions**, **`r zerowin_rows` rows**  
+  - Combined problematic rows represent  **`r round((multiwin_rows + zerowin_rows) / nrow(ad_clean) * 100, 4)` \%**  
+    of the dataset.
+  - These cases are **logically impossible** under the client’s business rules and indicate corrupted or incomplete auction records.
+
+**Decision:**  
+Since an auction must have *exactly one* winner, correcting the winner is impossible, and the number of rows affected is a very small fraction of the dataset, we remove all auctions where `n_won != 1`.
+
+### Cleaning
+
+Identifier fields (`AUCTION_ID`, `PUBLISHER_ID`) require **minimal cleaning**:
+
+  - No missing values
+  - No leading/trailing whitespace
+  - Behavior matches expectations
+
+We still create trimmed versions for consistency:
+
+```{r ids-clean, results='hold'}
+ad_clean <- ad_clean %>%
+  mutate(
+    AUCTION_ID_clean   = str_trim(as.character(AUCTION_ID)),
+    PUBLISHER_ID_clean = str_trim(as.character(PUBLISHER_ID))
+  )
+```
+
+We then remove rows belonging to zero-win or multi-win auctions:
+
+```{r ids-remove-invalid-auctions, results='hold'}
+# Auctions that violate business logic: n_won != 1
+invalid_ids <- auction_win_summary %>%
+  filter(n_won != 1) %>%
+  pull(AUCTION_ID)
+
+n_invalid_rows <- ad_clean %>%
+  filter(AUCTION_ID %in% invalid_ids) %>%
+  nrow()
+
+# Remove invalid auctions
+ad_clean <- ad_clean %>%
+  filter(!AUCTION_ID %in% invalid_ids)
+
+cat("Total rows removed due to invalid auction outcome structure: ",
+    n_invalid_rows, "\n")
+```
+
+Log entries for identifier variables:
+
+```{r ids-log, results='hold'}
+log_change(
+  step_id = "I1",
+  variable = "AUCTION_ID",
+  issue = "Auctions with zero or multiple winners violate business rules.",
+  decision = "Removed all rows belonging to auctions where n_won != 1.",
+  rows_affected = n_invalid_rows
+)
+```
+
+### Summary
+
+  - Both identifier fields were already well-formed:
+      - No missing values  
+      - No whitespace issues  
+      - High-cardinality and consistent structure  
+  - Clean versions (`AUCTION_ID_clean`, `PUBLISHER_ID_clean`) were created for consistency.
+  - Structural validation revealed **invalid auctions** with zero or multiple winners.  
+      - These represent impossible events under domain rules, and correcting them is not feasible.  
+      - A total of **`r n_invalid_rows`** rows were removed to ensure dataset consistency.  
+  - The remaining dataset now contains only auctions with a valid outcome structure.
 
 ---
 
@@ -571,39 +731,37 @@ log_change(
 
 - `VARIABLE`  
   - **Type:** `TYPE`  
-  - **Meaning:** Event time (UTC) when the log row was recorded 
-  - **Expectation:** A full datetime (date + time), treated as UTC
+  - **Meaning:** 
+  - **Expectation:** 
   - **Actual:** `character`
   - **Missing:** None
 
-- `DATE_UTC`  
-  - **Type:** `DATE`  
-  - **Meaning:** Calendar date (UTC) used for partitioning / grouping
-  - **Expectation:** A date consistent with the date portion of `TIMESTAMP`
+- `VARIABLE`  
+  - **Type:** `TYPE`  
+  - **Meaning:** 
+  - **Expectation:** 
   - **Actual:** `character`
   - **Missing:** None
-
+  
 ### Exploration
 
 
 **Observations**
 
-  - `r dash_rows` of `TIMESTAMP` values use a dash-separated date (e.g., `"2025-10-12 14:03:27"`).
-  - `r slash_rows` uses a slash-separated format (e.g., `"10/12/2025 14:03:27"`).  
-  - `r na_date_rows` appear with an `NA` date and a valid time-of-day (e.g., `"NA 14:03:27"`).  
-  - The raw columns themselves do **not** contain missing values: all rows have some string in `TIMESTAMP` and `DATE_UTC`. 
+  - 
+  - 
+  - 
+  - 
 
 **Decisions:**
 
-  - Recover missing dates in `TIMESTAMP` via `DATE_UTC`
-  - Parse `TIMESTAMP` into a POSIXct (UTC) variable with multiple formats.
-  - Convert `DATE_UTC` to *Date* type, keeping raw string as-is.
+  - 
+  - 
 
-
-## Cleaning
+### Cleaning
 Log entries for time variables:
 
-```{r time-log}
+```{r example-log}
 log_change(
   step_id = "T1",
   variable = "TIMESTAMP",
@@ -621,7 +779,7 @@ log_change(
 )
 ```
 
-**Summary**
+### Summary
 
   - `TIMESTAMP`: 
       - Inconsistently formatted (mixture of dash- vs. slash-separated dates and a small number of entries with an `NA` date token).
@@ -631,6 +789,13 @@ log_change(
       - Converted from character to `DATE_UTC_clean` (Date type).  
       
   - No rows were dropped as part of Time Variables cleaning steps.
+   
+   
+   
+   
+   
+   
+   
    
 ---
 

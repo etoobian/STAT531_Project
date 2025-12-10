@@ -1611,9 +1611,16 @@ margin-left: 0 !important;
       <li><a href="#description" id="toc-description">Description</a></li>
       <li><a href="#exploration" id="toc-exploration">Exploration</a></li>
       <li><a href="#cleaning" id="toc-cleaning">Cleaning</a></li>
+      <li><a href="#summary-1" id="toc-summary-1">Summary</a></li>
       </ul></li>
       <li><a href="#identifiers-auction_id-publisher_id" id="toc-identifiers-auction_id-publisher_id"><strong>IDENTIFIERS:</strong>
-      <code>AUCTION_ID</code> &amp; <code>PUBLISHER_ID</code></a></li>
+      <code>AUCTION_ID</code> &amp; <code>PUBLISHER_ID</code></a>
+      <ul>
+      <li><a href="#description-1" id="toc-description-1">Description</a></li>
+      <li><a href="#exploration-1" id="toc-exploration-1">Exploration</a></li>
+      <li><a href="#cleaning-1" id="toc-cleaning-1">Cleaning</a></li>
+      <li><a href="#summary-2" id="toc-summary-2">Summary</a></li>
+      </ul></li>
       <li><a href="#device-attribute-device_type" id="toc-device-attribute-device_type"><strong>DEVICE
       ATTRIBUTE:</strong> <code>DEVICE_TYPE</code></a></li>
       <li><a href="#geolocation-fields-device_geo_region-device_geo_city-device_geo_zip" id="toc-geolocation-fields-device_geo_region-device_geo_city-device_geo_zip"><strong>GEOLOCATION
@@ -1634,10 +1641,10 @@ margin-left: 0 !important;
       </ul></li>
       <li><a href="#variable" id="toc-variable"><strong>VARIABLE</strong></a>
       <ul>
-      <li><a href="#description-1" id="toc-description-1">Description</a></li>
-      <li><a href="#exploration-1" id="toc-exploration-1">Exploration</a></li>
-      <li><a href="#cleaning-1" id="toc-cleaning-1">Cleaning</a></li>
-      <li><a href="#summary-1" id="toc-summary-1">Summary</a></li>
+      <li><a href="#description-2" id="toc-description-2">Description</a></li>
+      <li><a href="#exploration-2" id="toc-exploration-2">Exploration</a></li>
+      <li><a href="#cleaning-2" id="toc-cleaning-2">Cleaning</a></li>
+      <li><a href="#summary-3" id="toc-summary-3">Summary</a></li>
       </ul></li>
       <li><a href="#cleaned-dataset" id="toc-cleaned-dataset"><strong>CLEANED DATASET</strong></a>
       <ul>
@@ -2462,7 +2469,9 @@ time-of-day exists, using <code>DATE_UTC</code> as the date source:</p>
 <span id="cb22-13"><a href="#cb22-13" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Converted to Date type.&quot;</span>,</span>
 <span id="cb22-14"><a href="#cb22-14" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
 <span id="cb22-15"><a href="#cb22-15" tabindex="-1"></a>)</span></code></pre></div>
-<p><strong>Summary</strong></p>
+</div>
+<div id="summary-1" class="section level3">
+<h3>Summary</h3>
 <ul>
 <li><code>TIMESTAMP</code>:
 <ul>
@@ -2485,7 +2494,202 @@ type).</li>
 <div id="identifiers-auction_id-publisher_id" class="section level2">
 <h2><strong>IDENTIFIERS:</strong> <code>AUCTION_ID</code> &amp;
 <code>PUBLISHER_ID</code></h2>
+<div id="description-1" class="section level3">
+<h3>Description</h3>
+<ul>
+<li><code>AUCTION_ID</code>
+<ul>
+<li><strong>Type (dictionary):</strong> <code>VARCHAR</code><br />
+</li>
+<li><strong>Meaning:</strong> Unique identifier for a single
+auction.<br />
+</li>
+<li><strong>Expectation:</strong> Repeated across multiple rows (one
+auction <span class="math inline">\(to\)</span> many bid lines).<br />
+</li>
+<li><strong>Actual:</strong> <code>character</code><br />
+</li>
+<li><strong>Missing:</strong> None</li>
+</ul></li>
+<li><code>PUBLISHER_ID</code>
+<ul>
+<li><strong>Type (dictionary):</strong> <code>VARCHAR</code><br />
+</li>
+<li><strong>Meaning:</strong> Identifier for the publisher / site / app
+running the auction.<br />
+</li>
+<li><strong>Expectation:</strong> Medium/high cardinality; used for
+grouping and filtering.<br />
+</li>
+<li><strong>Actual:</strong> <code>character</code><br />
+</li>
+<li><strong>Missing:</strong> None</li>
+</ul></li>
+</ul>
+</div>
+<div id="exploration-1" class="section level3">
+<h3>Exploration</h3>
+<p>These are opaque identifiers:</p>
+<ul>
+<li>We do <strong>not</strong> attempt to interpret or recode their
+values</li>
+<li>We only ensure they are well-formed and structurally consistent with
+the data dictionary.</li>
+</ul>
+<p>We begin with basic uniqueness and format checks.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>    <span class="at">n_rows                 =</span> <span class="fu">n</span>(),</span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>    <span class="at">n_auctions             =</span> <span class="fu">n_distinct</span>(AUCTION_ID),</span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a>    <span class="at">n_publishers           =</span> <span class="fu">n_distinct</span>(PUBLISHER_ID),</span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a>    <span class="at">avg_rows_per_auction   =</span> n_rows <span class="sc">/</span> n_auctions,</span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a>    <span class="at">avg_rows_per_publisher =</span> n_rows <span class="sc">/</span> n_publishers</span>
+<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 5
+##   n_rows n_auctions n_publishers avg_rows_per_auction avg_rows_per_publisher
+##    &lt;int&gt;      &lt;int&gt;        &lt;int&gt;                &lt;dbl&gt;                  &lt;dbl&gt;
+## 1 441535     120406           29                 3.67                 15225.</code></pre>
+<p>Check for leading/trailing whitespace:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>auct_ws <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">str_detect</span>(ad_clean<span class="sc">$</span>AUCTION_ID, <span class="st">&quot;^</span><span class="sc">\\</span><span class="st">s|</span><span class="sc">\\</span><span class="st">s$&quot;</span>))</span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>pub_ws  <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">str_detect</span>(ad_clean<span class="sc">$</span>PUBLISHER_ID, <span class="st">&quot;^</span><span class="sc">\\</span><span class="st">s|</span><span class="sc">\\</span><span class="st">s$&quot;</span>))</span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;AUCTION_ID rows with whitespace:  &quot;</span>, auct_ws, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;PUBLISHER_ID rows with whitespace:&quot;</span>, pub_ws,  <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## AUCTION_ID rows with whitespace:   0 
+## PUBLISHER_ID rows with whitespace: 0</code></pre>
+<ul>
+<li>All identifier fields appear to be free of whitespace issues.</li>
+</ul>
+<p>The client clarified that an auction is expected to have
+<strong>exactly one</strong> winning bid. We evaluate this
+assumption:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a>auction_win_summary <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a>  <span class="fu">group_by</span>(AUCTION_ID) <span class="sc">%&gt;%</span></span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a>    <span class="at">n_rows =</span> <span class="fu">n</span>(),</span>
+<span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a>    <span class="at">n_won  =</span> <span class="fu">sum</span>(BID_WON <span class="sc">==</span> <span class="st">&quot;TRUE&quot;</span>,  <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb27-6"><a href="#cb27-6" tabindex="-1"></a>    <span class="at">n_lost =</span> <span class="fu">sum</span>(BID_WON <span class="sc">==</span> <span class="st">&quot;FALSE&quot;</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb27-7"><a href="#cb27-7" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb27-8"><a href="#cb27-8" tabindex="-1"></a>  )</span>
+<span id="cb27-9"><a href="#cb27-9" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" tabindex="-1"></a><span class="co"># Auctions violating the &quot;exactly one winner&quot; rule</span></span>
+<span id="cb27-11"><a href="#cb27-11" tabindex="-1"></a>auctions_multiwin <span class="ot">&lt;-</span> auction_win_summary <span class="sc">%&gt;%</span> <span class="fu">filter</span>(n_won <span class="sc">&gt;</span> <span class="dv">1</span>)</span>
+<span id="cb27-12"><a href="#cb27-12" tabindex="-1"></a>auctions_zerowin  <span class="ot">&lt;-</span> auction_win_summary <span class="sc">%&gt;%</span> <span class="fu">filter</span>(n_won <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb27-13"><a href="#cb27-13" tabindex="-1"></a></span>
+<span id="cb27-14"><a href="#cb27-14" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Auctions with &gt;1 winning bid:  &quot;</span>, <span class="fu">nrow</span>(auctions_multiwin), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb27-15"><a href="#cb27-15" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Auctions with 0 winning bids:  &quot;</span>, <span class="fu">nrow</span>(auctions_zerowin),  <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Auctions with &gt;1 winning bid:   215 
+## Auctions with 0 winning bids:   1</code></pre>
+<p>We investigate how many rows are affected by these problematic
+auctions:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a>multiwin_ids <span class="ot">&lt;-</span> auctions_multiwin<span class="sc">$</span>AUCTION_ID</span>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a>zerowin_ids  <span class="ot">&lt;-</span> auctions_zerowin<span class="sc">$</span>AUCTION_ID</span>
+<span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a>multiwin_rows <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a>  <span class="fu">filter</span>(AUCTION_ID <span class="sc">%in%</span> multiwin_ids) <span class="sc">%&gt;%</span></span>
+<span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
+<span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a></span>
+<span id="cb29-8"><a href="#cb29-8" tabindex="-1"></a>zerowin_rows <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb29-9"><a href="#cb29-9" tabindex="-1"></a>  <span class="fu">filter</span>(AUCTION_ID <span class="sc">%in%</span> zerowin_ids) <span class="sc">%&gt;%</span></span>
+<span id="cb29-10"><a href="#cb29-10" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
+<span id="cb29-11"><a href="#cb29-11" tabindex="-1"></a></span>
+<span id="cb29-12"><a href="#cb29-12" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Rows in multi-winner auctions: &quot;</span>, multiwin_rows, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb29-13"><a href="#cb29-13" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Rows in zero-winner auctions:  &quot;</span>, zerowin_rows,  <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb29-14"><a href="#cb29-14" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Total problematic rows:        &quot;</span>, multiwin_rows <span class="sc">+</span> zerowin_rows, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Rows in multi-winner auctions:  824 
+## Rows in zero-winner auctions:   6 
+## Total problematic rows:         830</code></pre>
+<p><strong>Observations</strong></p>
+<ul>
+<li>Multi-winner auctions: <strong>215 auctions</strong>, <strong>824
+rows</strong><br />
+</li>
+<li>Zero-winner auctions: <strong>1 auctions</strong>, <strong>6
+rows</strong><br />
+</li>
+<li>Combined problematic rows represent <strong>0.188 %</strong><br />
+of the dataset.</li>
+<li>These cases are <strong>logically impossible</strong> under the
+client’s business rules and indicate corrupted or incomplete auction
+records.</li>
+</ul>
+<p><strong>Decision:</strong><br />
+Since an auction must have <em>exactly one</em> winner, correcting the
+winner is impossible, and the number of rows affected is a very small
+fraction of the dataset, we remove all auctions where
+<code>n_won != 1</code>.</p>
+</div>
+<div id="cleaning-1" class="section level3">
+<h3>Cleaning</h3>
+<p>Identifier fields (<code>AUCTION_ID</code>,
+<code>PUBLISHER_ID</code>) require <strong>minimal
+cleaning</strong>:</p>
+<ul>
+<li>No missing values</li>
+<li>No leading/trailing whitespace</li>
+<li>Behavior matches expectations</li>
+</ul>
+<p>We still create trimmed versions for consistency:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb31-3"><a href="#cb31-3" tabindex="-1"></a>    <span class="at">AUCTION_ID_clean   =</span> <span class="fu">str_trim</span>(<span class="fu">as.character</span>(AUCTION_ID)),</span>
+<span id="cb31-4"><a href="#cb31-4" tabindex="-1"></a>    <span class="at">PUBLISHER_ID_clean =</span> <span class="fu">str_trim</span>(<span class="fu">as.character</span>(PUBLISHER_ID))</span>
+<span id="cb31-5"><a href="#cb31-5" tabindex="-1"></a>  )</span></code></pre></div>
+<p>We then remove rows belonging to zero-win or multi-win auctions:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a><span class="co"># Auctions that violate business logic: n_won != 1</span></span>
+<span id="cb32-2"><a href="#cb32-2" tabindex="-1"></a>invalid_ids <span class="ot">&lt;-</span> auction_win_summary <span class="sc">%&gt;%</span></span>
+<span id="cb32-3"><a href="#cb32-3" tabindex="-1"></a>  <span class="fu">filter</span>(n_won <span class="sc">!=</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb32-4"><a href="#cb32-4" tabindex="-1"></a>  <span class="fu">pull</span>(AUCTION_ID)</span>
+<span id="cb32-5"><a href="#cb32-5" tabindex="-1"></a></span>
+<span id="cb32-6"><a href="#cb32-6" tabindex="-1"></a>n_invalid_rows <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb32-7"><a href="#cb32-7" tabindex="-1"></a>  <span class="fu">filter</span>(AUCTION_ID <span class="sc">%in%</span> invalid_ids) <span class="sc">%&gt;%</span></span>
+<span id="cb32-8"><a href="#cb32-8" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
+<span id="cb32-9"><a href="#cb32-9" tabindex="-1"></a></span>
+<span id="cb32-10"><a href="#cb32-10" tabindex="-1"></a><span class="co"># Remove invalid auctions</span></span>
+<span id="cb32-11"><a href="#cb32-11" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb32-12"><a href="#cb32-12" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>AUCTION_ID <span class="sc">%in%</span> invalid_ids)</span>
+<span id="cb32-13"><a href="#cb32-13" tabindex="-1"></a></span>
+<span id="cb32-14"><a href="#cb32-14" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Total rows removed due to invalid auction outcome structure: &quot;</span>,</span>
+<span id="cb32-15"><a href="#cb32-15" tabindex="-1"></a>    n_invalid_rows, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Total rows removed due to invalid auction outcome structure:  830</code></pre>
+<p>Log entries for identifier variables:</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb34-2"><a href="#cb34-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;I1&quot;</span>,</span>
+<span id="cb34-3"><a href="#cb34-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;AUCTION_ID&quot;</span>,</span>
+<span id="cb34-4"><a href="#cb34-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Auctions with zero or multiple winners violate business rules.&quot;</span>,</span>
+<span id="cb34-5"><a href="#cb34-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Removed all rows belonging to auctions where n_won != 1.&quot;</span>,</span>
+<span id="cb34-6"><a href="#cb34-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> n_invalid_rows</span>
+<span id="cb34-7"><a href="#cb34-7" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="summary-2" class="section level3">
+<h3>Summary</h3>
+<ul>
+<li>Both identifier fields were already well-formed:
+<ul>
+<li>No missing values<br />
+</li>
+<li>No whitespace issues<br />
+</li>
+<li>High-cardinality and consistent structure<br />
+</li>
+</ul></li>
+<li>Clean versions (<code>AUCTION_ID_clean</code>,
+<code>PUBLISHER_ID_clean</code>) were created for consistency.</li>
+<li>Structural validation revealed <strong>invalid auctions</strong>
+with zero or multiple winners.
+<ul>
+<li>These represent impossible events under domain rules, and correcting
+them is not feasible.<br />
+</li>
+<li>A total of <strong>830</strong> rows were removed to ensure dataset
+consistency.<br />
+</li>
+</ul></li>
+<li>The remaining dataset now contains only auctions with a valid
+outcome structure.</li>
+</ul>
 <hr />
+</div>
 </div>
 <div id="device-attribute-device_type" class="section level2">
 <h2><strong>DEVICE ATTRIBUTE:</strong> <code>DEVICE_TYPE</code></h2>
@@ -2521,26 +2725,96 @@ type).</li>
 </div>
 <div id="variable" class="section level1">
 <h1><strong>VARIABLE</strong></h1>
-<div id="description-1" class="section level2">
-<h2>Description</h2>
+<div id="description-2" class="section level3">
+<h3>Description</h3>
 <ul>
-<li>Description &amp; expected type/constraints (from dictionary).</li>
-<li>Use the dictionary to define expectations.</li>
+<li><code>VARIABLE</code>
+<ul>
+<li><strong>Type:</strong> <code>TYPE</code><br />
+</li>
+<li><strong>Meaning:</strong> Event time (UTC) when the log row was
+recorded</li>
+<li><strong>Expectation:</strong> A full datetime (date + time), treated
+as UTC</li>
+<li><strong>Actual:</strong> <code>character</code></li>
+<li><strong>Missing:</strong> None</li>
+</ul></li>
+<li><code>DATE_UTC</code>
+<ul>
+<li><strong>Type:</strong> <code>DATE</code><br />
+</li>
+<li><strong>Meaning:</strong> Calendar date (UTC) used for partitioning
+/ grouping</li>
+<li><strong>Expectation:</strong> A date consistent with the date
+portion of <code>TIMESTAMP</code></li>
+<li><strong>Actual:</strong> <code>character</code></li>
+<li><strong>Missing:</strong> None</li>
+</ul></li>
 </ul>
 </div>
-<div id="exploration-1" class="section level2">
-<h2>Exploration</h2>
+<div id="exploration-2" class="section level3">
+<h3>Exploration</h3>
+<p><strong>Observations</strong></p>
 <ul>
-<li>values, distributions, weird codes, NA patterns.</li>
+<li>419294 of <code>TIMESTAMP</code> values use a dash-separated date
+(e.g., <code>&quot;2025-10-12 14:03:27&quot;</code>).</li>
+<li>1156 uses a slash-separated format (e.g.,
+<code>&quot;10/12/2025 14:03:27&quot;</code>).<br />
+</li>
+<li>21085 appear with an <code>NA</code> date and a valid time-of-day
+(e.g., <code>&quot;NA 14:03:27&quot;</code>).<br />
+</li>
+<li>The raw columns themselves do <strong>not</strong> contain missing
+values: all rows have some string in <code>TIMESTAMP</code> and
+<code>DATE_UTC</code>.</li>
+</ul>
+<p><strong>Decisions:</strong></p>
+<ul>
+<li>Recover missing dates in <code>TIMESTAMP</code> via
+<code>DATE_UTC</code></li>
+<li>Parse <code>TIMESTAMP</code> into a POSIXct (UTC) variable with
+multiple formats.</li>
+<li>Convert <code>DATE_UTC</code> to <em>Date</em> type, keeping raw
+string as-is.</li>
 </ul>
 </div>
-<div id="cleaning-1" class="section level2">
-<h2>Cleaning</h2>
-<p>-type conversion, recodes, outlier handling, bounds checks, etc.</p>
+<div id="cleaning-2" class="section level3">
+<h3>Cleaning</h3>
+<p>Log entries for time variables:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb35-2"><a href="#cb35-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
+<span id="cb35-3"><a href="#cb35-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
+<span id="cb35-4"><a href="#cb35-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
+<span id="cb35-5"><a href="#cb35-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
+<span id="cb35-6"><a href="#cb35-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb35-7"><a href="#cb35-7" tabindex="-1"></a>)</span>
+<span id="cb35-8"><a href="#cb35-8" tabindex="-1"></a></span>
+<span id="cb35-9"><a href="#cb35-9" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb35-10"><a href="#cb35-10" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T2&quot;</span>,</span>
+<span id="cb35-11"><a href="#cb35-11" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;DATE_UTC&quot;</span>,</span>
+<span id="cb35-12"><a href="#cb35-12" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;DATE_UTC stored as character.&quot;</span>,</span>
+<span id="cb35-13"><a href="#cb35-13" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Converted to Date type.&quot;</span>,</span>
+<span id="cb35-14"><a href="#cb35-14" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb35-15"><a href="#cb35-15" tabindex="-1"></a>)</span></code></pre></div>
 </div>
-<div id="summary-1" class="section level2">
-<h2>Summary</h2>
-<p>-Add to cleaning_log if we changed anything.</p>
+<div id="summary-3" class="section level3">
+<h3>Summary</h3>
+<ul>
+<li><code>TIMESTAMP</code>:
+<ul>
+<li>Inconsistently formatted (mixture of dash- vs. slash-separated dates
+and a small number of entries with an <code>NA</code> date token).</li>
+<li>We repaired rows with an <code>NA</code> date by using the date from
+<code>DATE_UTC</code>, then parsed the corrected string into
+<code>TIMESTAMP_clean</code> (POSIXct, UTC).</li>
+</ul></li>
+<li><code>DATE_UTC</code>:
+<ul>
+<li>Converted from character to <code>DATE_UTC_clean</code> (Date
+type).</li>
+</ul></li>
+<li>No rows were dropped as part of Time Variables cleaning steps.</li>
+</ul>
 <hr />
 <hr />
 </div>
@@ -2571,13 +2845,13 @@ Each entry corresponds to a specific issue that was identified and the
 decision made to address it.</p>
 <div id="log" class="section level2">
 <h2>Log</h2>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>cleaning_log <span class="sc">%&gt;%</span></span>
-<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(step_id) <span class="sc">%&gt;%</span></span>
-<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
-<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Summary of Data-Cleaning Decisions&quot;</span>,</span>
-<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a>    <span class="at">align   =</span> <span class="st">&quot;l&quot;</span></span>
-<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>, <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a>cleaning_log <span class="sc">%&gt;%</span></span>
+<span id="cb36-2"><a href="#cb36-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(step_id) <span class="sc">%&gt;%</span></span>
+<span id="cb36-3"><a href="#cb36-3" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb36-4"><a href="#cb36-4" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Summary of Data-Cleaning Decisions&quot;</span>,</span>
+<span id="cb36-5"><a href="#cb36-5" tabindex="-1"></a>    <span class="at">align   =</span> <span class="st">&quot;l&quot;</span></span>
+<span id="cb36-6"><a href="#cb36-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb36-7"><a href="#cb36-7" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>, <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>)</span></code></pre></div>
 <table class="table table-striped" style="color: black; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
 Summary of Data-Cleaning Decisions
@@ -2621,6 +2895,23 @@ Dropped full duplicate rows keeping one copy.
 </tr>
 <tr>
 <td style="text-align:left;">
+I1
+</td>
+<td style="text-align:left;">
+AUCTION_ID
+</td>
+<td style="text-align:left;">
+Auctions with zero or multiple winners violate business rules.
+</td>
+<td style="text-align:left;">
+Removed all rows belonging to auctions where n_won != 1.
+</td>
+<td style="text-align:left;">
+830
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 T1
 </td>
 <td style="text-align:left;">
@@ -2631,6 +2922,40 @@ Inconsistent TIMESTAMP formats, including ‘NA’ date tokens.
 </td>
 <td style="text-align:left;">
 Recover ‘NA’ dates using <code>DATE_UTC</code>; parsed to POSIXct (UTC).
+</td>
+<td style="text-align:left;">
+441535
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+T1
+</td>
+<td style="text-align:left;">
+TIMESTAMP
+</td>
+<td style="text-align:left;">
+Inconsistent TIMESTAMP formats, including ‘NA’ date tokens.
+</td>
+<td style="text-align:left;">
+Recover ‘NA’ dates using <code>DATE_UTC</code>; parsed to POSIXct (UTC).
+</td>
+<td style="text-align:left;">
+440705
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+T2
+</td>
+<td style="text-align:left;">
+DATE_UTC
+</td>
+<td style="text-align:left;">
+DATE_UTC stored as character.
+</td>
+<td style="text-align:left;">
+Converted to Date type.
 </td>
 <td style="text-align:left;">
 441535
@@ -2650,7 +2975,7 @@ DATE_UTC stored as character.
 Converted to Date type.
 </td>
 <td style="text-align:left;">
-441535
+440705
 </td>
 </tr>
 </tbody>
