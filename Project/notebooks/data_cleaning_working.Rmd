@@ -407,17 +407,17 @@ For each variable, we document:
 ### Description
 
 - `TIMESTAMP`  
-  - **Type:** `TIMESTAMP_NTZ`  
+  - **Type (dictionary):** `TIMESTAMP_NTZ`  
   - **Meaning:** Event time (UTC) when the log row was recorded 
   - **Expectation:** A full datetime (date + time), treated as UTC
-  - **Actual:** `character`
+  - **Actual Type:** `character`
   - **Missing:** None
 
 - `DATE_UTC`  
-  - **Type:** `DATE`  
+  - **Type (dictionary):** `DATE`  
   - **Meaning:** Calendar date (UTC) used for partitioning / grouping
   - **Expectation:** A date consistent with the date portion of `TIMESTAMP`
-  - **Actual:** `character`
+  - **Actual Type:** `character`
   - **Missing:** None
 
 ### Exploration
@@ -539,14 +539,14 @@ log_change(
   - **Type (dictionary):** `VARCHAR`  
   - **Meaning:** Unique identifier for a single auction.  
   - **Expectation:** Repeated across multiple rows (one auction $to$ many bid lines).  
-  - **Actual:** `character`  
+  - **Actual Type:** `character`  
   - **Missing:** None  
 
 - `PUBLISHER_ID`  
   - **Type (dictionary):** `VARCHAR`  
   - **Meaning:** Identifier for the publisher / site / app running the auction.  
   - **Expectation:** Medium/high cardinality; used for grouping and filtering.  
-  - **Actual:** `character`  
+  - **Actual Type:** `character`  
   - **Missing:** None  
 
 ### Exploration
@@ -698,9 +698,76 @@ log_change(
 
 ## **DEVICE ATTRIBUTE:** `DEVICE_TYPE`
 
+### Description
+
+- `DEVICE_TYPE`  
+  - **Type (dictionary):** `VARCHAR`
+  - **Meaning:** Indicates the type of device from which the impression originated  
+  - **Expectation:** Categorical values such as "mobile", "desktop", "tablet"  
+  - **Actual Type:** `integer` codes
+  - **Missing:** None  
+
+A client-provided lookup table defines the meaning of these codes in our subset:
+
+| Code | Description        |
+|-----:|--------------------|
+| 0    | Mobile/Tablet      |
+| 1    | Personal Computer  |
+| 2    | Connected TV       |
+| 4    | Tablet             |
+| 5    | Connected Device   |
+
 ---
 
-## **GEOLOCATION FIELDS:** `DEVICE_GEO_REGION`, `DEVICE_GEO_CITY` \& `DEVICE_GEO_ZIP`
+### Exploration
+
+Check for whitespace or formatting anomalies:
+
+```{r device-type-whitespace}
+sum(str_detect(as.character(ad_clean$DEVICE_TYPE), "^\\s|\\s$"))
+```
+
+**Observations**
+
+- `DEVICE_TYPE` contains **no missing values**.  
+- The column is stored as an **integer**, not a descriptive string.  
+- There are **5 unique codes** associated with an accompanying lookup table.
+- No leading or trailing whitespace was detected. 
+- The team agreed to **retain raw integer codes** and use mapping only for interpretability.
+
+
+**Decision:** 
+
+  - Keep integer codes as-is and do not recode `DEVICE_TYPE` into descriptive labels.  
+  - Apply mapping only in EDA/plots and not in the cleaned dataset.
+  
+
+### Cleaning
+
+No transformation of `DEVICE_TYPE` is required. 
+
+Create a pass-through cleaned column for schema consistency:
+
+```{r device-type-clean}
+ad_clean <- ad_clean %>%
+  mutate(DEVICE_TYPE_clean = DEVICE_TYPE)
+```
+
+Because there are **no persistent changes**, **no log entry is added** for this variable.
+
+### Summary
+
+  - `DEVICE_TYPE` is a clean, non-missing integer column representing device categories.
+  - No inconsistencies or formatting issues were detected.  
+  - The dataset preserves the raw integer representation, while a lookup table will be used for interpretation in downstream analysis.  
+
+
+
+
+
+---
+
+## **GEOLOCATION FIELDS:** `DEVICE_GEO_REGION`, `DEVICE_GEO_CITY`, `DEVICE_GEO_ZIP`,
 ## **GEOLOCATION FIELDS:** `DEVICE_GEO_LAT` \& `DEVICE_GEO_LONG`
 
 ---
@@ -781,14 +848,8 @@ log_change(
 
 ### Summary
 
-  - `TIMESTAMP`: 
-      - Inconsistently formatted (mixture of dash- vs. slash-separated dates and a small number of entries with an `NA` date token).
-      - We repaired rows with an `NA` date by using the date from `DATE_UTC`, then parsed the corrected string into `TIMESTAMP_clean` (POSIXct, UTC).  
-
-  - `DATE_UTC`:
-      - Converted from character to `DATE_UTC_clean` (Date type).  
-      
-  - No rows were dropped as part of Time Variables cleaning steps.
+  - 
+  - 
    
    
    

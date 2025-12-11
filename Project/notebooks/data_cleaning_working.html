@@ -1622,7 +1622,13 @@ margin-left: 0 !important;
       <li><a href="#summary-2" id="toc-summary-2">Summary</a></li>
       </ul></li>
       <li><a href="#device-attribute-device_type" id="toc-device-attribute-device_type"><strong>DEVICE
-      ATTRIBUTE:</strong> <code>DEVICE_TYPE</code></a></li>
+      ATTRIBUTE:</strong> <code>DEVICE_TYPE</code></a>
+      <ul>
+      <li><a href="#description-2" id="toc-description-2">Description</a></li>
+      <li><a href="#exploration-2" id="toc-exploration-2">Exploration</a></li>
+      <li><a href="#cleaning-2" id="toc-cleaning-2">Cleaning</a></li>
+      <li><a href="#summary-3" id="toc-summary-3">Summary</a></li>
+      </ul></li>
       <li><a href="#geolocation-fields-device_geo_region-device_geo_city-device_geo_zip" id="toc-geolocation-fields-device_geo_region-device_geo_city-device_geo_zip"><strong>GEOLOCATION
       FIELDS:</strong> <code>DEVICE_GEO_REGION</code>,
       <code>DEVICE_GEO_CITY</code> &amp;
@@ -1641,10 +1647,10 @@ margin-left: 0 !important;
       </ul></li>
       <li><a href="#variable" id="toc-variable"><strong>VARIABLE</strong></a>
       <ul>
-      <li><a href="#description-2" id="toc-description-2">Description</a></li>
-      <li><a href="#exploration-2" id="toc-exploration-2">Exploration</a></li>
-      <li><a href="#cleaning-2" id="toc-cleaning-2">Cleaning</a></li>
-      <li><a href="#summary-3" id="toc-summary-3">Summary</a></li>
+      <li><a href="#description-3" id="toc-description-3">Description</a></li>
+      <li><a href="#exploration-3" id="toc-exploration-3">Exploration</a></li>
+      <li><a href="#cleaning-3" id="toc-cleaning-3">Cleaning</a></li>
+      <li><a href="#summary-4" id="toc-summary-4">Summary</a></li>
       </ul></li>
       <li><a href="#cleaned-dataset" id="toc-cleaned-dataset"><strong>CLEANED DATASET</strong></a>
       <ul>
@@ -2693,7 +2699,106 @@ outcome structure.</li>
 </div>
 <div id="device-attribute-device_type" class="section level2">
 <h2><strong>DEVICE ATTRIBUTE:</strong> <code>DEVICE_TYPE</code></h2>
+<div id="description-2" class="section level3">
+<h3>Description</h3>
+<ul>
+<li><code>DEVICE_TYPE</code>
+<ul>
+<li><strong>Type:</strong> <code>VARCHAR</code></li>
+<li><strong>Meaning:</strong> Indicates the type of device from which
+the impression originated<br />
+</li>
+<li><strong>Expectation:</strong> Categorical values such as “mobile”,
+“desktop”, “tablet”<br />
+</li>
+<li><strong>Actual:</strong> <code>integer</code> codes</li>
+<li><strong>Missing:</strong> None</li>
+</ul></li>
+</ul>
+<p>A client-provided lookup table defines the meaning of these codes in
+our subset:</p>
+<table>
+<thead>
+<tr>
+<th align="right">Code</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">0</td>
+<td>Mobile/Tablet</td>
+</tr>
+<tr>
+<td align="right">1</td>
+<td>Personal Computer</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td>Connected TV</td>
+</tr>
+<tr>
+<td align="right">4</td>
+<td>Tablet</td>
+</tr>
+<tr>
+<td align="right">5</td>
+<td>Connected Device</td>
+</tr>
+</tbody>
+</table>
 <hr />
+</div>
+<div id="exploration-2" class="section level3">
+<h3>Exploration</h3>
+<p>Check for whitespace or formatting anomalies:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">str_detect</span>(<span class="fu">as.character</span>(ad_clean<span class="sc">$</span>DEVICE_TYPE), <span class="st">&quot;^</span><span class="sc">\\</span><span class="st">s|</span><span class="sc">\\</span><span class="st">s$&quot;</span>))</span></code></pre></div>
+<pre><code>## [1] 0</code></pre>
+<p><strong>Observations</strong></p>
+<ul>
+<li><code>DEVICE_TYPE</code> contains <strong>no missing
+values</strong>.<br />
+</li>
+<li>The column is stored as an <strong>integer</strong>, not a
+descriptive string.<br />
+</li>
+<li>There are <strong>5 unique codes</strong> associated with an
+accompanying lookup table.</li>
+<li>No leading or trailing whitespace was detected.</li>
+<li>The team agreed to <strong>retain raw integer codes</strong> and use
+mapping only for interpretability.</li>
+</ul>
+<p><strong>Decision:</strong></p>
+<ul>
+<li>Keep integer codes as-is and do not recode <code>DEVICE_TYPE</code>
+into descriptive labels.<br />
+</li>
+<li>Apply mapping only in EDA/plots and not in the cleaned dataset.</li>
+</ul>
+<hr />
+</div>
+<div id="cleaning-2" class="section level3">
+<h3>Cleaning</h3>
+<p>No transformation of <code>DEVICE_TYPE</code> is required.
+<code>DEVICE_TYPE_clean</code> created for consistency:</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DEVICE_TYPE_clean =</span> DEVICE_TYPE)</span></code></pre></div>
+<p>Because there are <strong>no persistent changes</strong>, <strong>no
+log entry is added</strong> for this variable.</p>
+<hr />
+</div>
+<div id="summary-3" class="section level3">
+<h3>Summary</h3>
+<ul>
+<li><code>DEVICE_TYPE</code> is a clean, non-missing integer column
+representing device categories.</li>
+<li>No inconsistencies or formatting issues were detected.<br />
+</li>
+<li>The dataset preserves the raw integer representation, while a lookup
+table will be used for interpretation in downstream analysis.</li>
+</ul>
+<hr />
+</div>
 </div>
 <div id="geolocation-fields-device_geo_region-device_geo_city-device_geo_zip" class="section level2">
 <h2><strong>GEOLOCATION FIELDS:</strong> <code>DEVICE_GEO_REGION</code>,
@@ -2725,95 +2830,68 @@ outcome structure.</li>
 </div>
 <div id="variable" class="section level1">
 <h1><strong>VARIABLE</strong></h1>
-<div id="description-2" class="section level3">
+<div id="description-3" class="section level3">
 <h3>Description</h3>
 <ul>
 <li><code>VARIABLE</code>
 <ul>
 <li><strong>Type:</strong> <code>TYPE</code><br />
 </li>
-<li><strong>Meaning:</strong> Event time (UTC) when the log row was
-recorded</li>
-<li><strong>Expectation:</strong> A full datetime (date + time), treated
-as UTC</li>
+<li><strong>Meaning:</strong></li>
+<li><strong>Expectation:</strong></li>
 <li><strong>Actual:</strong> <code>character</code></li>
 <li><strong>Missing:</strong> None</li>
 </ul></li>
-<li><code>DATE_UTC</code>
+<li><code>VARIABLE</code>
 <ul>
-<li><strong>Type:</strong> <code>DATE</code><br />
+<li><strong>Type:</strong> <code>TYPE</code><br />
 </li>
-<li><strong>Meaning:</strong> Calendar date (UTC) used for partitioning
-/ grouping</li>
-<li><strong>Expectation:</strong> A date consistent with the date
-portion of <code>TIMESTAMP</code></li>
+<li><strong>Meaning:</strong></li>
+<li><strong>Expectation:</strong></li>
 <li><strong>Actual:</strong> <code>character</code></li>
 <li><strong>Missing:</strong> None</li>
 </ul></li>
 </ul>
 </div>
-<div id="exploration-2" class="section level3">
+<div id="exploration-3" class="section level3">
 <h3>Exploration</h3>
 <p><strong>Observations</strong></p>
 <ul>
-<li>419294 of <code>TIMESTAMP</code> values use a dash-separated date
-(e.g., <code>&quot;2025-10-12 14:03:27&quot;</code>).</li>
-<li>1156 uses a slash-separated format (e.g.,
-<code>&quot;10/12/2025 14:03:27&quot;</code>).<br />
-</li>
-<li>21085 appear with an <code>NA</code> date and a valid time-of-day
-(e.g., <code>&quot;NA 14:03:27&quot;</code>).<br />
-</li>
-<li>The raw columns themselves do <strong>not</strong> contain missing
-values: all rows have some string in <code>TIMESTAMP</code> and
-<code>DATE_UTC</code>.</li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
 </ul>
 <p><strong>Decisions:</strong></p>
 <ul>
-<li>Recover missing dates in <code>TIMESTAMP</code> via
-<code>DATE_UTC</code></li>
-<li>Parse <code>TIMESTAMP</code> into a POSIXct (UTC) variable with
-multiple formats.</li>
-<li>Convert <code>DATE_UTC</code> to <em>Date</em> type, keeping raw
-string as-is.</li>
+<li></li>
+<li></li>
 </ul>
 </div>
-<div id="cleaning-2" class="section level3">
+<div id="cleaning-3" class="section level3">
 <h3>Cleaning</h3>
 <p>Log entries for time variables:</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
-<span id="cb35-2"><a href="#cb35-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
-<span id="cb35-3"><a href="#cb35-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
-<span id="cb35-4"><a href="#cb35-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
-<span id="cb35-5"><a href="#cb35-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
-<span id="cb35-6"><a href="#cb35-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
-<span id="cb35-7"><a href="#cb35-7" tabindex="-1"></a>)</span>
-<span id="cb35-8"><a href="#cb35-8" tabindex="-1"></a></span>
-<span id="cb35-9"><a href="#cb35-9" tabindex="-1"></a><span class="fu">log_change</span>(</span>
-<span id="cb35-10"><a href="#cb35-10" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T2&quot;</span>,</span>
-<span id="cb35-11"><a href="#cb35-11" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;DATE_UTC&quot;</span>,</span>
-<span id="cb35-12"><a href="#cb35-12" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;DATE_UTC stored as character.&quot;</span>,</span>
-<span id="cb35-13"><a href="#cb35-13" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Converted to Date type.&quot;</span>,</span>
-<span id="cb35-14"><a href="#cb35-14" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
-<span id="cb35-15"><a href="#cb35-15" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb38-2"><a href="#cb38-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
+<span id="cb38-3"><a href="#cb38-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
+<span id="cb38-4"><a href="#cb38-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
+<span id="cb38-5"><a href="#cb38-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
+<span id="cb38-6"><a href="#cb38-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb38-7"><a href="#cb38-7" tabindex="-1"></a>)</span>
+<span id="cb38-8"><a href="#cb38-8" tabindex="-1"></a></span>
+<span id="cb38-9"><a href="#cb38-9" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb38-10"><a href="#cb38-10" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T2&quot;</span>,</span>
+<span id="cb38-11"><a href="#cb38-11" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;DATE_UTC&quot;</span>,</span>
+<span id="cb38-12"><a href="#cb38-12" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;DATE_UTC stored as character.&quot;</span>,</span>
+<span id="cb38-13"><a href="#cb38-13" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Converted to Date type.&quot;</span>,</span>
+<span id="cb38-14"><a href="#cb38-14" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb38-15"><a href="#cb38-15" tabindex="-1"></a>)</span></code></pre></div>
 </div>
-<div id="summary-3" class="section level3">
+<div id="summary-4" class="section level3">
 <h3>Summary</h3>
 <ul>
-<li><code>TIMESTAMP</code>:
-<ul>
-<li>Inconsistently formatted (mixture of dash- vs. slash-separated dates
-and a small number of entries with an <code>NA</code> date token).</li>
-<li>We repaired rows with an <code>NA</code> date by using the date from
-<code>DATE_UTC</code>, then parsed the corrected string into
-<code>TIMESTAMP_clean</code> (POSIXct, UTC).</li>
-</ul></li>
-<li><code>DATE_UTC</code>:
-<ul>
-<li>Converted from character to <code>DATE_UTC_clean</code> (Date
-type).</li>
-</ul></li>
-<li>No rows were dropped as part of Time Variables cleaning steps.</li>
+<li></li>
+<li></li>
 </ul>
 <hr />
 <hr />
@@ -2845,13 +2923,13 @@ Each entry corresponds to a specific issue that was identified and the
 decision made to address it.</p>
 <div id="log" class="section level2">
 <h2>Log</h2>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a>cleaning_log <span class="sc">%&gt;%</span></span>
-<span id="cb36-2"><a href="#cb36-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(step_id) <span class="sc">%&gt;%</span></span>
-<span id="cb36-3"><a href="#cb36-3" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
-<span id="cb36-4"><a href="#cb36-4" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Summary of Data-Cleaning Decisions&quot;</span>,</span>
-<span id="cb36-5"><a href="#cb36-5" tabindex="-1"></a>    <span class="at">align   =</span> <span class="st">&quot;l&quot;</span></span>
-<span id="cb36-6"><a href="#cb36-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb36-7"><a href="#cb36-7" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>, <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a>cleaning_log <span class="sc">%&gt;%</span></span>
+<span id="cb39-2"><a href="#cb39-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(step_id) <span class="sc">%&gt;%</span></span>
+<span id="cb39-3"><a href="#cb39-3" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb39-4"><a href="#cb39-4" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Summary of Data-Cleaning Decisions&quot;</span>,</span>
+<span id="cb39-5"><a href="#cb39-5" tabindex="-1"></a>    <span class="at">align   =</span> <span class="st">&quot;l&quot;</span></span>
+<span id="cb39-6"><a href="#cb39-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb39-7"><a href="#cb39-7" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>, <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>)</span></code></pre></div>
 <table class="table table-striped" style="color: black; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
 Summary of Data-Cleaning Decisions
