@@ -14,10 +14,10 @@ editor: visual
 
 # Opening Slide
 
--   **Project:** Oregon Ad Bidding Analysis
--   **Team:** TECK Squad — *Chris G., Takeshi S., Esther T., Khloud Z.*
--   **GitHub repository:** <https://github.com/etoobian/STAT531_Project/>
--   **Summary:** A collaborative workflow demonstrating data cleaning, reproducibility, and exploratory analysis on Oregon advertising auction data.
+- **Project:** Oregon Ad Bidding Analysis
+- **Team:** TECK Squad — *Chris G., Takeshi S., Esther T., Khloud Z.*
+- **GitHub repository:** <https://github.com/etoobian/STAT531_Project/>
+- **Summary:** A collaborative workflow demonstrating data cleaning, reproducibility, and exploratory analysis on Oregon advertising auction data.
 
 ::: notes
 Professor's requirement: 
@@ -33,10 +33,10 @@ Professor's requirement:
 
 ## TECK Squad
 
--   **T** — Takeshi
--   **E** — Esther
--   **C** — Chris
--   **K** — Khloud
+- **T** — Takeshi
+- **E** — Esther
+- **C** — Chris
+- **K** — Khloud
 
 Previously known as **KTC (Kentucky Thighed Chicken)** before the team reformed.
 
@@ -50,14 +50,14 @@ Optional slide. Can add pic if we make one. (KTC Chicken?? New one??) Can be ski
 
 ## Dataset Context
 
--   Parquet dataset of Oregon digital ad auctions
-    -   A prebid server handles online ad auctions where bidders submit CPM bids.
-    -   Individual bidders may bid on multiple sizes
-    -   Each row represents **a bid within a prebid auction**.
--   Includes metadata such as:
-    -   Timestamps
-    -   Geolocation
-    -   Device Type
+- Parquet dataset of Oregon digital ad auctions
+    - A prebid server handles online ad auctions where bidders submit CPM bids.
+    - Individual bidders may bid on multiple sizes
+    - Each row represents **a bid within a prebid auction**.
+- Includes metadata such as:
+    - Timestamps
+    - Geolocation
+    - Device Type
 
 ::: note
 Contains intentionally inserted data-quality issues
@@ -65,15 +65,15 @@ Contains intentionally inserted data-quality issues
 
 ## Guiding Questions (examples)
 
--   What patterns appear across time, device type, and geography?
--   How does missingness or inconsistency affect analysis?
--   What behaviors or trends characterize Oregon's ad ecosystem?
+- What patterns appear across time, device type, and geography?
+- How does missingness or inconsistency affect analysis?
+- What behaviors or trends characterize Oregon's ad ecosystem?
 
 ## Why These Questions Matter (examples)
 
--   Ethical concerns around targeting and bias
--   Interpretability and decision-making
--   Understanding data reliability and uncertainty
+- Ethical concerns around targeting and bias
+- Interpretability and decision-making
+- Understanding data reliability and uncertainty
 
 ::: notes
 Professor's requirement (Section 2): 
@@ -84,21 +84,25 @@ Professor's requirement (Section 2):
 
 ------------------------------------------------------------------------
 
+::: notes
+Will be covered by Khloud.
+:::
+
 # Team Workflow & Roles
 
 ## Roles & Responsibilities
 
--   **Chris** — ED Analyst, Visualizer, Guiding Question Refinement
--   **Takeshi** — Data Cleaner, Scribe, Presentation Editor.
--   **Esther** — GitHub/Project Coordinator, ED Analyst, Reproducibility Enforcer.
--   **Khloud** — Data Cleaner, Presentation Editor.
+- **Chris** — ED Analyst, Visualizer, Guiding Question Refinement
+- **Takeshi** — Data Cleaner, Scribe, Presentation Editor.
+- **Esther** — GitHub/Project Coordinator, ED Analyst, Reproducibility Enforcer.
+- **Khloud** — Data Cleaner, Presentation Editor.
 
 ## Coordination Tools
 
--   **GitHub:** Checkout to Branch → PRs → Reviews → Merge.
--   **Jira/Kanban:** Task/Subtask Alloting, Progress Tracking.
--   **Discord:** Quick Updates, Online Meeting Location.
--   **Commit Habits:** Consistent Commits, Detailed Messages.
+- **GitHub:** Checkout to Branch → PRs → Reviews → Merge.
+- **Jira/Kanban:** Task/Subtask Alloting, Progress Tracking.
+- **Discord:** Quick Updates, Online Meeting Location.
+- **Commit Habits:** Consistent Commits, Detailed Messages.
 
 Through the combination of Github, Jira, and a rigid commit/PR routine outlined by checklists/workflows that we agreed upon ensured we ran into minimal issues with the completion of this project.
 
@@ -118,23 +122,27 @@ Refer to Team Docs for greater depth of detail while presenting?
 
 ## Key Issues Identified (Overview)
 
--   Text and Value Inconsistencies.
--   Implausible Values and Sentinels.
--   Missing Information.
--   Duplicates and Near-duplicates.
+- Text and Value Inconsistencies.
+- Implausible Values and Sentinels.
+- Missing Information.
+- Duplicates and Near-duplicates.
 
 ::: notes
 Professor's Section 3.1 — Key Issues You Found. Goal: show variety and importance of issues before deep-diving.
 
--   Missingness patterns across multiple columns
--   Text inconsistencies (typos, casing, spelling variants)
--   Type mismatches (numbers stored as text, dates as strings)
--   Duplicates and near-duplicates
--   Outliers / implausible values (e.g., coordinates outside Oregon)
--   Structural inconsistencies (unexpected categories, inconsistent naming)
+- Missingness patterns across multiple columns
+- Text inconsistencies (typos, casing, spelling variants)
+- Type mismatches (numbers stored as text, dates as strings)
+- Duplicates and near-duplicates
+- Outliers / implausible values (e.g., coordinates outside Oregon)
+- Structural inconsistencies (unexpected categories, inconsistent naming)
 :::
 
 ------------------------------------------------------------------------
+
+::: notes
+Will be covered by Takeshi.
+:::
 
 # Issue 1: <br>Type and Value Inconsistencies
 
@@ -146,30 +154,35 @@ The type refers to the data type of a column and value refers to individual rows
 
 Examples of Type Inconsistencies:
 
--   The PRICE column was of the character type.
--   The RESPONSE_TIME column was of the character type.
+- The PRICE column was of the character type.
+- The RESPONSE_TIME column was of the character type.
 
 Examples of Value Inconsistencies:
 
--   The TIMESTAMP column has three different formats:
-    -   "YYYY/MM/DD...", "YYYY-MM-DD..." and "NA..."
--   The RESPONSE_TIME column had different prefix delimeters:
-    -   "RESPONSE_TIME:" and "RESSPONSE_TIME:".
+- The TIMESTAMP column has three different formats:
+    - "YYYY/MM/DD...", "YYYY-MM-DD..." and "NA..."
+- The RESPONSE_TIME column had different prefix delimeters:
+    - "RESPONSE_TIME:" and "RESSPONSE_TIME:".
 
 ## Why It Matters
 
 Issues pertaining to certain columns, like PRICE, were crucial to remedy because:
 
--   These columns are crucial for exploring the guiding questions.
--   Directly contradicted the data dictionary provided by the client.
+- These columns are crucial for exploring the guiding questions.
+- Directly contradicted the data dictionary provided by the client.
+- 
 
 ## Cleaning Strategy
 
--   Principle: Convert columns to their intended type and enforce sufficient formatting.
--   Implementation: Compare types to data dictionary; remove delimiters; alleviate potential points of coercion; convert to correct data type.
--   Example: Verify Data Type of PRICE → Identify Points of Coercion → Alleviate Given Points → Convert PRICE to the Numeric Data Type.
+- Principle: Convert columns to their intended type and enforce sufficient formatting.
+- Implementation: Compare types to data dictionary; remove delimiters; alleviate potential points of coercion; convert to correct data type.
+- Example: Verify Data Type of PRICE → Identify Points of Coercion → Alleviate Given Points → Convert PRICE to the Numeric Data Type.
 
 ------------------------------------------------------------------------
+
+::: notes
+Will be covered by Khloud.
+:::
 
 # Issue 2: <br>Implausible Values and Sentinels
 
@@ -181,29 +194,33 @@ Implausible values are values that otherwise, through the inherent existence of 
 
 Examples of Implausible Values:
 
--   The PRICE column contains negative values.
--   The DEVICE_GEO_LONG column contains values that exist outside of Oregon's border.
+- The PRICE column contains negative values.
+- The DEVICE_GEO_LONG column contains values that exist outside of Oregon's border.
 
 Sentinels:
 
--   The generic sentinel value is -999, seen in columns such as:
-    -   PRICE
-    -   DEVICE_GEO_ZIP
+- The generic sentinel value is -999, seen in columns such as:
+    - PRICE
+    - DEVICE_GEO_ZIP
 
 ## Why It Matters
 
 Similar to the prior issue, with some additions:
 
--   These columns are crucial for the exploration of the guiding questions.
--   The inclusion of implausible and/or sentinel values can greatly skew any final conclusions.
+- These columns are crucial for the exploration of the guiding questions.
+- The inclusion of implausible and/or sentinel values can greatly skew any final conclusions.
 
 ## Cleaning Strategy (Fix Summary)
 
--   Principle: Correct, if possible, or remove sentinel values and implausible values.
--   Implementation: Identify firm restrictions/bounds and impossible values; identify potential sentinel values; check respective values with bounds in mind; recover, if possible, or remove rows with implausible/sentinel values.
--   Example: Verify that PRICE is Positive → Identify Negative Values → Delineate Between Sentinel and Implausible → Verify that Sentinel Values Can't be Recovered → Verify Distribution of Remaining Implausible Values to Test Recoverability → Recover Values.
+- Principle: Correct, if possible, or remove sentinels and implausible values.
+- Implementation: Identify firm restrictions/bounds and impossible values; identify potential sentinel values; check respective values with bounds in mind; recover, if possible, or remove rows with implausible/sentinel values.
+- Example: Verify that PRICE is Positive → Identify Negative Values → Delineate Between Sentinel and Implausible → Verify that Sentinel Values Can't be Recovered → Verify Distribution of Remaining Implausible Values to Test Recoverability → Recover Values.
 
 ------------------------------------------------------------------------
+
+::: notes
+Will be covered by Khloud.
+:::
 
 # Issue 3: <br>Missing Information
 
@@ -295,19 +312,20 @@ Repeat this pattern for all Issues if needed, or combine smaller issues on a sin
 
 ## Git + File Structure
 
--   Project root with clear directories:
-    -   data/ (local, git-ignored)
-    -   scripts/ (modular R scripts)
-    -   docs/ (Rmd and Quarto files)
-    -   figs/ (saved plots)
--   Consistent naming conventions (snake_case)
+- .../STAT531_Project/Project (root):
+    - data/ (local, git-ignored)
+    - scripts/ (modular R scripts)
+    - docs/ (Rmd and Quarto files)
+    - reports/ (saved plots)
+- Snake case naming convention utilized.
+- Modularity achieved through the distinction of tasks.
 
 ## Documentation Practices
 
--   Quarto slides for final presentation
--   R Markdown for analysis steps and lab-style documentation
--   Commit history shows contributions from all team members
--   PRs used for review and discussion
+-   Quarto utilized for final presentation.
+-   R Markdown for analysis steps and lab-style documentation.
+-   Commit history shows frequent contributions from all team members.
+-   Pull requestss used for review and discussion of content.
 
 ::: notes
 Professor's Section 3.3 — Reproducibility and Workflow: 
