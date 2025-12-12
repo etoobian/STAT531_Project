@@ -19,16 +19,7 @@ editor: visual
 - **GitHub repository:** <https://github.com/etoobian/STAT531_Project/>
 - **Summary:** A collaborative workflow demonstrating data cleaning, reproducibility, and exploratory analysis on Oregon advertising auction data.
 
-::: notes
-✅
-Professor's requirement: 
-- Project title 
-- Team members 
-- Repo link 
-- One-sentence summary of project's focus
-:::
-
-------------------------------------------------------------------------
+---
 
 # Team Banner
 
@@ -41,12 +32,7 @@ Professor's requirement:
 
 Previously known as **KTC (Kentucky Thighed Chicken)** before the team reformed.
 
-::: notes
-✅
-Optional slide. Can add pic if we make one. (KTC Chicken?? New one??) Can be skipped if time is tight.
-:::
-
-------------------------------------------------------------------------
+---
 
 # The Data & Initial Plan (\< 5 min)
 
@@ -61,11 +47,6 @@ Optional slide. Can add pic if we make one. (KTC Chicken?? New one??) Can be ski
     - Geolocation
     - Device Type
 
-::: note
-✅
-Contains intentionally inserted data-quality issues
-:::
-
 ## Guiding Questions
     
 What findings can we deduce from:
@@ -79,13 +60,6 @@ To help us deduce to what extent does:
 - Response time impact the bid (price)?
     - By extension, geographic location impact bid (price)?
 
-::: notes
-✅✅✅✅
-- What patterns appear across time, device type, and geography?
-- How does missingness or inconsistency affect analysis?
-- What behaviors or trends characterize Oregon's ad ecosystem?
-:::
-
 ## Why These Questions Matter
 
 These questions will help us by:
@@ -94,24 +68,8 @@ These questions will help us by:
 - How to accommodate different device types to ensure fair bidding procedures.
 - General understanding of how certain predictors influence each other will prove beneficial when looking to maximize bid prices and potentially reduce or standardize a maximum response time.
 
-::: notes
-✅✅✅✅
-- Ethical concerns around targeting and bias
-- Interpretability and decision-making
-- Understanding data reliability and uncertainty
-:::
-::: notes
-Professor's requirement (Section 2): 
-- Basic data set context 
-- Guiding questions we developed 
-- Why these guiding questions matter
-:::
+---
 
-------------------------------------------------------------------------
-
-::: notes
-Will be covered by Khloud.
-:::
 
 # Team Workflow & Roles
 
@@ -131,18 +89,7 @@ Will be covered by Khloud.
 
 Through the combination of Github, Jira, and a rigid commit/PR routine outlined by checklists/workflows that we agreed upon ensured we ran into minimal issues with the completion of this project.
 
-::: notes
-✅
-Professor's requirement (Section 2): 
-- The roles you assigned within the team and how you coordinated work: 
-– GitHub workflow (branches, pull requests, commits) 
-– Jira/Kanban tasks, deadlines, progress tracking 
-- NOTE: Roles/coordination will be detailed in the next slide group Use this slide to emphasize collaboration practices, not code.
-
-Refer to Team Docs for greater depth of detail while presenting?
-:::
-
-------------------------------------------------------------------------
+---
 
 # Data Cleaning Process (6-8 min)
 
@@ -153,24 +100,7 @@ Refer to Team Docs for greater depth of detail while presenting?
 - Missing Information.
 - Duplicates and Keys.
 
-::: notes
-✅
-Professor's Section 3.1 — Key Issues You Found. Goal: show variety and importance of issues before deep-diving.
-
-- Missingness patterns across multiple columns
-- Text inconsistencies (typos, casing, spelling variants)
-- Type mismatches (numbers stored as text, dates as strings)
-- Duplicates and near-duplicates
-- Outliers / implausible values (e.g., coordinates outside Oregon)
-- Structural inconsistencies (unexpected categories, inconsistent naming)
-:::
-
-------------------------------------------------------------------------
-
-::: notes
-✅
-Will be covered by Takeshi.
-:::
+---
 
 # Issue 1: <br>Type and Value Inconsistencies
 
@@ -206,12 +136,7 @@ Issues pertaining to certain columns, like PRICE, were crucial to remedy because
 - Implementation: Compare types to data dictionary; remove delimiters; alleviate potential points of coercion; convert to correct data type.
 - Example: Verify Data Type of PRICE → Identify Points of Coercion → Alleviate Given Points → Convert PRICE to the Numeric Data Type.
 
-------------------------------------------------------------------------
-
-::: notes
-✅
-Will be covered by Khloud.
-:::
+---
 
 # Issue 2: <br>Implausible Values and Sentinels
 
@@ -245,12 +170,7 @@ Similar to the prior issue, with some additions:
 - Implementation: Identify firm restrictions/bounds and impossible values; identify potential sentinel values; check respective values with bounds in mind; recover, if possible, or remove rows with implausible/sentinel values.
 - Example: Verify that PRICE is Positive → Identify Negative Values → Delineate Between Sentinel and Implausible → Verify that Sentinel Values Can't be Recovered → Verify Distribution of Remaining Implausible Values to Test Recoverability → Recover Values.
 
-------------------------------------------------------------------------
-
-::: notes
-✅
-Will be covered by Khloud.
-:::
+---
 
 # Issue 3: <br>Missing Values
 
@@ -304,34 +224,6 @@ It is intended for there to be a specific key given by the data dictionary, but 
 - Implementation: Remove duplicates.
 - Example: Remove Duplicates by Taking Uniqueness.
 
-::: notes 
-✅
-Professor's Section 3.2 — Cleaning Strategy: 
-- What you observed 
-- Why it was a problem 
-- Principle behind your fix 
-- Concise code or pseudo-code (keep it light)
-
-Why It was Problem: 
-
-- Misrepresents geographic locations
-- Misleads EDA maps and summaries
-- Could bias location-based conclusions
-
-Cleaning Strategy: 
-
-- Principle: enforce realistic Oregon bounds and correct shifted values
-- Implementation: detect shifted observations; adjust values; re-check ranges
-- Example (conceptual): mutate longitude values and validate them 
-:::
-
-::: notes
-From Prof:
-- For each issue: - What you observed - Why it was a problem - Principle behind your fix (e.g., “We chose this imputation strategy because...”) - Concise R code or pseudo-code Focus on justifying decisions, not on full code dumps."
-
-Repeat this pattern for all Issues if needed, or combine smaller issues on a single slide.
-:::
-
 ------------------------------------------------------------------------
 
 # Reproducibility & Workflow
@@ -362,91 +254,73 @@ Repeat this pattern for all Issues if needed, or combine smaller issues on a sin
     - TeamCheckInEntries/ (check in folder)
     - TeamCheckInTeamplate.md
 
-::: notes
-✅
-Professor's Section 3.3 — Reproducibility and Workflow: 
-- Git usage (branches, PRs, conflicts) 
-- Script modularity and readability 
-- Rmd/Quarto 
-- Naming conventions and folder structure
-:::
-
 ------------------------------------------------------------------------
 
 # Exploratory Data Analysis (7 - 10 min)
 
-## Overview Patterns (likely split into multiple slides or infor below)
+## Missinginess Heatmap
 
-![Test](/results/Latitude-1.png)
+![](../results/Missingness Heatmap.png) {width="60%" fig-align="center"}
 
-::: notes 
-PLOTS:
-- Distributions.
-- Key Relationships.
-- Missinginess profiles (from data_io.R)
-- Surprising patterns.
-:::
+## Overview Distribution (Price histogram)
 
-::::: columns
-::: columns
-### Figures (Placeholders)
+![](../results/Price-1.png) {width="60%" fig-align="center"}
 
--   Placeholder: Overall distributions figure
--   Placeholder: Key relationship plot
--   Placeholder: Missingness heatmap
+## Overview Distribution (Price boxplot)
 
-(Example: save as reports/eda_overview_distributions.png,
-figs/eda_overview_relationships.png, figs/eda_missingness.png)
-:::
+![](../results/Price-2.png) {width="60%" fig-align="center"}
 
-::: column
-### Interpretation Notes
+## Overview Distribution (Device Type boxplot)
 
--   Describe main distribution shapes and any skew
--   Highlight major relationships (e.g., device vs outcome)
--   Summarize missingness profile and any surprising gaps
--   Note any patterns that motivated deeper guiding questions
-:::
-:::::
+![](../results/Device Type-1.png) {width="60%" fig-align="center"}
+
+## Overview Distribution (Response Time)
+
+![asd](../results/Response Time-1.png) {width="60%" fig-align="center"}
+
+## Overview Distribution (Longitude histogram)
+
+![asd](../results/Longitude-1.png) {width="60%" fig-align="center"}
+
+## Overview Distribution (Latitude histogram)
+
+![asd](../results/Latitude-1.png) {width="60%" fig-align="center"}
 
 ::: notes
-EDA Overview 
-- High-level distributions 
-- Relationships 
-- Missingness summaries 
-Professor's Sections 4.1 and 4.3: 
-- Show distributions, relationships, missingness, and surprising patterns 
-- Ensure clear labels, good color choices, no clutter and interpretation w/ each visual This slide uses side-by-side layout for plots and narrative.
+- Key Relationships.
+- Surprising patterns.
 :::
 
 ------------------------------------------------------------------------
 
 # Deep Dive: Guiding Question 1
 
-## Question and Visuals
+## City to Device Type to Response Time
 
-::::: columns
-::: column
-### Guiding Question 1 (example)
+Does a difference in device types vary across cities, and subsequently relate to response time?
 
--   State the question clearly
-    (for example: "How does device type vary by time of day?")
+\
 
-#### Figure Placeholder
+This line of thinking could provide us with insight to how geospatial data can be utilized to uncover potential issues regarding latency, which can improve overall bidding procedure.
 
--   Insert main plot here (e.g., time-of-day vs device type)
--   File suggestion: figs/gq1_main_plot.png
-:::
+## Device Type by City
 
-::: column
-### Interpretation
+![](../results/Device Type by City-1.png) {width="60%" fig-align="center"}
 
--   Describe the pattern shown in the figure
--   Connect back to the guiding question explicitly
--   Mention how cleaning decisions (e.g., device-type standardization) were necessary for this figure to be meaningful
--   Note any caveats or surprising findings
-:::
-:::::
+## Response Time by Device Type
+
+![](../results/Device Type v Response Time-1.png) {width="60%" fig-align="center"}
+
+## Response Time by City
+
+![](../results/Response Time v City-1.png) {width="60%" fig-align="center"}
+
+## Interpretation
+
+- The majority of cities encompassed by the data were taken from personal computers, but some cities, like Medford and Portland were dominated by tablets.
+- We see that tablets and personal computers have the lowest median latency, which could indicate better connectivity to these devices. 
+- Despite a high concentration of bid count in major cities like Portland, we see a relatively low median latency period. However, we see that some cities further away from metropolitan areas have comparitively higher median response times.
+
 
 ::: notes
 Professor's Section 4.2 — Deep Dives on Guiding Questions: 
@@ -460,41 +334,42 @@ Professor's Section 4.2 — Deep Dives on Guiding Questions:
 
 # Deep Dive: Guiding Question 2
 
-## Question and Visuals
+## Geospatial Location to Response Time to Price
 
-::::: columns
-::: column
-### Guiding Question 2
+To what extent does geospatial location impact response time, and how does response time impact bid price?
 
--   State the question clearly
-    (for example: "Are ad impressions concentrated in particular regions of Oregon?")
+A clearer image can be painted through the usage of the longitudinal and latitudinal points when looking to explore response time as an indicator of bid price.
+    
+## Latitude by Response Time
 
-#### Figure Placeholder
+![](../results/Latitude v Response Time-1.png) {width="60%" fig-align="center"}
 
--   Insert main map or spatial plot here
--   File suggestion: figs/gq2_map_plot.png
-:::
+## Longitude by Response Time
 
-::: column
-### Interpretation
+![](../results/Longitude v Response Time-1.png) {width="60%" fig-align="center"}
+    
+## Price by Latitude
 
--   Summarize spatial concentration or lack thereof
--   Discuss how coordinate cleaning affected conclusions
--   Note any hotspots, gaps, or anomalies
--   Comment briefly on ethical or fairness implications if relevant
-:::
-:::::
+![asd](../results/Price v Latitude-2.png) {width="60%" fig-align="center"}
+    
+![](../results/Price v Response Time-1.png) {width="60%" fig-align="center"}  
+    
+## Price by Longitude
+    
+![](../results/Price v Longitude-2.png) {width="60%" fig-align="center"}
+    
+## Price by Response Time
 
-::: notes
-For each: 
-- State the question 
-- Show relevant figures 
-- Interpret results clearly 
-- Connect to cleaning decisions
+![](../results/Price v Response Time-1.png) {width="60%" fig-align="center"}  
 
-Same structure as Guiding Question 1, maintaining consistent layout: 
-plots on left, interpretation on right.
-:::
+## Interpretation
+
+- Though the median response time for Portland was relatively low, we notice that the variability in the response time of the latitudinal range surrounding Portland is much greater than other cities. We notice the same for longitude. This could be as a result of higher traffic, or the fact that many cities lie East and South of Portland.
+- We notice lower prices around the longitudinal and latitudinal values surrounding Portland, which could indicate a lower average price seen in major cities.
+
+## Interpretation Cont.
+
+- The general trend of bid price with respect to response time is downwards, noting that bids with faster response time tends to have higher CPM values. There are notable dips at roughly 350ms and 700ms.
 
 ------------------------------------------------------------------------
 
@@ -502,17 +377,11 @@ plots on left, interpretation on right.
 
 ## Summary of Insights
 
--   3–5 major findings from the cleaned and explored data
--   One key insight about data quality and cleaning impact
--   One insight about behavior or patterns in the ad ecosystem
--   One insight about limitations or uncertainties in the data
-
-::: notes
-Professor's Section 5 — Insight Summary: 
-- Summarize 3-5 most important / key findings 
-- Explain what the data suggests overall 
-- Mention uncertainties or next steps Keep bullets crisp and non-technical.
-:::
+- Latency between device types are roughly the same.
+- Latency decreases in greater populated longitudinal/latitudinal rows, but has increased variability.
+- Bid price decreases as response time increases.
+- Geospatial location impacts price.
+- Area of high concentration of bids have moderate median bid prices.
 
 ------------------------------------------------------------------------
 
@@ -520,36 +389,43 @@ Professor's Section 5 — Insight Summary:
 
 ## What Went Well
 
--   Effective use of GitHub, branches, and PRs.
--   Clear division of labor and ownership.
--   Helpful use of Jira/Kanban for tracking progress.
+- Effective use of GitHub, branches, and PRs.
+- Clear division of labor and ownership.
+- Jira/Kanban proved helpful for tracking progress.
 
 ## Challenges and Lessons
 
--   Merge conflicts and how they were resolved.
--   Aligning on cleaning decisions and documentation style.
--   Time management and coordination across schedules.
+- Merge conflicts and how they were resolved.
+- Aligning on cleaning decisions and documentation style.
+- Time management and coordination across schedules.
+- Learned not to rebase... (Takeshi).
 
-::: notes
-Professor's Section 6 — Collaboration Reflection: 
-- What went wellin workflow 
-- What was challenging 
-- Lessons learned for future projects 
-- Role of GitHub, Jira, RStudio in collaboration
-:::
+---
 
-------------------------------------------------------------------------
+## GitHub Repo Content Confirmation
 
-# Final Slide: Repository Checklist (1 min)
+Does the repository contain:
 
-## GitHub Repo Contents
-
--   Clean and informative README
+-   Clean and informative README.md
 -   Data-cleaning scripts
--   EDA notebooks (Rmd and/or qmd)
+-   EDA notebooks (rmd and/or qmd)
 -   Clear folder structure: data, scripts, figs, docs
 -   Kanban board snapshot (exported image or link)
 -   Evidence of teamwork: PRs, commit history, multiple authors
+
+# It does.
+
+# README.md
+
+![](../results/Pasted image.png) {width="60%" fig-align="center"}  
+
+# data_cleaning.R
+
+![](../results/data_cleaning.png) {width="60%" fig-align="center"}  
+
+# EDA Notebook
+
+![](../results/Pasted image.png) {width="60%" fig-align="center"}  
 
 ::: notes
 Professor's Section 7 — GitHub Repository Checklist. 
@@ -562,9 +438,3 @@ Clean README
 - Evidence of teamwork (commit history, pull requests, etc.)
 :::
 
-::: notes
-Presentation Logistics Timing 
-- Total: 20–30 minutes 
-- Leave 3 min for questions 
-- Practice pacing
-:::
