@@ -1582,7 +1582,7 @@ margin-left: 0 !important;
     <h2><a href="#content"><code>Project/notebooks/data_cleaning.R</code></a></h2>
     <div id="toc">
       <ul>
-      <li><a href="#purpose" id="toc-purpose"><strong>Purpose</strong></a></li>
+      <li><a href="#purpose" id="toc-purpose"><strong>PURPOSE</strong></a></li>
       <li><a href="#data-overview" id="toc-data-overview"><strong>DATA
       OVERVIEW</strong></a>
       <ul>
@@ -1639,26 +1639,33 @@ margin-left: 0 !important;
       <code>DEVICE_GEO_REGION</code></a></li>
       <li><a href="#cleaning---device_geo_region" id="toc-cleaning---device_geo_region">Cleaning -
       <code>DEVICE_GEO_REGION</code></a></li>
+      <li><a href="#summary-4" id="toc-summary-4">Summary</a></li>
       <li><a href="#exploration-device_geo_city" id="toc-exploration-device_geo_city">Exploration –
       <code>DEVICE_GEO_CITY</code></a></li>
       <li><a href="#cleaning-device_geo_city" id="toc-cleaning-device_geo_city">Cleaning –
       <code>DEVICE_GEO_CITY</code></a></li>
-      <li><a href="#summary-4" id="toc-summary-4">Summary</a></li>
+      <li><a href="#summary-5" id="toc-summary-5">Summary</a></li>
       <li><a href="#exploration---device_geo_zip" id="toc-exploration---device_geo_zip">Exploration -
       <code>DEVICE_GEO_ZIP</code></a></li>
       <li><a href="#cleaning-device_geo_zip" id="toc-cleaning-device_geo_zip">Cleaning –
       <code>DEVICE_GEO_ZIP</code></a></li>
-      <li><a href="#summary-5" id="toc-summary-5">Summary</a></li>
+      <li><a href="#summary-6" id="toc-summary-6">Summary</a></li>
       <li><a href="#exploration---device_geo_lat-device_geo_long" id="toc-exploration---device_geo_lat-device_geo_long">Exploration
       - <code>DEVICE_GEO_LAT</code>
       &amp;<code>DEVICE_GEO_LONG</code></a></li>
       <li><a href="#cleaning---device_geo_long-device_geo_long" id="toc-cleaning---device_geo_long-device_geo_long">Cleaning -
       <code>DEVICE_GEO_LONG</code>
       &amp;<code>DEVICE_GEO_LONG</code></a></li>
-      <li><a href="#summary-6" id="toc-summary-6">Summary</a></li>
+      <li><a href="#summary-7" id="toc-summary-7">Summary</a></li>
       </ul></li>
       <li><a href="#ad-sizes-requested_sizes-size" id="toc-ad-sizes-requested_sizes-size"><strong>AD SIZES:</strong>
-      <code>REQUESTED_SIZES</code>, <code>SIZE</code></a></li>
+      <code>REQUESTED_SIZES</code>, <code>SIZE</code></a>
+      <ul>
+      <li><a href="#description-4" id="toc-description-4">Description</a></li>
+      <li><a href="#exploration-3" id="toc-exploration-3">Exploration</a></li>
+      <li><a href="#cleaning-3" id="toc-cleaning-3">Cleaning</a></li>
+      <li><a href="#summary-8" id="toc-summary-8">Summary</a></li>
+      </ul></li>
       <li><a href="#pricing-price" id="toc-pricing-price"><strong>PRICING:</strong>
       <code>PRICE</code></a></li>
       <li><a href="#latency-metric-response_time" id="toc-latency-metric-response_time"><strong>LATENCY
@@ -1668,10 +1675,10 @@ margin-left: 0 !important;
       </ul></li>
       <li><a href="#variable" id="toc-variable"><strong>VARIABLE</strong></a>
       <ul>
-      <li><a href="#description-4" id="toc-description-4">Description</a></li>
-      <li><a href="#exploration-3" id="toc-exploration-3">Exploration</a></li>
-      <li><a href="#cleaning-3" id="toc-cleaning-3">Cleaning</a></li>
-      <li><a href="#summary-7" id="toc-summary-7">Summary</a></li>
+      <li><a href="#description-5" id="toc-description-5">Description</a></li>
+      <li><a href="#exploration-4" id="toc-exploration-4">Exploration</a></li>
+      <li><a href="#cleaning-4" id="toc-cleaning-4">Cleaning</a></li>
+      <li><a href="#summary-9" id="toc-summary-9">Summary</a></li>
       </ul></li>
       <li><a href="#cleaned-dataset" id="toc-cleaned-dataset"><strong>CLEANED DATASET</strong></a>
       <ul>
@@ -1706,7 +1713,7 @@ Squad</p>
 <div id="main">
 <hr />
 <div id="purpose" class="section level1">
-<h1><strong>Purpose</strong></h1>
+<h1><strong>PURPOSE</strong></h1>
 <p>This notebook documents the full data-cleaning workflow for the
 Oregon ad bidding dataset.</p>
 <ul>
@@ -2392,8 +2399,7 @@ portion of <code>TIMESTAMP</code></li>
 <div id="exploration" class="section level3">
 <h3>Exploration</h3>
 <p>Sample a few <code>TIMESTAMP</code> values:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">sample</span>(ad_clean<span class="sc">$</span>TIMESTAMP, <span class="at">size =</span> <span class="dv">20</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">sample</span>(ad_clean<span class="sc">$</span>TIMESTAMP, <span class="at">size =</span> <span class="dv">20</span>)</span></code></pre></div>
 <pre><code>##  [1] &quot;2025-10-21 23:7:30&quot;  &quot;NA 0:18:20&quot;          &quot;2025-10-22 0:32:9&quot;  
 ##  [4] &quot;2025-10-21 23:10:5&quot;  &quot;2025-10-22 4:13:30&quot;  &quot;NA 23:3:0&quot;          
 ##  [7] &quot;2025-10-22 2:42:14&quot;  &quot;2025-10-22 4:14:39&quot;  &quot;2025-10-22 4:15:41&quot; 
@@ -2761,7 +2767,6 @@ our subset:</p>
 </tr>
 </tbody>
 </table>
-<hr />
 </div>
 <div id="exploration-2" class="section level3">
 <h3>Exploration</h3>
@@ -3001,6 +3006,17 @@ single clean code, <code>&quot;OR&quot;</code>.</li>
 <span id="cb44-6"><a href="#cb44-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> n_region_changed</span>
 <span id="cb44-7"><a href="#cb44-7" tabindex="-1"></a>)</span></code></pre></div>
 </div>
+<div id="summary-4" class="section level3">
+<h3>Summary</h3>
+<ul>
+<li><code>DEVICE_GEO_REGION</code> is stored as a <code>character</code>
+field and has no missing values.</li>
+<li>All Oregon variants (<code>&quot;OR&quot;</code>, <code>&quot;Or&quot;</code>,
+<code>&quot;oregon&quot;</code>, <code>&quot;xor&quot;</code>) were standardized to a single
+clean code, <code>&quot;OR&quot;</code>.</li>
+<li>No rows were removed based during this cleaning process.</li>
+</ul>
+</div>
 <div id="exploration-device_geo_city" class="section level3">
 <h3>Exploration – <code>DEVICE_GEO_CITY</code></h3>
 <p>We begin by checking for basic formatting issues:</p>
@@ -3053,7 +3069,7 @@ or variant spellings.</li>
 <p>Because <strong>no values were modified</strong>, <strong>no log
 entry is added</strong> for this variable.</p>
 </div>
-<div id="summary-4" class="section level3">
+<div id="summary-5" class="section level3">
 <h3>Summary</h3>
 <ul>
 <li><code>DEVICE_GEO_CITY</code> contains a large variety of locality
@@ -3237,7 +3253,7 @@ would be speculative</li>
 <span id="cb62-6"><a href="#cb62-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> n_zip_changed</span>
 <span id="cb62-7"><a href="#cb62-7" tabindex="-1"></a>)</span></code></pre></div>
 </div>
-<div id="summary-5" class="section level3">
+<div id="summary-6" class="section level3">
 <h3>Summary</h3>
 <ul>
 <li><code>DEVICE_GEO_ZIP</code> is treated as a <strong>string
@@ -3581,7 +3597,7 @@ adding 10.</li>
 <span id="cb73-6"><a href="#cb73-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> n_long_shifted</span>
 <span id="cb73-7"><a href="#cb73-7" tabindex="-1"></a>)</span></code></pre></div>
 </div>
-<div id="summary-6" class="section level3">
+<div id="summary-7" class="section level3">
 <h3>Summary</h3>
 <ul>
 <li><code>DEVICE_GEO_LAT</code> required no changes; all values were
@@ -3601,7 +3617,199 @@ now restores all observations to plausible Oregon coordinates.</li>
 <div id="ad-sizes-requested_sizes-size" class="section level2">
 <h2><strong>AD SIZES:</strong> <code>REQUESTED_SIZES</code>,
 <code>SIZE</code></h2>
+<div id="description-4" class="section level3">
+<h3>Description</h3>
+<ul>
+<li><code>REQUESTED_SIZES</code>
+<ul>
+<li><strong>Type (dictionary):</strong> <code>categorical</code> (string
+or array of sizes)</li>
+<li><strong>Meaning:</strong> All ad slot sizes that were requested for
+the impression (e.g., <code>&quot;300x250, 320x50&quot;</code>).<br />
+</li>
+<li><strong>Expectation:</strong> A non-missing, delimited list of size
+codes in <code>width x height</code> format.<br />
+</li>
+<li><strong>Actual Type:</strong> <code>character</code></li>
+<li><strong>Missing:</strong> None</li>
+</ul></li>
+<li><code>SIZE</code>
+<ul>
+<li><strong>Type (dictionary):</strong> <code>categorical</code><br />
+</li>
+<li><strong>Meaning:</strong> The size associated with this bid line
+(typically one of the <code>REQUESTED_SIZES</code>).<br />
+</li>
+<li><strong>Expectation:</strong> A single size in
+<code>width x height</code> format (e.g., <code>&quot;300x250&quot;</code>),
+matching one of the requested sizes and representing a valid display
+slot.<br />
+</li>
+<li><strong>Actual type:</strong> <code>character</code><br />
+</li>
+<li><strong>Missing:</strong> None</li>
+</ul></li>
+</ul>
+</div>
+<div id="exploration-3" class="section level3">
+<h3>Exploration</h3>
+<p>We first check the <strong>storage format</strong> of
+<code>REQUESTED_SIZES</code> and then look for structurally unusual
+<code>SIZE</code> values.</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" tabindex="-1"></a><span class="co"># Sample REQUESTED_SIZES to understand its raw format</span></span>
+<span id="cb74-2"><a href="#cb74-2" tabindex="-1"></a><span class="fu">sample</span>(ad_clean<span class="sc">$</span>REQUESTED_SIZES, <span class="at">size =</span> <span class="dv">10</span>)</span>
+<span id="cb74-3"><a href="#cb74-3" tabindex="-1"></a></span>
+<span id="cb74-4"><a href="#cb74-4" tabindex="-1"></a><span class="co"># Structural sanity checks for REQUESTED_SIZES:</span></span>
+<span id="cb74-5"><a href="#cb74-5" tabindex="-1"></a><span class="co">#   - looks like a JSON array (starts with &quot;[&quot; and ends with &quot;]&quot;)</span></span>
+<span id="cb74-6"><a href="#cb74-6" tabindex="-1"></a><span class="co">#   - contains at least one &quot;x&quot; character (size-like tokens)</span></span>
+<span id="cb74-7"><a href="#cb74-7" tabindex="-1"></a>requested_json_like <span class="ot">&lt;-</span> <span class="fu">str_starts</span>(ad_clean<span class="sc">$</span>REQUESTED_SIZES, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">[&quot;</span>) <span class="sc">&amp;</span></span>
+<span id="cb74-8"><a href="#cb74-8" tabindex="-1"></a>  <span class="fu">str_ends</span>(ad_clean<span class="sc">$</span>REQUESTED_SIZES, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">]&quot;</span>)</span>
+<span id="cb74-9"><a href="#cb74-9" tabindex="-1"></a></span>
+<span id="cb74-10"><a href="#cb74-10" tabindex="-1"></a>requested_contains_x <span class="ot">&lt;-</span> <span class="fu">str_detect</span>(ad_clean<span class="sc">$</span>REQUESTED_SIZES, <span class="st">&quot;x&quot;</span>)</span>
+<span id="cb74-11"><a href="#cb74-11" tabindex="-1"></a></span>
+<span id="cb74-12"><a href="#cb74-12" tabindex="-1"></a>n_requested_not_json <span class="ot">&lt;-</span></span>
+<span id="cb74-13"><a href="#cb74-13" tabindex="-1"></a>  <span class="fu">sum</span>(<span class="sc">!</span>requested_json_like <span class="sc">|</span> <span class="fu">is.na</span>(requested_json_like))</span>
+<span id="cb74-14"><a href="#cb74-14" tabindex="-1"></a>n_requested_no_x     <span class="ot">&lt;-</span></span>
+<span id="cb74-15"><a href="#cb74-15" tabindex="-1"></a>  <span class="fu">sum</span>(<span class="sc">!</span>requested_contains_x <span class="sc">|</span> <span class="fu">is.na</span>(requested_contains_x))</span>
+<span id="cb74-16"><a href="#cb74-16" tabindex="-1"></a></span>
+<span id="cb74-17"><a href="#cb74-17" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;REQUESTED_SIZES not bracketed like JSON array: &quot;</span>,</span>
+<span id="cb74-18"><a href="#cb74-18" tabindex="-1"></a>    n_requested_not_json,</span>
+<span id="cb74-19"><a href="#cb74-19" tabindex="-1"></a>    <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb74-20"><a href="#cb74-20" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;REQUESTED_SIZES with no &#39;x&#39; character:         &quot;</span>, n_requested_no_x, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb74-21"><a href="#cb74-21" tabindex="-1"></a></span>
+<span id="cb74-22"><a href="#cb74-22" tabindex="-1"></a><span class="co"># Count distinct SIZE values and show most common ones</span></span>
+<span id="cb74-23"><a href="#cb74-23" tabindex="-1"></a>size_summary <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb74-24"><a href="#cb74-24" tabindex="-1"></a>  <span class="fu">count</span>(SIZE, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb74-25"><a href="#cb74-25" tabindex="-1"></a></span>
+<span id="cb74-26"><a href="#cb74-26" tabindex="-1"></a><span class="fu">head</span>(size_summary, <span class="dv">15</span>)</span>
+<span id="cb74-27"><a href="#cb74-27" tabindex="-1"></a></span>
+<span id="cb74-28"><a href="#cb74-28" tabindex="-1"></a><span class="co"># Count clearly non-physical sizes we know about (&quot;0x0&quot;, &quot;1x1&quot;)</span></span>
+<span id="cb74-29"><a href="#cb74-29" tabindex="-1"></a>size_invalid_counts <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb74-30"><a href="#cb74-30" tabindex="-1"></a>  <span class="fu">filter</span>(SIZE <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;0x0&quot;</span>, <span class="st">&quot;1x1&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb74-31"><a href="#cb74-31" tabindex="-1"></a>  <span class="fu">count</span>(SIZE, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb74-32"><a href="#cb74-32" tabindex="-1"></a></span>
+<span id="cb74-33"><a href="#cb74-33" tabindex="-1"></a>size_invalid_counts</span>
+<span id="cb74-34"><a href="#cb74-34" tabindex="-1"></a></span>
+<span id="cb74-35"><a href="#cb74-35" tabindex="-1"></a><span class="co"># Specifically check how many of these &quot;invalid&quot; sizes correspond to winning bids</span></span>
+<span id="cb74-36"><a href="#cb74-36" tabindex="-1"></a>invalid_size_won <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb74-37"><a href="#cb74-37" tabindex="-1"></a>  <span class="fu">filter</span>(SIZE <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;0x0&quot;</span>, <span class="st">&quot;1x1&quot;</span>),</span>
+<span id="cb74-38"><a href="#cb74-38" tabindex="-1"></a>         BID_WON <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;TRUE&quot;</span>, <span class="st">&quot;true&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb74-39"><a href="#cb74-39" tabindex="-1"></a>  <span class="fu">select</span>(AUCTION_ID, SIZE, BID_WON)</span>
+<span id="cb74-40"><a href="#cb74-40" tabindex="-1"></a></span>
+<span id="cb74-41"><a href="#cb74-41" tabindex="-1"></a>n_invalid_size_won <span class="ot">&lt;-</span> <span class="fu">nrow</span>(invalid_size_won)</span>
+<span id="cb74-42"><a href="#cb74-42" tabindex="-1"></a></span>
+<span id="cb74-43"><a href="#cb74-43" tabindex="-1"></a><span class="fu">cat</span>(</span>
+<span id="cb74-44"><a href="#cb74-44" tabindex="-1"></a>  <span class="st">&quot;Rows with SIZE in {</span><span class="sc">\&quot;</span><span class="st">0x0</span><span class="sc">\&quot;</span><span class="st">,</span><span class="sc">\&quot;</span><span class="st">1x1</span><span class="sc">\&quot;</span><span class="st">} and BID_WON == TRUE/</span><span class="sc">\&quot;</span><span class="st">true</span><span class="sc">\&quot;</span><span class="st">: &quot;</span>,</span>
+<span id="cb74-45"><a href="#cb74-45" tabindex="-1"></a>  n_invalid_size_won,</span>
+<span id="cb74-46"><a href="#cb74-46" tabindex="-1"></a>  <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span></span>
+<span id="cb74-47"><a href="#cb74-47" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>##  [1] &quot;[\n  \&quot;320x50\&quot;\n]&quot;                &quot;[\n  \&quot;728x90\&quot;\n]&quot;               
+##  [3] &quot;[\n  \&quot;320x50\&quot;\n]&quot;                &quot;[\n  \&quot;320x50\&quot;,\n  \&quot;300x50\&quot;\n]&quot;
+##  [5] &quot;[\n  \&quot;300x250\&quot;\n]&quot;               &quot;[\n  \&quot;320x50\&quot;\n]&quot;               
+##  [7] &quot;[\n  \&quot;300x250\&quot;\n]&quot;               &quot;[\n  \&quot;320x50\&quot;\n]&quot;               
+##  [9] &quot;[\n  \&quot;320x50\&quot;,\n  \&quot;300x50\&quot;\n]&quot; &quot;[\n  \&quot;320x50\&quot;\n]&quot;               
+## REQUESTED_SIZES not bracketed like JSON array:  0 
+## REQUESTED_SIZES with no &#39;x&#39; character:          0 
+## # A tibble: 15 × 2
+##    SIZE          n
+##    &lt;chr&gt;     &lt;int&gt;
+##  1 320x50   266959
+##  2 300x250  131379
+##  3 300x50    22530
+##  4 300x600    6992
+##  5 728x90     6923
+##  6 970x250    2482
+##  7 0x0         901
+##  8 300x251     320
+##  9 325x508     312
+## 10 160x600     277
+## 11 300x1050    262
+## 12 336x280     253
+## 13 468x60      226
+## 14 320x100     205
+## 15 1237x500    162
+## # A tibble: 2 × 2
+##   SIZE      n
+##   &lt;chr&gt; &lt;int&gt;
+## 1 0x0     901
+## 2 1x1      52
+## Rows with SIZE in {&quot;0x0&quot;,&quot;1x1&quot;} and BID_WON == TRUE/&quot;true&quot;:  327</code></pre>
+<p><strong>Observations</strong></p>
+<ul>
+<li><code>REQUESTED_SIZES</code> is consistently stored as a
+JSON-encoded array (all rows begin with <code>[</code> and end with
+<code>]</code>, and contain size-like tokens such as
+<code>&quot;320x50&quot;</code>).
+<ul>
+<li>We do not need to modify this field for cleaning.</li>
+</ul></li>
+<li><code>SIZE</code> mostly contains standard ad dimensions (e.g.,
+<code>&quot;320x50&quot;</code>, <code>&quot;300x250&quot;</code>), but includes a small
+number of values such as <code>&quot;0x0&quot;</code> (901 rows) and
+<code>&quot;1x1&quot;</code> (52 rows).</li>
+<li>These <code>&quot;0x0&quot;</code> / <code>&quot;1x1&quot;</code> values also appear in
+<strong>winning</strong> rows (327 cases), but they do not correspond to
+a physical display size.
+<ul>
+<li>Without additional system documentation, their operational meaning
+is unclear.</li>
+</ul></li>
+</ul>
+<p><strong>Decisions</strong></p>
+<ul>
+<li>Preserve <code>REQUESTED_SIZES</code> as stored; downstream analysis
+can parse the JSON if needed.</li>
+<li>Because <code>&quot;0x0&quot;</code> and <code>&quot;1x1&quot;</code> cannot be
+interpreted as physical ad sizes and their meaning is unknown, the
+cleaned size field (<code>SIZE_clean</code>) will treat these values as
+<strong>missing</strong> (<code>NA</code>).
+<ul>
+<li>The raw <code>SIZE</code> column remains unchanged.<br />
+</li>
+</ul></li>
+<li>All other <code>SIZE</code> values will be carried forward
+as-is.</li>
+</ul>
+</div>
+<div id="cleaning-3" class="section level3">
+<h3>Cleaning</h3>
+<p>No transformations are required for either
+<code>REQUESTED_SIZES</code> or <code>SIZE</code>.</p>
+<p>Although <code>SIZE</code> includes values such as <code>&quot;0x0&quot;</code>
+and <code>&quot;1x1&quot;</code>, we do not have domain documentation confirming
+that these codes are invalid or erroneous. They may represent upstream
+placeholders or system-level codes, and therefore we preserve them
+exactly as recorded.</p>
+<p>For schema consistency, we create pass-through cleaned columns:</p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb76-2"><a href="#cb76-2" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb76-3"><a href="#cb76-3" tabindex="-1"></a>    <span class="at">REQUESTED_SIZES_clean =</span> REQUESTED_SIZES,</span>
+<span id="cb76-4"><a href="#cb76-4" tabindex="-1"></a>    <span class="at">SIZE_clean            =</span> SIZE</span>
+<span id="cb76-5"><a href="#cb76-5" tabindex="-1"></a>  )</span></code></pre></div>
+<p>Because there are <strong>no persistent changes</strong>, <strong>no
+log entry is added</strong> for this variable group.</p>
+</div>
+<div id="summary-8" class="section level3">
+<h3>Summary</h3>
+<ul>
+<li><code>REQUESTED_SIZES</code> is consistently stored as a
+JSON-encoded array of size strings.
+<ul>
+<li>No cleaning was required, and the field is preserved as
+<code>REQUESTED_SIZES_clean</code>.</li>
+</ul></li>
+<li><code>SIZE</code> contains mostly standard dimensions, with a small
+number of unusual codes (e.g., <code>&quot;0x0&quot;</code>, <code>&quot;1x1&quot;</code>).
+<ul>
+<li>Because their meaning is unknown and not documented as erroneous,
+these values are preserved exactly and exposed as
+<code>SIZE_clean</code> without modification.</li>
+</ul></li>
+<li>No rows were removed and no values were altered in the ad-size
+fields.</li>
+</ul>
 <hr />
+</div>
 </div>
 <div id="pricing-price" class="section level2">
 <h2><strong>PRICING:</strong> <code>PRICE</code></h2>
@@ -3619,7 +3827,7 @@ now restores all observations to plausible Oregon coordinates.</li>
 </div>
 <div id="variable" class="section level1">
 <h1><strong>VARIABLE</strong></h1>
-<div id="description-4" class="section level3">
+<div id="description-5" class="section level3">
 <h3>Description</h3>
 <ul>
 <li><code>VARIABLE</code>
@@ -3642,7 +3850,7 @@ now restores all observations to plausible Oregon coordinates.</li>
 </ul></li>
 </ul>
 </div>
-<div id="exploration-3" class="section level3">
+<div id="exploration-4" class="section level3">
 <h3>Exploration</h3>
 <p><strong>Observations</strong></p>
 <ul>
@@ -3657,26 +3865,26 @@ now restores all observations to plausible Oregon coordinates.</li>
 <li></li>
 </ul>
 </div>
-<div id="cleaning-3" class="section level3">
+<div id="cleaning-4" class="section level3">
 <h3>Cleaning</h3>
 <p>Log entries for time variables:</p>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
-<span id="cb74-2"><a href="#cb74-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
-<span id="cb74-3"><a href="#cb74-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
-<span id="cb74-4"><a href="#cb74-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
-<span id="cb74-5"><a href="#cb74-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
-<span id="cb74-6"><a href="#cb74-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
-<span id="cb74-7"><a href="#cb74-7" tabindex="-1"></a>)</span>
-<span id="cb74-8"><a href="#cb74-8" tabindex="-1"></a></span>
-<span id="cb74-9"><a href="#cb74-9" tabindex="-1"></a><span class="fu">log_change</span>(</span>
-<span id="cb74-10"><a href="#cb74-10" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T2&quot;</span>,</span>
-<span id="cb74-11"><a href="#cb74-11" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;DATE_UTC&quot;</span>,</span>
-<span id="cb74-12"><a href="#cb74-12" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;DATE_UTC stored as character.&quot;</span>,</span>
-<span id="cb74-13"><a href="#cb74-13" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Converted to Date type.&quot;</span>,</span>
-<span id="cb74-14"><a href="#cb74-14" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
-<span id="cb74-15"><a href="#cb74-15" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb77-2"><a href="#cb77-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
+<span id="cb77-3"><a href="#cb77-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
+<span id="cb77-4"><a href="#cb77-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
+<span id="cb77-5"><a href="#cb77-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
+<span id="cb77-6"><a href="#cb77-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb77-7"><a href="#cb77-7" tabindex="-1"></a>)</span>
+<span id="cb77-8"><a href="#cb77-8" tabindex="-1"></a></span>
+<span id="cb77-9"><a href="#cb77-9" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb77-10"><a href="#cb77-10" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T2&quot;</span>,</span>
+<span id="cb77-11"><a href="#cb77-11" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;DATE_UTC&quot;</span>,</span>
+<span id="cb77-12"><a href="#cb77-12" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;DATE_UTC stored as character.&quot;</span>,</span>
+<span id="cb77-13"><a href="#cb77-13" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Converted to Date type.&quot;</span>,</span>
+<span id="cb77-14"><a href="#cb77-14" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb77-15"><a href="#cb77-15" tabindex="-1"></a>)</span></code></pre></div>
 </div>
-<div id="summary-7" class="section level3">
+<div id="summary-9" class="section level3">
 <h3>Summary</h3>
 <ul>
 <li></li>
@@ -3712,13 +3920,13 @@ Each entry corresponds to a specific issue that was identified and the
 decision made to address it.</p>
 <div id="log" class="section level2">
 <h2>Log</h2>
-<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" tabindex="-1"></a>cleaning_log <span class="sc">%&gt;%</span></span>
-<span id="cb75-2"><a href="#cb75-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(step_id) <span class="sc">%&gt;%</span></span>
-<span id="cb75-3"><a href="#cb75-3" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
-<span id="cb75-4"><a href="#cb75-4" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Summary of Data-Cleaning Decisions&quot;</span>,</span>
-<span id="cb75-5"><a href="#cb75-5" tabindex="-1"></a>    <span class="at">align   =</span> <span class="st">&quot;l&quot;</span></span>
-<span id="cb75-6"><a href="#cb75-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb75-7"><a href="#cb75-7" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>, <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" tabindex="-1"></a>cleaning_log <span class="sc">%&gt;%</span></span>
+<span id="cb78-2"><a href="#cb78-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(step_id) <span class="sc">%&gt;%</span></span>
+<span id="cb78-3"><a href="#cb78-3" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb78-4"><a href="#cb78-4" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Summary of Data-Cleaning Decisions&quot;</span>,</span>
+<span id="cb78-5"><a href="#cb78-5" tabindex="-1"></a>    <span class="at">align   =</span> <span class="st">&quot;l&quot;</span></span>
+<span id="cb78-6"><a href="#cb78-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb78-7"><a href="#cb78-7" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>, <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>)</span></code></pre></div>
 <table class="table table-striped" style="color: black; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
 Summary of Data-Cleaning Decisions

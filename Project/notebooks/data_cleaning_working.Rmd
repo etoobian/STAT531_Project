@@ -40,6 +40,7 @@ knitr::opts_chunk$set(
 )
 theme_set(theme_bw(base_size = 12))
 
+set.seed(42)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 
 # ---- Helper functions ----
@@ -77,7 +78,7 @@ log_change <- function(step_id, variable, issue, decision, rows_affected = NA_in
 
 ---
 
-# **Purpose**
+# **PURPOSE**
 
 This notebook documents the full data-cleaning workflow for the Oregon ad bidding dataset.
 
@@ -424,7 +425,6 @@ For each variable, we document:
 
 Sample a few `TIMESTAMP` values:
 ```{r timestamp-sample}
-set.seed(42)
 sample(ad_clean$TIMESTAMP, size = 20)
 ```
 
@@ -717,8 +717,6 @@ A client-provided lookup table defines the meaning of these codes in our subset:
 | 4    | Tablet             |
 | 5    | Connected Device   |
 
----
-
 ### Exploration
 
 Check for whitespace or formatting anomalies:
@@ -801,7 +799,6 @@ Because there are **no persistent changes**, **no log entry is added** for this 
   - **Expectation:** Within Oregon’s approximate longitude bounds  
   - **Actual type:** `numeric`  
   - **Missing:** None  
-
 
 ### Exploration - `DEVICE_GEO_REGION`
 
@@ -900,6 +897,12 @@ log_change(
 )
 ```
 
+### Summary
+
+  - `DEVICE_GEO_REGION` is stored as a `character` field and has no missing values.
+  - All Oregon variants (`"OR"`, `"Or"`, `"oregon"`, `"xor"`) were standardized to a single clean code, `"OR"`.
+  - No rows were removed based during this cleaning process.  
+
 ### Exploration – `DEVICE_GEO_CITY`
 
 We begin by checking for basic formatting issues:
@@ -954,6 +957,8 @@ Because **no values were modified**, **no log entry is added** for this variable
   - `DEVICE_GEO_CITY` contains a large variety of locality names, which is expected for IP-derived geodata.  
   - `r n_city_na` rows contain missing city information; All rows are otherwise confirmed as Oregon $\to$ these are retained.
   - No rows were removed based on city information.  
+
+
 
 ### Exploration - `DEVICE_GEO_ZIP`
 
@@ -1117,6 +1122,7 @@ log_change(
   - No other structural issues were present in the ZIP field.  
   - Missing values remain missing and are **not reconstructed** to avoid speculative geolocation inference.  
   - No rows were removed during these data cleaning steps.
+
 
 
 ### Exploration - `DEVICE_GEO_LAT` \&`DEVICE_GEO_LONG` 
@@ -1317,10 +1323,121 @@ log_change(
   - A cleaned longitude variable (`DEVICE_GEO_LONG_clean`) now restores all observations to plausible Oregon coordinates.
   - No rows were removed; only 100 longitude values were corrected. 
    
-
 ---
 
 ## **AD SIZES:** `REQUESTED_SIZES`, `SIZE`
+
+### Description
+
+- `REQUESTED_SIZES`  
+  - **Type (dictionary):** `categorical`  (string or array of sizes)
+  - **Meaning:** All ad slot sizes that were requested for the impression (e.g., `"300x250, 320x50"`).  
+  - **Expectation:** A non-missing, delimited list of size codes in `width x height` format.  
+  - **Actual Type:** `character`
+  - **Missing:** None
+
+- `SIZE`  
+  - **Type (dictionary):** `categorical`  
+  - **Meaning:** The size associated with this bid line (typically one of the `REQUESTED_SIZES`).  
+  - **Expectation:** A single size in `width x height` format (e.g., `"300x250"`), matching one of the requested sizes and representing a valid display slot.  
+  - **Actual type:** `character`  
+  - **Missing:** None  
+
+### Exploration
+
+We first check the **storage format** of `REQUESTED_SIZES` and then look for structurally unusual `SIZE` values.
+
+```{r ad-sizes-explore, results='hold'}
+# Sample REQUESTED_SIZES to understand its raw format
+sample(ad_clean$REQUESTED_SIZES, size = 10)
+
+# Structural sanity checks for REQUESTED_SIZES:
+#   - looks like a JSON array (starts with "[" and ends with "]")
+#   - contains at least one "x" character (size-like tokens)
+requested_json_like <- str_starts(ad_clean$REQUESTED_SIZES, "\\[") &
+  str_ends(ad_clean$REQUESTED_SIZES, "\\]")
+
+requested_contains_x <- str_detect(ad_clean$REQUESTED_SIZES, "x")
+
+n_requested_not_json <-
+  sum(!requested_json_like | is.na(requested_json_like))
+n_requested_no_x     <-
+  sum(!requested_contains_x | is.na(requested_contains_x))
+
+cat("REQUESTED_SIZES not bracketed like JSON array: ",
+    n_requested_not_json,
+    "\n")
+cat("REQUESTED_SIZES with no 'x' character:         ", n_requested_no_x, "\n")
+
+# Count distinct SIZE values and show most common ones
+size_summary <- ad_clean %>%
+  count(SIZE, sort = TRUE)
+
+head(size_summary, 15)
+
+# Count clearly non-physical sizes we know about ("0x0", "1x1")
+size_invalid_counts <- ad_clean %>%
+  filter(SIZE %in% c("0x0", "1x1")) %>%
+  count(SIZE, sort = TRUE)
+
+size_invalid_counts
+
+# Specifically check how many of these "invalid" sizes correspond to winning bids
+invalid_size_won <- ad_clean %>%
+  filter(SIZE %in% c("0x0", "1x1"),
+         BID_WON %in% c("TRUE", "true")) %>%
+  select(AUCTION_ID, SIZE, BID_WON)
+
+n_invalid_size_won <- nrow(invalid_size_won)
+
+cat(
+  "Rows with SIZE in {\"0x0\",\"1x1\"} and BID_WON == TRUE/\"true\": ",
+  n_invalid_size_won,
+  "\n"
+)
+```
+
+**Observations**
+
+  - `REQUESTED_SIZES` is consistently stored as a JSON-encoded array (all rows begin with `[` and end with `]`, and contain size-like tokens such as `"320x50"`). 
+      - We do not need to modify this field for cleaning.
+  - `SIZE` mostly contains standard ad dimensions (e.g., `"320x50"`, `"300x250"`), but includes a small number of values such as `"0x0"` (901 rows) and `"1x1"` (52 rows).
+  - These `"0x0"` / `"1x1"` values also appear in **winning** rows (327 cases), but they do not correspond to a physical display size. 
+      - Without additional system documentation, their operational meaning is unclear.
+
+**Decisions**
+
+  - Preserve `REQUESTED_SIZES` as stored; downstream analysis can parse the JSON if needed.
+  - Because `"0x0"` and `"1x1"` cannot be interpreted as physical ad sizes and their meaning is unknown, the cleaned size field (`SIZE_clean`) will treat these values as **missing** (`NA`).  
+      - The raw `SIZE` column remains unchanged.  
+  - All other `SIZE` values will be carried forward as-is.
+
+### Cleaning
+
+No transformations are required for either `REQUESTED_SIZES` or `SIZE`.
+
+Although `SIZE` includes values such as `"0x0"` and `"1x1"`, we do not have domain documentation confirming that these codes are invalid or erroneous. 
+They may represent upstream placeholders or system-level codes, and therefore we preserve them exactly as recorded.
+
+For schema consistency, we create pass-through cleaned columns:
+
+```{r ad-sizes-clean, results='hold'}
+ad_clean <- ad_clean %>%
+  mutate(
+    REQUESTED_SIZES_clean = REQUESTED_SIZES,
+    SIZE_clean            = SIZE
+  )
+```
+
+Because there are **no persistent changes**, **no log entry is added** for this variable group.
+
+### Summary
+
+  - `REQUESTED_SIZES` is consistently stored as a JSON-encoded array of size strings.
+      - No cleaning was required, and the field is preserved as `REQUESTED_SIZES_clean`.
+  - `SIZE` contains mostly standard dimensions, with a small number of unusual codes (e.g., `"0x0"`, `"1x1"`).  
+      - Because their meaning is unknown and not documented as erroneous, these values are preserved exactly and exposed as `SIZE_clean` without modification.
+  - No rows were removed and no values were altered in the ad-size fields.
 
 ---
 
