@@ -363,14 +363,14 @@ composite_candidates <- c(
   "TIMESTAMP"
 )
 
-key_results <- check_candidate_keys(
-  data     = ad_clean,
-  cols     = composite_candidates,
-  max_size = 4,
-  show_full = FALSE
-)
+#key_results <- check_candidate_keys(
+#  data     = ad_clean,
+#  cols     = composite_candidates,
+#  max_size = 4,
+#  show_full = FALSE
+#)
 
-key_results
+#key_results
 ```
 
 From these results, we can see that no combination (up to four variables) of these candidate variables will create a composite key to uniquely identify the rows of this dataset.
@@ -907,7 +907,7 @@ We begin by checking for basic formatting issues:
 ```{r city-whitespace}
 # Check for leading/trailing whitespace
 city_ws <-
-  sum(stringr::str_detect(ad_clean$DEVICE_GEO_CITY, "^\\s|\\s$"),
+  sum(str_detect(ad_clean$DEVICE_GEO_CITY, "^\\s|\\s$"),
       na.rm = TRUE)
 
 # Count distinct non-missing values
@@ -927,7 +927,7 @@ cat("Rows with missing DEVICE_GEO_CITY:", n_city_na, "\n")
 **Observations**
 
   - `DEVICE_GEO_CITY` is a free-text field with **many unique values** (`r n_city_unique`), including small communities and non-city place names.
-  - There are no rows with whitespace in the city name.
+  - There are no rows with and leading or trailing whitespace.
   - There are now **`r n_city_na` missing values** after removal of rows in previous steps.  
   - Since all impressions are known to originate from Oregon (via ZIP/Region/Lat–Long validation), **missing city names do not invalidate a row**.
 
@@ -957,49 +957,180 @@ Because **no values were modified**, **no log entry is added** for this variable
 
 ### Exploration - `DEVICE_GEO_ZIP`
 
-**Observations**
+We treat ZIP codes as **strings**.
 
-  - 
-  - 
-  - 
-  - 
+```{r zip-explore, results='hold'}
+# Basic checks
+zip_class <- class(ad_clean$DEVICE_GEO_ZIP)
 
-**Decisions:**
+n_zip_na <- sum(is.na(ad_clean$DEVICE_GEO_ZIP))
+n_zip_unique <- ad_clean %>%
+  filter(!is.na(DEVICE_GEO_ZIP)) %>%
+  summarise(n = n_distinct(DEVICE_GEO_ZIP)) %>%
+  pull(n)
 
-  - 
-  - 
+cat("Class of DEVICE_GEO_ZIP:      ", zip_class, "\n")
+cat("Distinct non-missing ZIPs:    ", n_zip_unique, "\n")
+cat("Rows with missing ZIP (now):  ", n_zip_na, "\n")
 
-### Cleaning - `DEVICE_GEO_ZIP`
-Log entries for time variables:
-
-```{r example-log1}
-log_change(
-  step_id = "T1",
-  variable = "TIMESTAMP",
-  issue = "Inconsistent TIMESTAMP formats, including 'NA' date tokens.",
-  decision = "Recover 'NA' dates using `DATE_UTC`; parsed to POSIXct (UTC).",
-  rows_affected = nrow(ad_clean)
-)
 ```
 
-### Exploration - `DEVICE_GEO_LAT`
-
-**Observations**
-
-  - 
-  - 
-  - 
-  - 
-
-**Decisions:**
-
-  - 
-  - 
+  - We see `DEVICE_GEO_ZIP` is the correct type, has 274 distinct ZIP values (non-NA), and now has 21,076 rows with `NA` values.
   
-### Cleaning -  `DEVICE_GEO_LAT`
+We now run full diagnostic checks:
+
+```{r zip-diagnostics, results='hold'}
+# Define ZIP helper structure
+zip_diag_tbl <- ad_clean %>%
+  mutate(
+    # Trim whitespace for diagnostic purposes
+    zip_trim = str_trim(DEVICE_GEO_ZIP),
+    
+    # Structural checks
+    has_ws = str_detect(DEVICE_GEO_ZIP, "^\\s|\\s$"),
+    bad_length = str_length(zip_trim) != 5,
+    starts_negative = str_starts(zip_trim, "-"),
+    
+    # Extract candidate 5-digit ZIP (for Oregon-range check)
+    zip5 = str_sub(zip_trim, 1, 5),
+    
+    # Check if first 5 chars are digits
+    zip5_is_digits = str_detect(zip5, "^[0-9]{5}$"),
+    
+    # Convert only valid 5-digit strings to integer
+    zip5_int = if_else(zip5_is_digits, as.integer(zip5), NA_integer_),
+    
+    # Oregon ZIP code validity check
+    out_of_or_range = if_else(
+      !is.na(zip5_int) & (zip5_int < 97001L | zip5_int > 97920L),
+      TRUE,
+      FALSE
+    )
+    
+    
+  )
+
+# Summaries
+zip_diag <- zip_diag_tbl %>%
+  summarise(
+    n_total_rows = n(),
+    n_whitespace = sum(has_ws, na.rm = TRUE),
+    n_bad_length = sum(bad_length, na.rm = TRUE),
+    n_negative_start = sum(starts_negative, na.rm = TRUE),
+    n_non_digit = sum(!zip5_is_digits, na.rm = TRUE),
+    n_missing = sum(is.na(DEVICE_GEO_ZIP)),
+    
+    # Oregon-range issues (only applies to true digit-strings)
+    n_out_of_range   = sum(out_of_or_range, na.rm = TRUE),
+    n_valid_oregon   = sum(!out_of_or_range & !is.na(zip5_int)),
+    n_invalid_zip5   = sum(is.na(zip5_int))   # includes non-digit, wrong length, etc.
+  )
+
+zip_diag
+```
+
+  - Of the `r zip_diag$n_total_rows` rows, **`r zip_diag$n_valid_oregon`** have structurally valid Oregon ZIPs (5 digits, in the 97001-97920 range).
+  - There are **`r zip_diag$n_missing`** rows with `NA` ZIP values.
+  - **`r zip_diag$n_bad_length`** rows have a length not equal to 5, **`r zip_diag$n_negative_start`** rows start with a negative sign, and **`r zip_diag$n_non_digit`** rows contain non-digit characters in the first five positions.
+
+We next investigate which ZIP values appear in these problematic rows:
+
+```{r badrow-checks}
+bad_zip_rows <- zip_diag_tbl %>%
+  filter(bad_length |
+           starts_negative |
+           !zip5_is_digits)
+
+bad_zip_patterns <- bad_zip_rows %>%
+  distinct(zip_trim) %>%
+  arrange(zip_trim)
+
+bad_zip_patterns
+```
+
+**Observations**
+
+  - `DEVICE_GEO_ZIP` is stored as a character vector, as expected for ZIP codes.  
+  - The majority of non-missing ZIP values are structurally valid 5-digit Oregon ZIP codes between 97001 and 97920.  
+  - A small number of rows (18) use a sentinel-style value (`"-999"`), which is:
+  - Missing ZIPs (`NA`) are relatively common and **co-occur with missing city information**, reflecting upstream geolocation lookup failures rather than formatting errors.  
+
+**Decisions**
+
+  - Create `DEVICE_GEO_ZIP_clean` with sentinel values (`"-999"`) as `NA` and all other values as-is.
+  - **We will not attempt to reconstruct missing ZIPs** from city or latitude/longitude due to:
+    - City $\to$ ZIP is not one-to-one in Oregon
+    - Reverse geocoding from lat/long would require external data and would be speculative
+
+### Cleaning – `DEVICE_GEO_ZIP`
+
+```{r zip-clean, results='hold'}
+# Sentinel codes to treat as true missing
+sentinels <- c("-999")
+
+ad_clean <- ad_clean %>%
+  mutate(
+    DEVICE_GEO_ZIP_clean = case_when(
+      DEVICE_GEO_ZIP %in% sentinels ~ NA_character_,
+      TRUE ~ DEVICE_GEO_ZIP
+    )
+  )
+
+# Count rows changed
+n_zip_changed <- sum(ad_clean$DEVICE_GEO_ZIP %in% sentinels)
+
+cat("ZIP rows changed due to sentinel removal: ", n_zip_changed, "\n")
+```
+
+Log entries for zip variable:
+
+```{r zip-log, results='hold'}
+log_change(
+  step_id       = "GEO2",
+  variable      = "DEVICE_GEO_ZIP",
+  issue         = "Sentinel ZIP value '-999' not a valid Oregon ZIP.",
+  decision      = "Converted sentinel ZIPs to NA; preserved all other ZIP values as-is.",
+  rows_affected = n_zip_changed
+)
+```
+
+### Summary
+
+  - `DEVICE_GEO_ZIP` is treated as a **string field**, which is appropriate for postal codes.  
+  - The vast majority of ZIP values are valid Oregon ZIP codes and are transferred as-is to `DEVICE_GEO_ZIP_clean`.  
+  - A small number of sentinel or malformed values (e.g., `"-999"`) are converted to `NA`, as they cannot represent real ZIP codes. 
+  - No other structural issues were present in the ZIP field.  
+  - Missing values remain missing and are **not reconstructed** to avoid speculative geolocation inference.  
+  - No rows were removed during these data cleaning steps.
+
+
+
+
+
+
+
+
+
+
+
+### Exploration - `DEVICE_GEO_LAT` 
+
+**Observations**
+
+  - 
+  - 
+  - 
+  - 
+
+**Decisions:**
+
+  - 
+  - 
+
+### Cleaning - `DEVICE_GEO_LAT` 
 Log entries for time variables:
 
-```{r example-log2}
+```{r lat-log}
 log_change(
   step_id = "T1",
   variable = "TIMESTAMP",
@@ -1008,6 +1139,12 @@ log_change(
   rows_affected = nrow(ad_clean)
 )
 ```
+
+### Summary
+
+  - 
+  - 
+
 
 
 ### Exploration - `DEVICE_GEO_LONG` 
