@@ -19,15 +19,8 @@ suppressPackageStartupMessages({
   library(arrow)
   library(dplyr)
   library(stringr)
-  #library(rprojroot)
   library(knitr)
   library(kableExtra)
-  
-  #library(broom)
-  #library(car)
-  #library(latex2exp)
-  #library(MPV)
-  #library(glmnet)
 })
 
 knitr::opts_chunk$set(
@@ -364,14 +357,14 @@ composite_candidates <- c(
   "TIMESTAMP"
 )
 
-#key_results <- check_candidate_keys(
-#  data     = ad_clean,
-#  cols     = composite_candidates,
-#  max_size = 4,
-#  show_full = FALSE
-#)
+key_results <- check_candidate_keys(
+  data     = ad_clean,
+  cols     = composite_candidates,
+  max_size = 4,
+  show_full = FALSE
+)
 
-#key_results
+key_results
 ```
 
 From these results, we can see that no combination (up to four variables) of these candidate variables will create a composite key to uniquely identify the rows of this dataset.
@@ -1609,7 +1602,11 @@ log_change(
 
 ### Summary
 
-  - `PRICE` was recorded as `character` and contained a mix of plain decimals, scientific notation, one obvious `"O"` $\to$ `"0"` typo, sentinel `-999` values, and negative prices with plausible magnitudes.  
+  - `PRICE` was recorded as `character` and contained a mix of plain decimals:
+      - Scientific notation
+      - One obvious `"O"` $\to$ `"0"` typo
+      - Sentinel `-999` values
+      - Negative prices with plausible magnitudes 
   - We created a cleaned numeric field `PRICE_clean` that:
       - Corrects the single `"O"` typo before parsing.  
       - Parses scientific notation correctly.  
@@ -1617,191 +1614,187 @@ log_change(
       - Treats remaining negative prices as sign errors and flips them to positive, based on their distribution and the presence of winning bids at those magnitudes.  
   - No rows were dropped; invalid or unrecoverable price strings are represented as `NA` in `PRICE_clean`, preserving completeness while improving validity for downstream analysis.
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ---
 
 ## **LATENCY METRIC:** `RESPONSE_TIME`
 
-
 ### Description
 
-- `VARIABLE`  
-  - **Type (dictionary):** `TYPE`  
-  - **Meaning:** 
-  - **Expectation:** 
-  - **Actual Type:** `character`
-  - **Missing:** None
+  - `RESPONSE_TIME`  
+    - **Type (dictionary):** `numeric`  
+    - **Meaning:** Bidder latency in milliseconds between the request and the bid response.  
+    - **Expectation:** Non-negative integer/numeric values (latency in ms) suitable for arithmetic summaries and modeling.  
+    - **Actual Type:** `character`  
+    - **Missing:** None
 
-- `VARIABLE`  
-  - **Type:** `TYPE`  
-  - **Meaning:** 
-  - **Expectation:** 
-  - **Actual:** `character`
-  - **Missing:** None
-  
 ### Exploration
 
+We inspect a small sample and inspect patterns:
+
+```{r response-time-sample}
+sample(ad_clean$RESPONSE_TIME, size = 20)
+```
+
+We see that all `RESPONSE_TIME` values from this sample begin with "RESPONSE_TIME: ". We verify if this is true for entire variable:
+
+```{r response-time-prefix-check}
+# Check common leading patterns (first 15 characters)
+rt_prefix_summary <- ad_clean %>%
+  transmute(prefix15 = str_sub(RESPONSE_TIME, 1, 15)) %>%
+  count(prefix15, sort = TRUE)
+
+rt_prefix_summary
+```
 
 **Observations**
 
-  - 
-  - 
-  - 
-  - 
+  - `RESPONSE_TIME` is stored as `character`, even though it represents a numeric value.  
+  - Almost all rows begin with the text prefix `"RESPONSE_TIME: "`, with a single row showing a typo `"RESSPONSE_TIME: "`.  
+  - The desired numeric content appears to be the digits following the prefix, and any trailing non-digit characters are extraneous.
+  - There are no structurally missing values: every row contains a string with this general pattern.
 
 **Decisions:**
 
-  - 
-  - 
+  - We extract the numeric portion of `RESPONSE_TIME`:
+      - Remove any leading non-digit prefix (including typo variants of `"RESPONSE_TIME"`).  
+      - Remove any trailing non-numeric characters.  
+  - Convert the remaining digits to a numeric variable `RESPONSE_TIME_clean`.  
+  - Verify that parsing does not introduce unexpected `NA`s; if any NA values appear, they will be interpreted as malformed latency strings.
 
 ### Cleaning
-Log entries for time variables:
 
-```{r example-log9}
-log_change(
-  step_id = "T1",
-  variable = "TIMESTAMP",
-  issue = "Inconsistent TIMESTAMP formats, including 'NA' date tokens.",
-  decision = "Recover 'NA' dates using `DATE_UTC`; parsed to POSIXct (UTC).",
-  rows_affected = nrow(ad_clean)
-)
+We implement the prefix/suffix removal and numeric conversion, then check for any resulting `NA`s:
 
+```{r response-time-clean, results='hold'}
+ad_clean <- ad_clean %>%
+  mutate(
+    RESPONSE_TIME_clean = RESPONSE_TIME %>%
+      # Remove any leading non-digit characters (prefix, including typos)
+      str_replace("^[^0-9]+", "") %>%
+      # Remove any trailing non-digit characters
+      str_replace("[^0-9]+$", "") %>%
+      # Convert to numeric (latency in ms)
+      as.numeric()
+  )
+
+n_rt_na <- sum(is.na(ad_clean$RESPONSE_TIME_clean))
+
+cat("Rows with NA in RESPONSE_TIME_clean after parsing: ",
+    n_rt_na, "\n")
+```
+
+Log entry for latency variable:
+
+```{r response-time-log, results='hold'}
 log_change(
-  step_id = "T2",
-  variable = "DATE_UTC",
-  issue = "DATE_UTC stored as character.",
-  decision = "Converted to Date type.",
+  step_id = "RT1",
+  variable = "RESPONSE_TIME",
+  issue = "Stored as character with text prefixes (e.g. 'RESPONSE_TIME: ') and possible trailing non-numeric characters.",
+  decision = "Stripped non-numeric prefix/suffix using regular expressions and converted the remaining digits to numeric.",
   rows_affected = nrow(ad_clean)
 )
 ```
 
 ### Summary
 
-  - 
-  - 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  - `RESPONSE_TIME` was recorded as a character field with a consistent `"RESPONSE_TIME: "`-style prefix and one typo variant.
+  - We extracted only the numeric portion by removing any leading non-digits and trailing non-numeric characters, then converted the result to a numeric latency variable `RESPONSE_TIME_clean`.  
+  - This cleaning step was performed without dropping any rows from the dataset.
 
 ---
 
 ## **OUTCOME:** `BID_WON`
 
-
-
 ### Description
 
-- `VARIABLE`  
-  - **Type (dictionary):** `TYPE`  
-  - **Meaning:** 
-  - **Expectation:** 
-  - **Actual Type:** `character`
+- `BID_WON`  
+  - **Type (dictionary):** `boolean`  
+  - **Meaning:** Indicator for whether this bid line is the **winning** bid in its auction.  
+  - **Expectation:** A logical TRUE/FALSE flag with exactly one `TRUE` per `AUCTION_ID`.  
+  - **Actual Type:** `character`  
   - **Missing:** None
 
-- `VARIABLE`  
-  - **Type:** `TYPE`  
-  - **Meaning:** 
-  - **Expectation:** 
-  - **Actual:** `character`
-  - **Missing:** None
-  
 ### Exploration
 
+We inspect the distinct string values used to encode the outcome and check for case variations.
+
+```{r bid-won-explore, results='hold'}
+# Distinct values and counts for BID_WON
+bid_won_summary <- ad_clean %>%
+  count(BID_WON, sort = TRUE)
+
+bid_won_summary
+```
+
+  - We see three values present: `"FALSE"`, `"TRUE"`, `"true"`
+
+We also check that there is still **exactly one** bid won per auction:
+```{r bid-won-auction, results='hold'}
+auction_win_summary <- ad_clean %>%
+  group_by(AUCTION_ID) %>%
+  summarise(
+    n_rows = n(),
+    n_won  = sum(BID_WON == "TRUE",  na.rm = TRUE),
+    n_lost = sum(BID_WON == "FALSE", na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Auctions violating the "exactly one winner" rule
+auctions_multiwin <- auction_win_summary %>% filter(n_won > 1)
+auctions_zerowin  <- auction_win_summary %>% filter(n_won == 0)
+
+cat("Auctions with >1 winning bid:  ", nrow(auctions_multiwin), "\n")
+cat("Auctions with 0 winning bids:  ", nrow(auctions_zerowin),  "\n")
+```
 
 **Observations**
 
-  - 
-  - 
-  - 
-  - 
+  - `BID_WON` is stored as a character flag rather than a logical variable.
+  - There are three distinct values for `BID_WON`: `"FALSE"`, `"TRUE"`, `"true"`
+  - We verified there is still **exactly one winner** per `AUCTION_ID`.
 
-**Decisions:**
+**Decisions**
 
-  - 
-  - 
+  - Convert `BID_WON` from a character flag into a proper logical variable `BID_WON_clean`.  
+  - Map `"TRUE"` and `"true"` to `TRUE`, and `"FALSE"` to `FALSE`. 
 
 ### Cleaning
-Log entries for time variables:
 
-```{r example-log8}
-log_change(
-  step_id = "T1",
-  variable = "TIMESTAMP",
-  issue = "Inconsistent TIMESTAMP formats, including 'NA' date tokens.",
-  decision = "Recover 'NA' dates using `DATE_UTC`; parsed to POSIXct (UTC).",
-  rows_affected = nrow(ad_clean)
-)
+We re-code `BID_WON` from character to logical.
 
+```{r bid-won-clean, results='hold'}
+ad_clean <- ad_clean %>%
+  mutate(
+    BID_WON_clean = case_when(
+      BID_WON %in% c("TRUE", "true")   ~ TRUE,
+      BID_WON %in% c("FALSE")          ~ FALSE,
+      TRUE                             ~ NA
+    )
+  )
+
+n_bid_won_na <- sum(is.na(ad_clean$BID_WON_clean))
+
+cat("Rows with NA in BID_WON_clean after recoding: ",
+    n_bid_won_na, "\n")
+```
+
+Log entry for outcome variable:
+
+```{r bid-won-log, results='hold'}
 log_change(
-  step_id = "T2",
-  variable = "DATE_UTC",
-  issue = "DATE_UTC stored as character.",
-  decision = "Converted to Date type.",
+  step_id = "BW1",
+  variable = "BID_WON",
+  issue = "Outcome flag stored as character with three string encodings ('TRUE', 'true', 'FALSE').",
+  decision = "Standardized to logical BID_WON_clean by mapping TRUE/true to TRUE and FALSE to FALSE.",
   rows_affected = nrow(ad_clean)
 )
 ```
 
 ### Summary
 
-  - 
-  - 
-   
-   
-   
-   
-   
-   
-   
+  - `BID_WON` is a key outcome flag but was stored as a character variable with three distinct encodings: `"FALSE"`, `"TRUE"`, and `"true"`.  
+  - We created `BID_WON_clean`, a logical TRUE/FALSE variable, by mapping these string encodings and reserving `NA` for any future unexpected labels.  
+  - A separate earlier step removed auctions with zero or multiple winners; this section only verified the “exactly one winner per auction” structure was preserved.
    
 ---
 
@@ -1811,11 +1804,75 @@ log_change(
 
 ## Assemble `ad_clean`
 
-## # Post-Cleaning Inspection
+We now construct the final cleaned dataset by:
 
-  - Final sanity checks on NA structure, bounds, duplicates
+  - Keeping only columns that represent cleaned variables (those ending in `"_clean"`), and  
+  - Renaming them back to their original variable names by removing the `"_clean"` suffix.
 
-## Save via `data_io.R` function `export_ad_data()`
+```{r assemble-ad-clean, results='hold'}
+# Identify cleaned columns
+all_cols   <- names(ad_clean)
+clean_cols <- all_cols[str_detect(all_cols, "_clean$")]
+
+# Keep only cleaned columns and rename by stripping the "_clean" suffix
+ad_clean <- ad_clean %>%
+  select(all_of(clean_cols))
+
+names(ad_clean) <- str_replace(names(ad_clean), "_clean$", "")
+```
+
+At this point, `ad_clean` contains only the cleaned variables with their original dictionary names (e.g., `TIMESTAMP`, `PRICE`, `BID_WON`).
+
+---
+
+## Post-Cleaning Inspection
+
+We perform a few final checks:
+
+  - Dimensions of the cleaned dataset,  
+  - Per-column missingness,  
+  - Verification that no new full-row duplicates were introduced during cleaning.
+
+```{r post-cleaning-inspection, results='hold'}
+# Dimensions
+n_rows_final <- nrow(ad_clean)
+n_cols_final <- ncol(ad_clean)
+
+cat("Final number of rows:    ", n_rows_final, "\n")
+cat("Final number of columns: ", n_cols_final, "\n\n")
+
+# Per column Summary
+summarize_ad_data(ad_clean)
+
+# Check for full-row duplicates in the final cleaned dataset
+n_distinct_final <- ad_clean %>%
+  distinct() %>%
+  nrow()
+
+n_dups_final <- n_rows_final - n_distinct_final
+
+cat("\nExact duplicate rows in final dataset: ", n_dups_final, "\n")
+```
+
+In this notebook run, `n_dups_final` reports whether any full-row duplicates remain after all cleaning steps; since we removed exact duplicates near the beginning and only performed deterministic transformations thereafter, we do **not** expect new duplicates to be introduced.
+
+---
+
+## Save cleaned dataset via `export_ad_data()`  (Optional)
+
+Finally, we export the cleaned dataset to Parquet using the helper in `data_io.R`.  
+The output is written to the default directory (`Project/data/processed/`) with a versioned filename.  
+If re-run with further changes, bump the `version` string (e.g., `"clean_v2"`) or set `overwrite = TRUE`.
+
+```{r export-cleaned-data, eval=FALSE}
+export_path <- export_ad_data(
+  df      = ad_clean,
+  version = "clean_v1"
+  # overwrite = FALSE  # set to TRUE only if intentionally replacing an existing file
+)
+
+export_path
+```
 
 ---
 
