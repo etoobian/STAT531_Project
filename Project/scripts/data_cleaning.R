@@ -1,19 +1,30 @@
 # Project/scripts/data_cleaning.R
 # ------------------------------------------------------------------
-#  DATA CLEANING PIPELINE
+#  DATA CLEANING PIPELINE — FUNCTION MODULE
 # ------------------------------------------------------------------
 # Purpose:
-#   - Load raw ad bidding data (via `load_ad_data()` from `data_io.R`)
-#   - Apply all team-agreed cleaning steps (same Logic/Order as Rmd)
-#   - Leave a cleaned tibble in the environment (`ad_clean`)
-#   - Optionally export cleaned data parquet file via `export_ad_data`
+#   - Accept raw ad bidding data (`ad_raw`) as input
+#   - Apply the full team-approved cleaning pipeline (same order as Rmd)
+#   - Return a cleaned tibble (`ad_clean`)
+#   - Optionally export cleaned data via `export_ad_data()` when export = TRUE
+#
+# Notes:
+#   - This file defines a single function: clean_ad_data()
+#   - It does NOT run cleaning automatically; users must call:
+#         ad_clean <- clean_ad_data(ad_raw)
 # ------------------------------------------------------------------
 
 # =====================================================================
 # clean_ad_data()
 # =====================================================================
 
-clean_ad_data <- function(ad_raw) {
+clean_ad_data <- function(ad_raw,
+                          export      = FALSE,
+                          version     = "clean_v1",
+                          out_dir     = default_out_dir,
+                          base_name = default_out_base_name,
+                          overwrite   = FALSE) {
+  
   
   suppressPackageStartupMessages({
     library(dplyr)
@@ -207,6 +218,16 @@ clean_ad_data <- function(ad_raw) {
   names(ad_clean) <- str_replace(names(ad_clean), "_clean$", "")
   
   message("Cleaning completed. Final rows: ", nrow(ad_clean))
+  
+  if (export) {
+    message(" - Exporting cleaned dataset via export_ad_data()...")
+    export_ad_data(
+      df        = ad_clean,
+      version   = version,
+      out_dir   = out_dir,
+      overwrite = overwrite
+    )
+  }
   
   return(ad_clean)
 }

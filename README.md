@@ -255,18 +255,26 @@ View(summary_tbl_raw)
 ad_clean <- clean_ad_data(ad_raw)
 ```
 
+**Note:** `clean_ad_data()` returns a cleaned tibble; 
+           it does not modify global variables.
+
 This function performs all cleaning steps, including:
 
-  - Reconstructing missing ZIP/CITY values
+  - Standardizing region codes (`DEVICE_GEO_REGION`)
+  - Correcting systematically shifted longitude values
+  - Preserving missing `ZIP`/`CITY` values
   - Correcting out-of-range geographic fields
-  - Cleaning malformed timestamps
+  - Cleaning malformed `TIMESTAMPS`
   - Repairing inconsistent field values
-  - Handling NAs
+  - Handling `NA`s
   - Removing duplicates
   - Enforcing consistent column types
   - Ensuring reproducible, well-structured final output
 
 ### Export the cleaned dataset (optional)
+
+**NOTE:** `clean_ad_data()` includes an argument `export = FALS`E (default). 
+           Set `export = TRUE` to write a parquet file automatically.
 
 ```
 export_ad_data(
