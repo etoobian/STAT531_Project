@@ -402,7 +402,7 @@ For each variable, we document:
 
 ---
 
-## **TIME VARIABLES:** `TIMESTAMP` \& `DATE_UTC`
+## **TIME VARIABLES:** `TIMESTAMP`, `DATE_UTC`
 
 ### Description
 
@@ -531,7 +531,7 @@ log_change(
 
 ---
 
-## **IDENTIFIERS:** `AUCTION_ID` \& `PUBLISHER_ID`
+## **IDENTIFIERS:** `AUCTION_ID`, `PUBLISHER_ID`
 
 ### Description
 
@@ -761,18 +761,324 @@ Because there are **no persistent changes**, **no log entry is added** for this 
   - No inconsistencies or formatting issues were detected.  
   - The dataset preserves the raw integer representation, while a lookup table will be used for interpretation in downstream analysis.  
 
+---
+
+## **GEOLOCATION FIELDS:** `DEVICE_GEO_REGION`, `DEVICE_GEO_CITY`, `DEVICE_GEO_ZIP`, `DEVICE_GEO_LAT`, `DEVICE_GEO_LONG`
+
+### Description
+
+- `DEVICE_GEO_REGION`  
+  - **Type (dictionary):** `categorical` (2-letter USPS state/region code)  
+  - **Meaning:** U.S. state or region derived from device IP  
+  - **Expectation:** For this dataset, all impressions are from Oregon $\to$ code should be "OR"  
+  - **Actual type:** `character`  
+  - **Missing:** None
+
+- `DEVICE_GEO_CITY`  
+  - **Type (dictionary):** `categorical` (free-text city name)  
+  - **Meaning:** City inferred from device IP  
+  - **Expectation:** Valid city or locality name within Oregon  
+  - **Actual type:** `character`  
+  - **Missing:** 21,198 in raw data
+
+- `DEVICE_GEO_ZIP`  
+  - **Type (dictionary):** `categorical` (ZIP or ZIP+4)  
+  - **Meaning:** ZIP code derived from device IP  
+  - **Expectation:** Oregon ZIP codes (5-digit or ZIP+4)  
+  - **Actual type:** `character`  
+  - **Missing:** 21,198 in raw data
+
+- `DEVICE_GEO_LAT`  
+  - **Type (dictionary):** `numeric`  
+  - **Meaning:** Latitude of device location  
+  - **Expectation:** Within Oregon’s approximate latitude bounds  
+  - **Actual type:** `numeric`
+  - **Missing:** None
+
+- `DEVICE_GEO_LONG`  
+  - **Type (dictionary):** `numeric`  
+  - **Meaning:** Longitude of device location  
+  - **Expectation:** Within Oregon’s approximate longitude bounds  
+  - **Actual type:** `numeric`  
+  - **Missing:** None  
+
+
+### Exploration - `DEVICE_GEO_REGION`
+
+We begin by inspecting distinct region codes and their frequencies:
+
+```{r region-explore}
+ad_clean %>%
+  dplyr::count(DEVICE_GEO_REGION, sort = TRUE)
+```
+
+  - We see four values identified: `"OR"`, `"Or"`, `"oregon"`, and `"xor"`.  
+  - Although the first three (`"OR"`, `"Or"`, and `"oregon"`) can easily be justified as meaning Oregon, `"xor"` may mean Oregon or *NOT* Oregon.
+
+We investigate further by looking at the Zip codes of those rows:
+
+```{r region-xor-zips}
+# Inspect ZIP prefixes for rows where DEVICE_GEO_REGION looks like "xor"
+xor_zip_summary <- ad_clean %>%
+  filter(DEVICE_GEO_REGION == "xor") %>%
+  mutate(zip_prefix = substr(DEVICE_GEO_ZIP, 1, 2)) %>%
+  count(zip_prefix, sort = TRUE)
+
+xor_zip_summary
+```
+
+The ZIP prefixes for `"xor"` rows are almost all `"97"` (Oregon), with 687 missing ZIPs and a single sentinel-like value (`-9`).
+
+To strengthen this conclusion, we also check whether the corresponding latitude/longitude values fall within Oregon’s approximate geographic bounds.
+
+```{r region-xor-geo}
+# Rough Oregon bounds
+oregon_lat_min  <- 42
+oregon_lat_max  <- 47
+oregon_long_min <- -125
+oregon_long_max <- -116
+
+
+xor_check <- ad_clean %>%
+  filter(DEVICE_GEO_REGION == "xor") %>%
+  mutate(
+    zip_is_or = substr(DEVICE_GEO_ZIP, 1, 2) == "97",
+    geo_is_or = DEVICE_GEO_LAT >= oregon_lat_min &
+      DEVICE_GEO_LAT <= oregon_lat_max &
+      DEVICE_GEO_LONG >= oregon_long_min &
+      DEVICE_GEO_LONG <= oregon_long_max,
+    either_or = zip_is_or | geo_is_or
+  ) %>%
+  summarise(
+    n_total      = n(),
+    n_zip_or     = sum(zip_is_or, na.rm = TRUE),
+    n_geo_or     = sum(geo_is_or, na.rm = TRUE),
+    n_either_or  = sum(either_or, na.rm = TRUE),
+    n_neither    = sum(!either_or, na.rm = TRUE)
+  )
+
+xor_check
+```
+
+This result justifies that `"xor"` is also representative of Oregon.
+
+**Observations**
+
+  - `DEVICE_GEO_REGION` is stored as a `character` field and has no missing values.
+  - There are four distinct values: "OR", "Or", "oregon", "xor"
+  - "OR", "Or", and "oregon" clearly represent Oregon; "xor" is shown to represent Oregon through further analysis of Zip code and latitudinal/longitudinal values.
+
+**Decisions:**
+
+  - Standardize all Oregon variants (`"OR"`, `"Or"`, `"oregon"`, `"xor"`) to a single clean code, `"OR"`.
+  
+### Cleaning - `DEVICE_GEO_REGION`
+
+```{r region-clean}
+ad_clean <- ad_clean %>%
+  mutate(
+    DEVICE_GEO_REGION_clean = case_when(
+      DEVICE_GEO_REGION %in% c("OR", "Or", "oregon", "xor") ~ "OR",
+      TRUE ~ NA_character_
+    )
+  )
+
+# Count the total number of rows affected
+n_region_changed <- sum(ad_clean$DEVICE_GEO_REGION_clean != ad_clean$DEVICE_GEO_REGION,
+                        na.rm = TRUE)
+```
+
+Log entry for region variable:
+
+```{r region-log}
+log_change(
+  step_id       = "GEO1",
+  variable      = "DEVICE_GEO_REGION",
+  issue         = "Inconsistent Oregon region codes ('OR', 'Or', 'oregon', 'xor').",
+  decision      = "Standardized all Oregon variants to 'OR'.",
+  rows_affected = n_region_changed
+)
+```
+
+### Exploration – `DEVICE_GEO_CITY`
+
+We begin by checking for basic formatting issues:
+
+```{r city-whitespace}
+# Check for leading/trailing whitespace
+city_ws <-
+  sum(stringr::str_detect(ad_clean$DEVICE_GEO_CITY, "^\\s|\\s$"),
+      na.rm = TRUE)
+
+# Count distinct non-missing values
+n_city_unique <- ad_clean %>%
+  filter(!is.na(DEVICE_GEO_CITY)) %>%
+  summarise(n = n_distinct(DEVICE_GEO_CITY)) %>%
+  pull(n)
+
+# Count new number of NA values
+n_city_na <- sum(is.na(ad_clean$DEVICE_GEO_CITY))
+
+cat("Rows with whitespace in city names:", city_ws, "\n")
+cat("Distinct non-missing city strings:", n_city_unique, "\n")
+cat("Rows with missing DEVICE_GEO_CITY:", n_city_na, "\n")
+```
+
+**Observations**
+
+  - `DEVICE_GEO_CITY` is a free-text field with **many unique values** (`r n_city_unique`), including small communities and non-city place names.
+  - There are no rows with whitespace in the city name.
+  - There are now **`r n_city_na` missing values** after removal of rows in previous steps.  
+  - Since all impressions are known to originate from Oregon (via ZIP/Region/Lat–Long validation), **missing city names do not invalidate a row**.
+
+**Decisions**
+
+  - Preserve all city names as-is, including unincorporated localities or variant spellings.
+  - Retain NA values as they still represent Oregon impressions.
+
+### Cleaning – `DEVICE_GEO_CITY`
+
+No transformation of `DEVICE_GEO_CITY` is required. 
+
+Create a pass-through cleaned column for schema consistency:
+
+```{r city-clean}
+ad_clean <- ad_clean %>%
+  mutate(DEVICE_GEO_CITY_clean = DEVICE_GEO_CITY)
+```
+
+Because **no values were modified**, **no log entry is added** for this variable.
+
+### Summary
+
+  - `DEVICE_GEO_CITY` contains a large variety of locality names, which is expected for IP-derived geodata.  
+  - `r n_city_na` rows contain missing city information; All rows are otherwise confirmed as Oregon $\to$ these are retained.
+  - No rows were removed based on city information.  
+
+### Exploration - `DEVICE_GEO_ZIP`
+
+**Observations**
+
+  - 
+  - 
+  - 
+  - 
+
+**Decisions:**
+
+  - 
+  - 
+
+### Cleaning - `DEVICE_GEO_ZIP`
+Log entries for time variables:
+
+```{r example-log1}
+log_change(
+  step_id = "T1",
+  variable = "TIMESTAMP",
+  issue = "Inconsistent TIMESTAMP formats, including 'NA' date tokens.",
+  decision = "Recover 'NA' dates using `DATE_UTC`; parsed to POSIXct (UTC).",
+  rows_affected = nrow(ad_clean)
+)
+```
+
+### Exploration - `DEVICE_GEO_LAT`
+
+**Observations**
+
+  - 
+  - 
+  - 
+  - 
+
+**Decisions:**
+
+  - 
+  - 
+  
+### Cleaning -  `DEVICE_GEO_LAT`
+Log entries for time variables:
+
+```{r example-log2}
+log_change(
+  step_id = "T1",
+  variable = "TIMESTAMP",
+  issue = "Inconsistent TIMESTAMP formats, including 'NA' date tokens.",
+  decision = "Recover 'NA' dates using `DATE_UTC`; parsed to POSIXct (UTC).",
+  rows_affected = nrow(ad_clean)
+)
+```
+
+
+### Exploration - `DEVICE_GEO_LONG` 
+
+**Observations**
+
+  - 
+  - 
+  - 
+  - 
+
+**Decisions:**
+
+  - 
+  - 
+
+### Cleaning - `DEVICE_GEO_LONG` 
+Log entries for time variables:
+
+```{r example-log3}
+log_change(
+  step_id = "T1",
+  variable = "TIMESTAMP",
+  issue = "Inconsistent TIMESTAMP formats, including 'NA' date tokens.",
+  decision = "Recover 'NA' dates using `DATE_UTC`; parsed to POSIXct (UTC).",
+  rows_affected = nrow(ad_clean)
+)
+```
+
+### Summary
+
+  - 
+  - 
+   
+   
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 ---
 
-## **GEOLOCATION FIELDS:** `DEVICE_GEO_REGION`, `DEVICE_GEO_CITY`, `DEVICE_GEO_ZIP`,
-## **GEOLOCATION FIELDS:** `DEVICE_GEO_LAT` \& `DEVICE_GEO_LONG`
-
----
-
-## **AD SIZES:** `REQUESTED_SIZES` \& `SIZE`
+## **AD SIZES:** `REQUESTED_SIZES`, `SIZE`
 
 ---
 
@@ -797,10 +1103,10 @@ Because there are **no persistent changes**, **no log entry is added** for this 
 ### Description
 
 - `VARIABLE`  
-  - **Type:** `TYPE`  
+  - **Type (dictionary):** `TYPE`  
   - **Meaning:** 
   - **Expectation:** 
-  - **Actual:** `character`
+  - **Actual Type:** `character`
   - **Missing:** None
 
 - `VARIABLE`  

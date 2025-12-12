@@ -1605,7 +1605,7 @@ margin-left: 0 !important;
       CLEANING</strong></a>
       <ul>
       <li><a href="#time-variables-timestamp-date_utc" id="toc-time-variables-timestamp-date_utc"><strong>TIME
-      VARIABLES:</strong> <code>TIMESTAMP</code> &amp;
+      VARIABLES:</strong> <code>TIMESTAMP</code>,
       <code>DATE_UTC</code></a>
       <ul>
       <li><a href="#description" id="toc-description">Description</a></li>
@@ -1614,7 +1614,7 @@ margin-left: 0 !important;
       <li><a href="#summary-1" id="toc-summary-1">Summary</a></li>
       </ul></li>
       <li><a href="#identifiers-auction_id-publisher_id" id="toc-identifiers-auction_id-publisher_id"><strong>IDENTIFIERS:</strong>
-      <code>AUCTION_ID</code> &amp; <code>PUBLISHER_ID</code></a>
+      <code>AUCTION_ID</code>, <code>PUBLISHER_ID</code></a>
       <ul>
       <li><a href="#description-1" id="toc-description-1">Description</a></li>
       <li><a href="#exploration-1" id="toc-exploration-1">Exploration</a></li>
@@ -1629,15 +1629,37 @@ margin-left: 0 !important;
       <li><a href="#cleaning-2" id="toc-cleaning-2">Cleaning</a></li>
       <li><a href="#summary-3" id="toc-summary-3">Summary</a></li>
       </ul></li>
-      <li><a href="#geolocation-fields-device_geo_region-device_geo_city-device_geo_zip" id="toc-geolocation-fields-device_geo_region-device_geo_city-device_geo_zip"><strong>GEOLOCATION
+      <li><a href="#geolocation-fields-device_geo_region-device_geo_city-device_geo_zip-device_geo_lat-device_geo_long" id="toc-geolocation-fields-device_geo_region-device_geo_city-device_geo_zip-device_geo_lat-device_geo_long"><strong>GEOLOCATION
       FIELDS:</strong> <code>DEVICE_GEO_REGION</code>,
-      <code>DEVICE_GEO_CITY</code> &amp;
+      <code>DEVICE_GEO_CITY</code>, <code>DEVICE_GEO_ZIP</code>,
+      <code>DEVICE_GEO_LAT</code>, <code>DEVICE_GEO_LONG</code></a>
+      <ul>
+      <li><a href="#description-3" id="toc-description-3">Description</a></li>
+      <li><a href="#exploration---device_geo_region" id="toc-exploration---device_geo_region">Exploration -
+      <code>DEVICE_GEO_REGION</code></a></li>
+      <li><a href="#cleaning---device_geo_region" id="toc-cleaning---device_geo_region">Cleaning -
+      <code>DEVICE_GEO_REGION</code></a></li>
+      <li><a href="#exploration-device_geo_city" id="toc-exploration-device_geo_city">Exploration –
+      <code>DEVICE_GEO_CITY</code></a></li>
+      <li><a href="#cleaning-device_geo_city" id="toc-cleaning-device_geo_city">Cleaning –
+      <code>DEVICE_GEO_CITY</code></a></li>
+      <li><a href="#summary-4" id="toc-summary-4">Summary</a></li>
+      <li><a href="#exploration---device_geo_zip" id="toc-exploration---device_geo_zip">Exploration -
       <code>DEVICE_GEO_ZIP</code></a></li>
-      <li><a href="#geolocation-fields-device_geo_lat-device_geo_long" id="toc-geolocation-fields-device_geo_lat-device_geo_long"><strong>GEOLOCATION
-      FIELDS:</strong> <code>DEVICE_GEO_LAT</code> &amp;
+      <li><a href="#cleaning---device_geo_zip" id="toc-cleaning---device_geo_zip">Cleaning -
+      <code>DEVICE_GEO_ZIP</code></a></li>
+      <li><a href="#exploration---device_geo_lat" id="toc-exploration---device_geo_lat">Exploration -
+      <code>DEVICE_GEO_LAT</code></a></li>
+      <li><a href="#cleaning---device_geo_lat" id="toc-cleaning---device_geo_lat">Cleaning -
+      <code>DEVICE_GEO_LAT</code></a></li>
+      <li><a href="#exploration---device_geo_long" id="toc-exploration---device_geo_long">Exploration -
       <code>DEVICE_GEO_LONG</code></a></li>
+      <li><a href="#cleaning---device_geo_long" id="toc-cleaning---device_geo_long">Cleaning -
+      <code>DEVICE_GEO_LONG</code></a></li>
+      <li><a href="#summary-5" id="toc-summary-5">Summary</a></li>
+      </ul></li>
       <li><a href="#ad-sizes-requested_sizes-size" id="toc-ad-sizes-requested_sizes-size"><strong>AD SIZES:</strong>
-      <code>REQUESTED_SIZES</code> &amp; <code>SIZE</code></a></li>
+      <code>REQUESTED_SIZES</code>, <code>SIZE</code></a></li>
       <li><a href="#pricing-price" id="toc-pricing-price"><strong>PRICING:</strong>
       <code>PRICE</code></a></li>
       <li><a href="#latency-metric-response_time" id="toc-latency-metric-response_time"><strong>LATENCY
@@ -1647,10 +1669,10 @@ margin-left: 0 !important;
       </ul></li>
       <li><a href="#variable" id="toc-variable"><strong>VARIABLE</strong></a>
       <ul>
-      <li><a href="#description-3" id="toc-description-3">Description</a></li>
+      <li><a href="#description-4" id="toc-description-4">Description</a></li>
       <li><a href="#exploration-3" id="toc-exploration-3">Exploration</a></li>
       <li><a href="#cleaning-3" id="toc-cleaning-3">Cleaning</a></li>
-      <li><a href="#summary-4" id="toc-summary-4">Summary</a></li>
+      <li><a href="#summary-6" id="toc-summary-6">Summary</a></li>
       </ul></li>
       <li><a href="#cleaned-dataset" id="toc-cleaned-dataset"><strong>CLEANED DATASET</strong></a>
       <ul>
@@ -2346,31 +2368,31 @@ For each variable, we document:</p>
 </ul>
 <hr />
 <div id="time-variables-timestamp-date_utc" class="section level2">
-<h2><strong>TIME VARIABLES:</strong> <code>TIMESTAMP</code> &amp;
+<h2><strong>TIME VARIABLES:</strong> <code>TIMESTAMP</code>,
 <code>DATE_UTC</code></h2>
 <div id="description" class="section level3">
 <h3>Description</h3>
 <ul>
 <li><code>TIMESTAMP</code>
 <ul>
-<li><strong>Type:</strong> <code>TIMESTAMP_NTZ</code><br />
+<li><strong>Type (dictionary):</strong> <code>TIMESTAMP_NTZ</code><br />
 </li>
 <li><strong>Meaning:</strong> Event time (UTC) when the log row was
 recorded</li>
 <li><strong>Expectation:</strong> A full datetime (date + time), treated
 as UTC</li>
-<li><strong>Actual:</strong> <code>character</code></li>
+<li><strong>Actual Type:</strong> <code>character</code></li>
 <li><strong>Missing:</strong> None</li>
 </ul></li>
 <li><code>DATE_UTC</code>
 <ul>
-<li><strong>Type:</strong> <code>DATE</code><br />
+<li><strong>Type (dictionary):</strong> <code>DATE</code><br />
 </li>
 <li><strong>Meaning:</strong> Calendar date (UTC) used for partitioning
 / grouping</li>
 <li><strong>Expectation:</strong> A date consistent with the date
 portion of <code>TIMESTAMP</code></li>
-<li><strong>Actual:</strong> <code>character</code></li>
+<li><strong>Actual Type:</strong> <code>character</code></li>
 <li><strong>Missing:</strong> None</li>
 </ul></li>
 </ul>
@@ -2498,7 +2520,7 @@ type).</li>
 </div>
 </div>
 <div id="identifiers-auction_id-publisher_id" class="section level2">
-<h2><strong>IDENTIFIERS:</strong> <code>AUCTION_ID</code> &amp;
+<h2><strong>IDENTIFIERS:</strong> <code>AUCTION_ID</code>,
 <code>PUBLISHER_ID</code></h2>
 <div id="description-1" class="section level3">
 <h3>Description</h3>
@@ -2513,7 +2535,7 @@ auction.<br />
 <li><strong>Expectation:</strong> Repeated across multiple rows (one
 auction <span class="math inline">\(to\)</span> many bid lines).<br />
 </li>
-<li><strong>Actual:</strong> <code>character</code><br />
+<li><strong>Actual Type:</strong> <code>character</code><br />
 </li>
 <li><strong>Missing:</strong> None</li>
 </ul></li>
@@ -2527,7 +2549,7 @@ running the auction.<br />
 <li><strong>Expectation:</strong> Medium/high cardinality; used for
 grouping and filtering.<br />
 </li>
-<li><strong>Actual:</strong> <code>character</code><br />
+<li><strong>Actual Type:</strong> <code>character</code><br />
 </li>
 <li><strong>Missing:</strong> None</li>
 </ul></li>
@@ -2704,14 +2726,14 @@ outcome structure.</li>
 <ul>
 <li><code>DEVICE_TYPE</code>
 <ul>
-<li><strong>Type:</strong> <code>VARCHAR</code></li>
+<li><strong>Type (dictionary):</strong> <code>VARCHAR</code></li>
 <li><strong>Meaning:</strong> Indicates the type of device from which
 the impression originated<br />
 </li>
 <li><strong>Expectation:</strong> Categorical values such as “mobile”,
 “desktop”, “tablet”<br />
 </li>
-<li><strong>Actual:</strong> <code>integer</code> codes</li>
+<li><strong>Actual Type:</strong> <code>integer</code> codes</li>
 <li><strong>Missing:</strong> None</li>
 </ul></li>
 </ul>
@@ -2775,17 +2797,15 @@ into descriptive labels.<br />
 </li>
 <li>Apply mapping only in EDA/plots and not in the cleaned dataset.</li>
 </ul>
-<hr />
 </div>
 <div id="cleaning-2" class="section level3">
 <h3>Cleaning</h3>
-<p>No transformation of <code>DEVICE_TYPE</code> is required.
-<code>DEVICE_TYPE_clean</code> created for consistency:</p>
+<p>No transformation of <code>DEVICE_TYPE</code> is required.</p>
+<p>Create a pass-through cleaned column for schema consistency:</p>
 <div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
 <span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DEVICE_TYPE_clean =</span> DEVICE_TYPE)</span></code></pre></div>
 <p>Because there are <strong>no persistent changes</strong>, <strong>no
 log entry is added</strong> for this variable.</p>
-<hr />
 </div>
 <div id="summary-3" class="section level3">
 <h3>Summary</h3>
@@ -2800,17 +2820,354 @@ table will be used for interpretation in downstream analysis.</li>
 <hr />
 </div>
 </div>
-<div id="geolocation-fields-device_geo_region-device_geo_city-device_geo_zip" class="section level2">
+<div id="geolocation-fields-device_geo_region-device_geo_city-device_geo_zip-device_geo_lat-device_geo_long" class="section level2">
 <h2><strong>GEOLOCATION FIELDS:</strong> <code>DEVICE_GEO_REGION</code>,
-<code>DEVICE_GEO_CITY</code> &amp; <code>DEVICE_GEO_ZIP</code></h2>
+<code>DEVICE_GEO_CITY</code>, <code>DEVICE_GEO_ZIP</code>,
+<code>DEVICE_GEO_LAT</code>, <code>DEVICE_GEO_LONG</code></h2>
+<div id="description-3" class="section level3">
+<h3>Description</h3>
+<ul>
+<li><code>DEVICE_GEO_REGION</code>
+<ul>
+<li><strong>Type (dictionary):</strong> <code>categorical</code>
+(2-letter USPS state/region code)<br />
+</li>
+<li><strong>Meaning:</strong> U.S. state or region derived from device
+IP<br />
+</li>
+<li><strong>Expectation:</strong> For this dataset, all impressions are
+from Oregon <span class="math inline">\(\to\)</span> code should be
+“OR”<br />
+</li>
+<li><strong>Actual type:</strong> <code>character</code><br />
+</li>
+<li><strong>Missing:</strong> None</li>
+</ul></li>
+<li><code>DEVICE_GEO_CITY</code>
+<ul>
+<li><strong>Type (dictionary):</strong> <code>categorical</code>
+(free-text city name)<br />
+</li>
+<li><strong>Meaning:</strong> City inferred from device IP<br />
+</li>
+<li><strong>Expectation:</strong> Valid city or locality name within
+Oregon<br />
+</li>
+<li><strong>Actual type:</strong> <code>character</code><br />
+</li>
+<li><strong>Missing:</strong> 21,198 in raw data</li>
+</ul></li>
+<li><code>DEVICE_GEO_ZIP</code>
+<ul>
+<li><strong>Type (dictionary):</strong> <code>categorical</code> (ZIP or
+ZIP+4)<br />
+</li>
+<li><strong>Meaning:</strong> ZIP code derived from device IP<br />
+</li>
+<li><strong>Expectation:</strong> Oregon ZIP codes (5-digit or
+ZIP+4)<br />
+</li>
+<li><strong>Actual type:</strong> <code>character</code><br />
+</li>
+<li><strong>Missing:</strong> 21,198 in raw data</li>
+</ul></li>
+<li><code>DEVICE_GEO_LAT</code>
+<ul>
+<li><strong>Type (dictionary):</strong> <code>numeric</code><br />
+</li>
+<li><strong>Meaning:</strong> Latitude of device location<br />
+</li>
+<li><strong>Expectation:</strong> Within Oregon’s approximate latitude
+bounds<br />
+</li>
+<li><strong>Actual type:</strong> <code>numeric</code></li>
+<li><strong>Missing:</strong> None</li>
+</ul></li>
+<li><code>DEVICE_GEO_LONG</code>
+<ul>
+<li><strong>Type (dictionary):</strong> <code>numeric</code><br />
+</li>
+<li><strong>Meaning:</strong> Longitude of device location<br />
+</li>
+<li><strong>Expectation:</strong> Within Oregon’s approximate longitude
+bounds<br />
+</li>
+<li><strong>Actual type:</strong> <code>numeric</code><br />
+</li>
+<li><strong>Missing:</strong> None</li>
+</ul></li>
+</ul>
 </div>
-<div id="geolocation-fields-device_geo_lat-device_geo_long" class="section level2">
-<h2><strong>GEOLOCATION FIELDS:</strong> <code>DEVICE_GEO_LAT</code>
-&amp; <code>DEVICE_GEO_LONG</code></h2>
+<div id="exploration---device_geo_region" class="section level3">
+<h3>Exploration - <code>DEVICE_GEO_REGION</code></h3>
+<p>We begin by inspecting distinct region codes and their
+frequencies:</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a>ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb38-2"><a href="#cb38-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">count</span>(DEVICE_GEO_REGION, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 4 × 2
+##   DEVICE_GEO_REGION      n
+##   &lt;chr&gt;              &lt;int&gt;
+## 1 OR                331395
+## 2 Or                 53309
+## 3 oregon             41163
+## 4 xor                14838</code></pre>
+<ul>
+<li>We see four values identified: <code>&quot;OR&quot;</code>, <code>&quot;Or&quot;</code>,
+<code>&quot;oregon&quot;</code>, and <code>&quot;xor&quot;</code>.<br />
+</li>
+<li>Although the first three (<code>&quot;OR&quot;</code>, <code>&quot;Or&quot;</code>, and
+<code>&quot;oregon&quot;</code>) can easily be justified as meaning Oregon,
+<code>&quot;xor&quot;</code> may mean Oregon or <em>NOT</em> Oregon.</li>
+</ul>
+<p>We investigate further by looking at the Zip codes of those rows:</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" tabindex="-1"></a><span class="co"># Inspect ZIP prefixes for rows where DEVICE_GEO_REGION looks like &quot;xor&quot;</span></span>
+<span id="cb40-2"><a href="#cb40-2" tabindex="-1"></a>xor_zip_summary <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb40-3"><a href="#cb40-3" tabindex="-1"></a>  <span class="fu">filter</span>(DEVICE_GEO_REGION <span class="sc">==</span> <span class="st">&quot;xor&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb40-4"><a href="#cb40-4" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">zip_prefix =</span> <span class="fu">substr</span>(DEVICE_GEO_ZIP, <span class="dv">1</span>, <span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb40-5"><a href="#cb40-5" tabindex="-1"></a>  <span class="fu">count</span>(zip_prefix, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb40-6"><a href="#cb40-6" tabindex="-1"></a></span>
+<span id="cb40-7"><a href="#cb40-7" tabindex="-1"></a>xor_zip_summary</span></code></pre></div>
+<pre><code>## # A tibble: 3 × 2
+##   zip_prefix     n
+##   &lt;chr&gt;      &lt;int&gt;
+## 1 97         14150
+## 2 &lt;NA&gt;         687
+## 3 -9             1</code></pre>
+<p>The ZIP prefixes for <code>&quot;xor&quot;</code> rows are almost all
+<code>&quot;97&quot;</code> (Oregon), with 687 missing ZIPs and a single
+sentinel-like value (<code>-9</code>).</p>
+<p>To strengthen this conclusion, we also check whether the
+corresponding latitude/longitude values fall within Oregon’s approximate
+geographic bounds.</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" tabindex="-1"></a><span class="co"># Rough Oregon bounds</span></span>
+<span id="cb42-2"><a href="#cb42-2" tabindex="-1"></a>oregon_lat_min  <span class="ot">&lt;-</span> <span class="dv">42</span></span>
+<span id="cb42-3"><a href="#cb42-3" tabindex="-1"></a>oregon_lat_max  <span class="ot">&lt;-</span> <span class="dv">47</span></span>
+<span id="cb42-4"><a href="#cb42-4" tabindex="-1"></a>oregon_long_min <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">125</span></span>
+<span id="cb42-5"><a href="#cb42-5" tabindex="-1"></a>oregon_long_max <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">116</span></span>
+<span id="cb42-6"><a href="#cb42-6" tabindex="-1"></a></span>
+<span id="cb42-7"><a href="#cb42-7" tabindex="-1"></a></span>
+<span id="cb42-8"><a href="#cb42-8" tabindex="-1"></a>xor_check <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb42-9"><a href="#cb42-9" tabindex="-1"></a>  <span class="fu">filter</span>(DEVICE_GEO_REGION <span class="sc">==</span> <span class="st">&quot;xor&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb42-10"><a href="#cb42-10" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb42-11"><a href="#cb42-11" tabindex="-1"></a>    <span class="at">zip_is_or =</span> <span class="fu">substr</span>(DEVICE_GEO_ZIP, <span class="dv">1</span>, <span class="dv">2</span>) <span class="sc">==</span> <span class="st">&quot;97&quot;</span>,</span>
+<span id="cb42-12"><a href="#cb42-12" tabindex="-1"></a>    <span class="at">geo_is_or =</span> DEVICE_GEO_LAT <span class="sc">&gt;=</span> oregon_lat_min <span class="sc">&amp;</span></span>
+<span id="cb42-13"><a href="#cb42-13" tabindex="-1"></a>      DEVICE_GEO_LAT <span class="sc">&lt;=</span> oregon_lat_max <span class="sc">&amp;</span></span>
+<span id="cb42-14"><a href="#cb42-14" tabindex="-1"></a>      DEVICE_GEO_LONG <span class="sc">&gt;=</span> oregon_long_min <span class="sc">&amp;</span></span>
+<span id="cb42-15"><a href="#cb42-15" tabindex="-1"></a>      DEVICE_GEO_LONG <span class="sc">&lt;=</span> oregon_long_max,</span>
+<span id="cb42-16"><a href="#cb42-16" tabindex="-1"></a>    <span class="at">either_or =</span> zip_is_or <span class="sc">|</span> geo_is_or</span>
+<span id="cb42-17"><a href="#cb42-17" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb42-18"><a href="#cb42-18" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb42-19"><a href="#cb42-19" tabindex="-1"></a>    <span class="at">n_total      =</span> <span class="fu">n</span>(),</span>
+<span id="cb42-20"><a href="#cb42-20" tabindex="-1"></a>    <span class="at">n_zip_or     =</span> <span class="fu">sum</span>(zip_is_or, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb42-21"><a href="#cb42-21" tabindex="-1"></a>    <span class="at">n_geo_or     =</span> <span class="fu">sum</span>(geo_is_or, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb42-22"><a href="#cb42-22" tabindex="-1"></a>    <span class="at">n_either_or  =</span> <span class="fu">sum</span>(either_or, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb42-23"><a href="#cb42-23" tabindex="-1"></a>    <span class="at">n_neither    =</span> <span class="fu">sum</span>(<span class="sc">!</span>either_or, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb42-24"><a href="#cb42-24" tabindex="-1"></a>  )</span>
+<span id="cb42-25"><a href="#cb42-25" tabindex="-1"></a></span>
+<span id="cb42-26"><a href="#cb42-26" tabindex="-1"></a>xor_check</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 5
+##   n_total n_zip_or n_geo_or n_either_or n_neither
+##     &lt;int&gt;    &lt;int&gt;    &lt;int&gt;       &lt;int&gt;     &lt;int&gt;
+## 1   14838    14150    14836       14838         0</code></pre>
+<p>This result justifies that <code>&quot;xor&quot;</code> is also representative
+of Oregon.</p>
+<p><strong>Observations</strong></p>
+<ul>
+<li><code>DEVICE_GEO_REGION</code> is stored as a <code>character</code>
+field and has no missing values.</li>
+<li>There are four distinct values: “OR”, “Or”, “oregon”, “xor”</li>
+<li>“OR”, “Or”, and “oregon” clearly represent Oregon; “xor” is shown to
+represent Oregon through further analysis of Zip code and
+latitudinal/longitudinal values.</li>
+</ul>
+<p><strong>Decisions:</strong></p>
+<ul>
+<li>Standardize all Oregon variants (<code>&quot;OR&quot;</code>,
+<code>&quot;Or&quot;</code>, <code>&quot;oregon&quot;</code>, <code>&quot;xor&quot;</code>) to a
+single clean code, <code>&quot;OR&quot;</code>.</li>
+</ul>
+</div>
+<div id="cleaning---device_geo_region" class="section level3">
+<h3>Cleaning - <code>DEVICE_GEO_REGION</code></h3>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb44-2"><a href="#cb44-2" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb44-3"><a href="#cb44-3" tabindex="-1"></a>    <span class="at">DEVICE_GEO_REGION_clean =</span> <span class="fu">case_when</span>(</span>
+<span id="cb44-4"><a href="#cb44-4" tabindex="-1"></a>      DEVICE_GEO_REGION <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;OR&quot;</span>, <span class="st">&quot;Or&quot;</span>, <span class="st">&quot;oregon&quot;</span>, <span class="st">&quot;xor&quot;</span>) <span class="sc">~</span> <span class="st">&quot;OR&quot;</span>,</span>
+<span id="cb44-5"><a href="#cb44-5" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span></span>
+<span id="cb44-6"><a href="#cb44-6" tabindex="-1"></a>    )</span>
+<span id="cb44-7"><a href="#cb44-7" tabindex="-1"></a>  )</span>
+<span id="cb44-8"><a href="#cb44-8" tabindex="-1"></a></span>
+<span id="cb44-9"><a href="#cb44-9" tabindex="-1"></a><span class="co"># Count the total number of rows affected</span></span>
+<span id="cb44-10"><a href="#cb44-10" tabindex="-1"></a>n_region_changed <span class="ot">&lt;-</span> <span class="fu">sum</span>(ad_clean<span class="sc">$</span>DEVICE_GEO_REGION_clean <span class="sc">!=</span> ad_clean<span class="sc">$</span>DEVICE_GEO_REGION,</span>
+<span id="cb44-11"><a href="#cb44-11" tabindex="-1"></a>                        <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>Log entry for region variable:</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb45-2"><a href="#cb45-2" tabindex="-1"></a>  <span class="at">step_id       =</span> <span class="st">&quot;GEO1&quot;</span>,</span>
+<span id="cb45-3"><a href="#cb45-3" tabindex="-1"></a>  <span class="at">variable      =</span> <span class="st">&quot;DEVICE_GEO_REGION&quot;</span>,</span>
+<span id="cb45-4"><a href="#cb45-4" tabindex="-1"></a>  <span class="at">issue         =</span> <span class="st">&quot;Inconsistent Oregon region codes (&#39;OR&#39;, &#39;Or&#39;, &#39;oregon&#39;, &#39;xor&#39;).&quot;</span>,</span>
+<span id="cb45-5"><a href="#cb45-5" tabindex="-1"></a>  <span class="at">decision      =</span> <span class="st">&quot;Standardized all Oregon variants to &#39;OR&#39;.&quot;</span>,</span>
+<span id="cb45-6"><a href="#cb45-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> n_region_changed</span>
+<span id="cb45-7"><a href="#cb45-7" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="exploration-device_geo_city" class="section level3">
+<h3>Exploration – <code>DEVICE_GEO_CITY</code></h3>
+<p>We begin by checking for basic formatting issues:</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" tabindex="-1"></a><span class="co"># Check for leading/trailing whitespace</span></span>
+<span id="cb46-2"><a href="#cb46-2" tabindex="-1"></a>city_ws <span class="ot">&lt;-</span></span>
+<span id="cb46-3"><a href="#cb46-3" tabindex="-1"></a>  <span class="fu">sum</span>(stringr<span class="sc">::</span><span class="fu">str_detect</span>(ad_clean<span class="sc">$</span>DEVICE_GEO_CITY, <span class="st">&quot;^</span><span class="sc">\\</span><span class="st">s|</span><span class="sc">\\</span><span class="st">s$&quot;</span>),</span>
+<span id="cb46-4"><a href="#cb46-4" tabindex="-1"></a>      <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb46-5"><a href="#cb46-5" tabindex="-1"></a></span>
+<span id="cb46-6"><a href="#cb46-6" tabindex="-1"></a><span class="co"># Count distinct non-missing values</span></span>
+<span id="cb46-7"><a href="#cb46-7" tabindex="-1"></a>n_city_unique <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb46-8"><a href="#cb46-8" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(DEVICE_GEO_CITY)) <span class="sc">%&gt;%</span></span>
+<span id="cb46-9"><a href="#cb46-9" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n_distinct</span>(DEVICE_GEO_CITY)) <span class="sc">%&gt;%</span></span>
+<span id="cb46-10"><a href="#cb46-10" tabindex="-1"></a>  <span class="fu">pull</span>(n)</span>
+<span id="cb46-11"><a href="#cb46-11" tabindex="-1"></a></span>
+<span id="cb46-12"><a href="#cb46-12" tabindex="-1"></a><span class="co"># Count new number of NA values</span></span>
+<span id="cb46-13"><a href="#cb46-13" tabindex="-1"></a>n_city_na <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(ad_clean<span class="sc">$</span>DEVICE_GEO_CITY))</span>
+<span id="cb46-14"><a href="#cb46-14" tabindex="-1"></a></span>
+<span id="cb46-15"><a href="#cb46-15" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Rows with whitespace in city names:&quot;</span>, city_ws, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Rows with whitespace in city names: 0</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Distinct non-missing city strings:&quot;</span>, n_city_unique, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Distinct non-missing city strings: 202</code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Rows with missing DEVICE_GEO_CITY:&quot;</span>, n_city_na, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Rows with missing DEVICE_GEO_CITY: 21076</code></pre>
+<p><strong>Observations</strong></p>
+<ul>
+<li><code>DEVICE_GEO_CITY</code> is a free-text field with <strong>many
+unique values</strong> (202), including small communities and non-city
+place names.</li>
+<li>There are no rows with whitespace in the city name.</li>
+<li>There are now <strong>21076 missing values</strong> after removal of
+rows in previous steps.<br />
+</li>
+<li>Since all impressions are known to originate from Oregon (via
+ZIP/Region/Lat–Long validation), <strong>missing city names do not
+invalidate a row</strong>.</li>
+</ul>
+<p><strong>Decisions</strong></p>
+<ul>
+<li>Preserve all city names as-is, including unincorporated localities
+or variant spellings.</li>
+<li>Retain NA values as they still represent Oregon impressions.</li>
+</ul>
+</div>
+<div id="cleaning-device_geo_city" class="section level3">
+<h3>Cleaning – <code>DEVICE_GEO_CITY</code></h3>
+<p>No transformation of <code>DEVICEGEO_CITY</code> is required.</p>
+<p>Create a pass-through cleaned column for schema consistency:</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb52-2"><a href="#cb52-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DEVICE_GEO_CITY_clean =</span></span>
+<span id="cb52-3"><a href="#cb52-3" tabindex="-1"></a>           <span class="fu">str_trim</span>(DEVICE_GEO_CITY))</span>
+<span id="cb52-4"><a href="#cb52-4" tabindex="-1"></a></span>
+<span id="cb52-5"><a href="#cb52-5" tabindex="-1"></a><span class="co"># Count rows where trimming changed the value</span></span>
+<span id="cb52-6"><a href="#cb52-6" tabindex="-1"></a>n_city_trimmed <span class="ot">&lt;-</span></span>
+<span id="cb52-7"><a href="#cb52-7" tabindex="-1"></a>  <span class="fu">sum</span>(ad_clean<span class="sc">$</span>DEVICE_GEO_CITY_clean <span class="sc">!=</span> ad_clean<span class="sc">$</span>DEVICE_GEO_CITY,</span>
+<span id="cb52-8"><a href="#cb52-8" tabindex="-1"></a>      <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>Because there are <strong>no persistent changes</strong>, <strong>no
+log entry is added</strong> for this variable.</p>
+</div>
+<div id="summary-4" class="section level3">
+<h3>Summary</h3>
+<ul>
+<li><code>DEVICE_GEO_CITY</code> contains a large variety of locality
+names, which is expected for IP-derived geodata.<br />
+</li>
+<li>21076 rows contain missing city information; All rows are otherwise
+confirmed as Oregon <span class="math inline">\(\to\)</span> these are
+retained.</li>
+<li>No rows were removed based on city information.</li>
+</ul>
+</div>
+<div id="exploration---device_geo_zip" class="section level3">
+<h3>Exploration - <code>DEVICE_GEO_ZIP</code></h3>
+<p><strong>Observations</strong></p>
+<ul>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+<p><strong>Decisions:</strong></p>
+<ul>
+<li></li>
+<li></li>
+</ul>
+</div>
+<div id="cleaning---device_geo_zip" class="section level3">
+<h3>Cleaning - <code>DEVICE_GEO_ZIP</code></h3>
+<p>Log entries for time variables:</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb53-2"><a href="#cb53-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
+<span id="cb53-3"><a href="#cb53-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
+<span id="cb53-4"><a href="#cb53-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
+<span id="cb53-5"><a href="#cb53-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
+<span id="cb53-6"><a href="#cb53-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb53-7"><a href="#cb53-7" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="exploration---device_geo_lat" class="section level3">
+<h3>Exploration - <code>DEVICE_GEO_LAT</code></h3>
+<p><strong>Observations</strong></p>
+<ul>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+<p><strong>Decisions:</strong></p>
+<ul>
+<li></li>
+<li></li>
+</ul>
+</div>
+<div id="cleaning---device_geo_lat" class="section level3">
+<h3>Cleaning - <code>DEVICE_GEO_LAT</code></h3>
+<p>Log entries for time variables:</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb54-2"><a href="#cb54-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
+<span id="cb54-3"><a href="#cb54-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
+<span id="cb54-4"><a href="#cb54-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
+<span id="cb54-5"><a href="#cb54-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
+<span id="cb54-6"><a href="#cb54-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb54-7"><a href="#cb54-7" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="exploration---device_geo_long" class="section level3">
+<h3>Exploration - <code>DEVICE_GEO_LONG</code></h3>
+<p><strong>Observations</strong></p>
+<ul>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+<p><strong>Decisions:</strong></p>
+<ul>
+<li></li>
+<li></li>
+</ul>
+</div>
+<div id="cleaning---device_geo_long" class="section level3">
+<h3>Cleaning - <code>DEVICE_GEO_LONG</code></h3>
+<p>Log entries for time variables:</p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb55-2"><a href="#cb55-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
+<span id="cb55-3"><a href="#cb55-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
+<span id="cb55-4"><a href="#cb55-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
+<span id="cb55-5"><a href="#cb55-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
+<span id="cb55-6"><a href="#cb55-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb55-7"><a href="#cb55-7" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="summary-5" class="section level3">
+<h3>Summary</h3>
+<ul>
+<li></li>
+<li></li>
+</ul>
 <hr />
 </div>
+</div>
 <div id="ad-sizes-requested_sizes-size" class="section level2">
-<h2><strong>AD SIZES:</strong> <code>REQUESTED_SIZES</code> &amp;
+<h2><strong>AD SIZES:</strong> <code>REQUESTED_SIZES</code>,
 <code>SIZE</code></h2>
 <hr />
 </div>
@@ -2830,16 +3187,16 @@ table will be used for interpretation in downstream analysis.</li>
 </div>
 <div id="variable" class="section level1">
 <h1><strong>VARIABLE</strong></h1>
-<div id="description-3" class="section level3">
+<div id="description-4" class="section level3">
 <h3>Description</h3>
 <ul>
 <li><code>VARIABLE</code>
 <ul>
-<li><strong>Type:</strong> <code>TYPE</code><br />
+<li><strong>Type (dictionary):</strong> <code>TYPE</code><br />
 </li>
 <li><strong>Meaning:</strong></li>
 <li><strong>Expectation:</strong></li>
-<li><strong>Actual:</strong> <code>character</code></li>
+<li><strong>Actual Type:</strong> <code>character</code></li>
 <li><strong>Missing:</strong> None</li>
 </ul></li>
 <li><code>VARIABLE</code>
@@ -2871,23 +3228,23 @@ table will be used for interpretation in downstream analysis.</li>
 <div id="cleaning-3" class="section level3">
 <h3>Cleaning</h3>
 <p>Log entries for time variables:</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
-<span id="cb38-2"><a href="#cb38-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
-<span id="cb38-3"><a href="#cb38-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
-<span id="cb38-4"><a href="#cb38-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
-<span id="cb38-5"><a href="#cb38-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
-<span id="cb38-6"><a href="#cb38-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
-<span id="cb38-7"><a href="#cb38-7" tabindex="-1"></a>)</span>
-<span id="cb38-8"><a href="#cb38-8" tabindex="-1"></a></span>
-<span id="cb38-9"><a href="#cb38-9" tabindex="-1"></a><span class="fu">log_change</span>(</span>
-<span id="cb38-10"><a href="#cb38-10" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T2&quot;</span>,</span>
-<span id="cb38-11"><a href="#cb38-11" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;DATE_UTC&quot;</span>,</span>
-<span id="cb38-12"><a href="#cb38-12" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;DATE_UTC stored as character.&quot;</span>,</span>
-<span id="cb38-13"><a href="#cb38-13" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Converted to Date type.&quot;</span>,</span>
-<span id="cb38-14"><a href="#cb38-14" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
-<span id="cb38-15"><a href="#cb38-15" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb56-2"><a href="#cb56-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
+<span id="cb56-3"><a href="#cb56-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
+<span id="cb56-4"><a href="#cb56-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
+<span id="cb56-5"><a href="#cb56-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
+<span id="cb56-6"><a href="#cb56-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb56-7"><a href="#cb56-7" tabindex="-1"></a>)</span>
+<span id="cb56-8"><a href="#cb56-8" tabindex="-1"></a></span>
+<span id="cb56-9"><a href="#cb56-9" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb56-10"><a href="#cb56-10" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T2&quot;</span>,</span>
+<span id="cb56-11"><a href="#cb56-11" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;DATE_UTC&quot;</span>,</span>
+<span id="cb56-12"><a href="#cb56-12" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;DATE_UTC stored as character.&quot;</span>,</span>
+<span id="cb56-13"><a href="#cb56-13" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Converted to Date type.&quot;</span>,</span>
+<span id="cb56-14"><a href="#cb56-14" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb56-15"><a href="#cb56-15" tabindex="-1"></a>)</span></code></pre></div>
 </div>
-<div id="summary-4" class="section level3">
+<div id="summary-6" class="section level3">
 <h3>Summary</h3>
 <ul>
 <li></li>
@@ -2923,13 +3280,13 @@ Each entry corresponds to a specific issue that was identified and the
 decision made to address it.</p>
 <div id="log" class="section level2">
 <h2>Log</h2>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a>cleaning_log <span class="sc">%&gt;%</span></span>
-<span id="cb39-2"><a href="#cb39-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(step_id) <span class="sc">%&gt;%</span></span>
-<span id="cb39-3"><a href="#cb39-3" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
-<span id="cb39-4"><a href="#cb39-4" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Summary of Data-Cleaning Decisions&quot;</span>,</span>
-<span id="cb39-5"><a href="#cb39-5" tabindex="-1"></a>    <span class="at">align   =</span> <span class="st">&quot;l&quot;</span></span>
-<span id="cb39-6"><a href="#cb39-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb39-7"><a href="#cb39-7" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>, <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" tabindex="-1"></a>cleaning_log <span class="sc">%&gt;%</span></span>
+<span id="cb57-2"><a href="#cb57-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(step_id) <span class="sc">%&gt;%</span></span>
+<span id="cb57-3"><a href="#cb57-3" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb57-4"><a href="#cb57-4" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Summary of Data-Cleaning Decisions&quot;</span>,</span>
+<span id="cb57-5"><a href="#cb57-5" tabindex="-1"></a>    <span class="at">align   =</span> <span class="st">&quot;l&quot;</span></span>
+<span id="cb57-6"><a href="#cb57-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb57-7"><a href="#cb57-7" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>, <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>)</span></code></pre></div>
 <table class="table table-striped" style="color: black; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
 Summary of Data-Cleaning Decisions
@@ -2973,6 +3330,23 @@ Dropped full duplicate rows keeping one copy.
 </tr>
 <tr>
 <td style="text-align:left;">
+GEO1
+</td>
+<td style="text-align:left;">
+DEVICE_GEO_REGION
+</td>
+<td style="text-align:left;">
+Inconsistent Oregon region codes (‘OR’, ‘Or’, ‘oregon’, ‘xor’).
+</td>
+<td style="text-align:left;">
+Standardized all Oregon variants to ‘OR’.
+</td>
+<td style="text-align:left;">
+109310
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 I1
 </td>
 <td style="text-align:left;">
@@ -3003,6 +3377,57 @@ Recover ‘NA’ dates using <code>DATE_UTC</code>; parsed to POSIXct (UTC).
 </td>
 <td style="text-align:left;">
 441535
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+T1
+</td>
+<td style="text-align:left;">
+TIMESTAMP
+</td>
+<td style="text-align:left;">
+Inconsistent TIMESTAMP formats, including ‘NA’ date tokens.
+</td>
+<td style="text-align:left;">
+Recover ‘NA’ dates using <code>DATE_UTC</code>; parsed to POSIXct (UTC).
+</td>
+<td style="text-align:left;">
+440705
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+T1
+</td>
+<td style="text-align:left;">
+TIMESTAMP
+</td>
+<td style="text-align:left;">
+Inconsistent TIMESTAMP formats, including ‘NA’ date tokens.
+</td>
+<td style="text-align:left;">
+Recover ‘NA’ dates using <code>DATE_UTC</code>; parsed to POSIXct (UTC).
+</td>
+<td style="text-align:left;">
+440705
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+T1
+</td>
+<td style="text-align:left;">
+TIMESTAMP
+</td>
+<td style="text-align:left;">
+Inconsistent TIMESTAMP formats, including ‘NA’ date tokens.
+</td>
+<td style="text-align:left;">
+Recover ‘NA’ dates using <code>DATE_UTC</code>; parsed to POSIXct (UTC).
+</td>
+<td style="text-align:left;">
+440705
 </td>
 </tr>
 <tr>
