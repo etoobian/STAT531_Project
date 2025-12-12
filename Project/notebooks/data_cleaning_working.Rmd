@@ -1443,21 +1443,213 @@ Because there are **no persistent changes**, **no log entry is added** for this 
 
 ## **PRICING:** `PRICE`
 
+### Description
+
+- `PRICE`  
+  - **Type (dictionary):** `numeric` (CPM bid in USD)  
+  - **Meaning:** Bid price in cost per thousand impressions (CPM).  
+  - **Expectation:** Non-negative real number; typically small (e.g., \$0–\$50).  
+  - **Actual Type:** `character`  
+  - **Missing:** None
+
+### Exploration
+
+`PRICE` has already been confirmed to be stored as `character`, we now inspect the characters used in `PRICE`.
+
+```{r price-characters}
+# Investigate all unique characters present in PRICE strings
+chars <- strsplit(ad_clean$PRICE, split = "")
+unique_chars <- sort(unique(unlist(chars)))
+unique_chars
+```
+
+We see there are negative values (`"-"`), likely some values in scientific notation (`"e"`), and likely typos (`"O"`).
+We investigate each of these further.
+
+```{r price-explore, results='hold'}
+# Rows with the letter 'O'
+price_O_rows <- ad_clean %>% filter(str_detect(PRICE, "O"))
+n_price_O    <- nrow(price_O_rows)
+head(price_O_rows$PRICE)
+
+# Rows containing 'e' (scientific notation)
+price_e_rows <- ad_clean %>% filter(str_detect(PRICE, "e"))
+n_price_e    <- nrow(price_e_rows)
+head(price_e_rows$PRICE)
+
+# Rows with a negative sign '-'
+price_neg_rows <- ad_clean %>% filter(str_detect(PRICE, "-"))
+n_price_neg_strings <- nrow(price_neg_rows)
+head(price_neg_rows$PRICE)
+
+# Frequency table of negative PRICE strings
+table(price_neg_rows$PRICE)
+```
+
+**Observations**
+
+  - `PRICE` is stored as `character`, but the data dictionary indicates it should be numeric.  
+  - The character set includes digits, decimal points, minus signs, `"e"` (scientific notation), and a single `"O"` at the start of one value (a likely typo for `"0"`).
+  - Rows containing:
+      - A leading `"O"` in `PRICE` appear exactly once (a clear typographical error for a numeric value).  
+      - `"e"` correspond to 3 rows in scientific notation.  
+      - A minus sign (`"-"`) appear in 115 rows, consisting of:
+          - 12 values equal to `"-999"`, which behave as sentinel codes rather than real prices.  
+          - 3 negative scientific-notation values already covered above.  
+          - 100 negative values that are plausible in magnitude but have the wrong sign (e.g., `"-0.34"`).
+
+**Decisions**
+
+  - Convert `PRICE` to a numeric field in a staged way:
+      - Correct the single `"O"` $\to$ `"0"` typo before parsing.
+      - Parse numeric values (including scientific notation) into a helper numeric column.
+      - Treat `-999` as a sentinel code and convert it to `NA`.
+  - After converting to numeric, examine the **distribution of negative prices** compared to positive prices:
+      - If negative values look like sign errors (same magnitude as plausible bids, including some with `BID_WON == TRUE`), we will flip their sign in the final cleaned field.
+      - Otherwise, we will leave them as-is or set them to `NA`.
+
+### Cleaning 
+
+We first correct obvious encoding issues, convert to `numeric`, and handle sentinel values.  
+We use a helper numeric column (`PRICE_num`) for intermediate steps.
+
+```{r price-clean-step1, results='hold'}
+# Fix leading 'O' typo and parse to numeric (handles scientific notation)
+ad_clean <- ad_clean %>%
+  mutate(PRICE_str = str_replace(PRICE, "^O", "0"),
+         PRICE_num = suppressWarnings(as.numeric(PRICE_str)))
+
+# Count anomalies before adjustment
+n_price_O        <-
+  sum(str_detect(ad_clean$PRICE, "^O"), na.rm = TRUE)
+n_price_sentinel <- sum(ad_clean$PRICE_num == -999, na.rm = TRUE)
+n_price_neg_vals <-
+  sum(ad_clean$PRICE_num < 0 &
+        ad_clean$PRICE_num != -999, na.rm = TRUE)
+
+cat("Rows with 'O' to '0' typo fixed: ", n_price_O, "\n")
+cat("Rows with sentinel -999:         ", n_price_sentinel, "\n")
+cat("Rows with negative values:       ", n_price_neg_vals, "\n")
+
+# Treat -999 as sentinel and set to NA in the helper numeric column
+ad_clean <- ad_clean %>%
+  mutate(PRICE_num = if_else(PRICE_num == -999, NA_real_, PRICE_num))
+```
+
+We now examine the distribution of `numeric` prices (focusing on negative values) to justify how to handle them.
+
+```{r price-diagnostic, results='hold'}
+neg_prices <- ad_clean %>%
+  filter(!is.na(PRICE_num) & PRICE_num < 0)
+
+par(mfrow = c(1, 2))
+
+hist(
+  sample(
+    na.omit(ad_clean$PRICE_num),
+    size    = min(1000, sum(!is.na(ad_clean$PRICE_num))),
+    replace = FALSE
+  ),
+  main  = "Histogram of overall Prices",
+  xlab  = "PRICE_num",
+  breaks = 150,
+  xlim = c(0, 3)
+)
+
+hist(
+  neg_prices$PRICE_num,
+  main = "Hist of Negative Prices",
+  xlab = "Negative Prices",
+  breaks = 50,
+  xlim = c(0, -3)
+)
+
+par(mfrow = c(1, 1))
+```
+
+  - The magnitudes of negative prices are in the same general range as the positive bids.  
+  - This supports interpreting them as sign errors rather than truly negative CPM bids.
+
+We now define `PRICE_clean`:
+
+  - Sentinel and malformed values remain `NA`.  
+  - Negative numeric prices are flipped to positive (sign error correction).  
+  - All other values are kept as-is.  
+  - Helper columns are dropped.
+
+```{r price-clean-step2, results='hold'}
+ad_clean <- ad_clean %>%
+  mutate(
+    PRICE_clean = case_when(
+      is.na(PRICE_num) ~ NA_real_,   # malformed or sentinel
+      PRICE_num < 0    ~ -PRICE_num, # interpret negatives as sign errors
+      TRUE             ~ PRICE_num   # all other values unchanged
+    )
+  ) %>%
+  select(-PRICE_str, -PRICE_num)
+
+# Total rows where PRICE was altered in any way
+n_price_affected <- n_price_O + n_price_sentinel + n_price_neg_vals
+
+cat("Rows with PRICE typo/sentinel/negative sign adjusted: ",
+    n_price_affected, "\n")
+```
+
+Log entry for pricing variable:
+
+```{r price-log, results='hold'}
+log_change(
+  step_id = "PR1",
+  variable = "PRICE",
+  issue = "PRICE stored as character with a leading 'O' typo, sentinel code -999, and 100 negative values of plausible magnitude.",
+  decision = "Created numeric PRICE_clean; corrected leading 'O' to '0', parsed scientific notation, converted -999 to NA, and negated remaining negative prices to treat them as sign errors.",
+  rows_affected = n_price_affected
+)
+```
+
+### Summary
+
+  - `PRICE` was recorded as `character` and contained a mix of plain decimals, scientific notation, one obvious `"O"` $\to$ `"0"` typo, sentinel `-999` values, and negative prices with plausible magnitudes.  
+  - We created a cleaned numeric field `PRICE_clean` that:
+      - Corrects the single `"O"` typo before parsing.  
+      - Parses scientific notation correctly.  
+      - Converts sentinel `-999` values to `NA`.  
+      - Treats remaining negative prices as sign errors and flips them to positive, based on their distribution and the presence of winning bids at those magnitudes.  
+  - No rows were dropped; invalid or unrecoverable price strings are represented as `NA` in `PRICE_clean`, preserving completeness while improving validity for downstream analysis.
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
 
 ## **LATENCY METRIC:** `RESPONSE_TIME`
 
----
-
-## **OUTCOME:** `BID_WON`
-
-
----
-
----
-
-
-# **VARIABLE**
 
 ### Description
 
@@ -1493,7 +1685,95 @@ Because there are **no persistent changes**, **no log entry is added** for this 
 ### Cleaning
 Log entries for time variables:
 
-```{r example-log}
+```{r example-log9}
+log_change(
+  step_id = "T1",
+  variable = "TIMESTAMP",
+  issue = "Inconsistent TIMESTAMP formats, including 'NA' date tokens.",
+  decision = "Recover 'NA' dates using `DATE_UTC`; parsed to POSIXct (UTC).",
+  rows_affected = nrow(ad_clean)
+)
+
+log_change(
+  step_id = "T2",
+  variable = "DATE_UTC",
+  issue = "DATE_UTC stored as character.",
+  decision = "Converted to Date type.",
+  rows_affected = nrow(ad_clean)
+)
+```
+
+### Summary
+
+  - 
+  - 
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+## **OUTCOME:** `BID_WON`
+
+
+
+### Description
+
+- `VARIABLE`  
+  - **Type (dictionary):** `TYPE`  
+  - **Meaning:** 
+  - **Expectation:** 
+  - **Actual Type:** `character`
+  - **Missing:** None
+
+- `VARIABLE`  
+  - **Type:** `TYPE`  
+  - **Meaning:** 
+  - **Expectation:** 
+  - **Actual:** `character`
+  - **Missing:** None
+  
+### Exploration
+
+
+**Observations**
+
+  - 
+  - 
+  - 
+  - 
+
+**Decisions:**
+
+  - 
+  - 
+
+### Cleaning
+Log entries for time variables:
+
+```{r example-log8}
 log_change(
   step_id = "T1",
   variable = "TIMESTAMP",

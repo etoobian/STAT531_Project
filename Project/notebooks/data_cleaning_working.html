@@ -1667,18 +1667,29 @@ margin-left: 0 !important;
       <li><a href="#summary-8" id="toc-summary-8">Summary</a></li>
       </ul></li>
       <li><a href="#pricing-price" id="toc-pricing-price"><strong>PRICING:</strong>
-      <code>PRICE</code></a></li>
-      <li><a href="#latency-metric-response_time" id="toc-latency-metric-response_time"><strong>LATENCY
-      METRIC:</strong> <code>RESPONSE_TIME</code></a></li>
-      <li><a href="#outcome-bid_won" id="toc-outcome-bid_won"><strong>OUTCOME:</strong>
-      <code>BID_WON</code></a></li>
-      </ul></li>
-      <li><a href="#variable" id="toc-variable"><strong>VARIABLE</strong></a>
+      <code>PRICE</code></a>
       <ul>
       <li><a href="#description-5" id="toc-description-5">Description</a></li>
       <li><a href="#exploration-4" id="toc-exploration-4">Exploration</a></li>
       <li><a href="#cleaning-4" id="toc-cleaning-4">Cleaning</a></li>
       <li><a href="#summary-9" id="toc-summary-9">Summary</a></li>
+      </ul></li>
+      <li><a href="#latency-metric-response_time" id="toc-latency-metric-response_time"><strong>LATENCY
+      METRIC:</strong> <code>RESPONSE_TIME</code></a>
+      <ul>
+      <li><a href="#description-6" id="toc-description-6">Description</a></li>
+      <li><a href="#exploration-5" id="toc-exploration-5">Exploration</a></li>
+      <li><a href="#cleaning-5" id="toc-cleaning-5">Cleaning</a></li>
+      <li><a href="#summary-10" id="toc-summary-10">Summary</a></li>
+      </ul></li>
+      <li><a href="#outcome-bid_won" id="toc-outcome-bid_won"><strong>OUTCOME:</strong>
+      <code>BID_WON</code></a>
+      <ul>
+      <li><a href="#description-7" id="toc-description-7">Description</a></li>
+      <li><a href="#exploration-6" id="toc-exploration-6">Exploration</a></li>
+      <li><a href="#cleaning-6" id="toc-cleaning-6">Cleaning</a></li>
+      <li><a href="#summary-11" id="toc-summary-11">Summary</a></li>
+      </ul></li>
       </ul></li>
       <li><a href="#cleaned-dataset" id="toc-cleaned-dataset"><strong>CLEANED DATASET</strong></a>
       <ul>
@@ -3813,21 +3824,280 @@ fields.</li>
 </div>
 <div id="pricing-price" class="section level2">
 <h2><strong>PRICING:</strong> <code>PRICE</code></h2>
+<div id="description-5" class="section level3">
+<h3>Description</h3>
+<ul>
+<li><code>PRICE</code>
+<ul>
+<li><strong>Type (dictionary):</strong> <code>numeric</code> (CPM bid in
+USD)<br />
+</li>
+<li><strong>Meaning:</strong> Bid price in cost per thousand impressions
+(CPM).<br />
+</li>
+<li><strong>Expectation:</strong> Non-negative real number; typically
+small (e.g., $0–$50).<br />
+</li>
+<li><strong>Actual Type:</strong> <code>character</code><br />
+</li>
+<li><strong>Missing:</strong> None</li>
+</ul></li>
+</ul>
+</div>
+<div id="exploration-4" class="section level3">
+<h3>Exploration</h3>
+<p><code>PRICE</code> has already been confirmed to be stored as
+<code>character</code>, we now inspect the characters used in
+<code>PRICE</code>.</p>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" tabindex="-1"></a><span class="co"># Investigate all unique characters present in PRICE strings</span></span>
+<span id="cb77-2"><a href="#cb77-2" tabindex="-1"></a>chars <span class="ot">&lt;-</span> <span class="fu">strsplit</span>(ad_clean<span class="sc">$</span>PRICE, <span class="at">split =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb77-3"><a href="#cb77-3" tabindex="-1"></a>unique_chars <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">unique</span>(<span class="fu">unlist</span>(chars)))</span>
+<span id="cb77-4"><a href="#cb77-4" tabindex="-1"></a>unique_chars</span></code></pre></div>
+<pre><code>##  [1] &quot;-&quot; &quot;.&quot; &quot;0&quot; &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; &quot;5&quot; &quot;6&quot; &quot;7&quot; &quot;8&quot; &quot;9&quot; &quot;e&quot; &quot;O&quot;</code></pre>
+<p>We see there are negative values (<code>&quot;-&quot;</code>), likely some
+values in scientific notation (<code>&quot;e&quot;</code>), and likely typos
+(<code>&quot;O&quot;</code>). We investigate each of these further.</p>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" tabindex="-1"></a><span class="co"># Rows with the letter &#39;O&#39;</span></span>
+<span id="cb79-2"><a href="#cb79-2" tabindex="-1"></a>price_O_rows <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">str_detect</span>(PRICE, <span class="st">&quot;O&quot;</span>))</span>
+<span id="cb79-3"><a href="#cb79-3" tabindex="-1"></a>n_price_O    <span class="ot">&lt;-</span> <span class="fu">nrow</span>(price_O_rows)</span>
+<span id="cb79-4"><a href="#cb79-4" tabindex="-1"></a><span class="fu">head</span>(price_O_rows<span class="sc">$</span>PRICE)</span>
+<span id="cb79-5"><a href="#cb79-5" tabindex="-1"></a></span>
+<span id="cb79-6"><a href="#cb79-6" tabindex="-1"></a><span class="co"># Rows containing &#39;e&#39; (scientific notation)</span></span>
+<span id="cb79-7"><a href="#cb79-7" tabindex="-1"></a>price_e_rows <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">str_detect</span>(PRICE, <span class="st">&quot;e&quot;</span>))</span>
+<span id="cb79-8"><a href="#cb79-8" tabindex="-1"></a>n_price_e    <span class="ot">&lt;-</span> <span class="fu">nrow</span>(price_e_rows)</span>
+<span id="cb79-9"><a href="#cb79-9" tabindex="-1"></a><span class="fu">head</span>(price_e_rows<span class="sc">$</span>PRICE)</span>
+<span id="cb79-10"><a href="#cb79-10" tabindex="-1"></a></span>
+<span id="cb79-11"><a href="#cb79-11" tabindex="-1"></a><span class="co"># Rows with a negative sign &#39;-&#39;</span></span>
+<span id="cb79-12"><a href="#cb79-12" tabindex="-1"></a>price_neg_rows <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">str_detect</span>(PRICE, <span class="st">&quot;-&quot;</span>))</span>
+<span id="cb79-13"><a href="#cb79-13" tabindex="-1"></a>n_price_neg_strings <span class="ot">&lt;-</span> <span class="fu">nrow</span>(price_neg_rows)</span>
+<span id="cb79-14"><a href="#cb79-14" tabindex="-1"></a><span class="fu">head</span>(price_neg_rows<span class="sc">$</span>PRICE)</span>
+<span id="cb79-15"><a href="#cb79-15" tabindex="-1"></a></span>
+<span id="cb79-16"><a href="#cb79-16" tabindex="-1"></a><span class="co"># Frequency table of negative PRICE strings</span></span>
+<span id="cb79-17"><a href="#cb79-17" tabindex="-1"></a><span class="fu">table</span>(price_neg_rows<span class="sc">$</span>PRICE)</span></code></pre></div>
+<pre><code>## [1] &quot;O.340000&quot;
+## [1] &quot;9.5e-05&quot; &quot;7.1e-05&quot; &quot;7.1e-05&quot;
+## [1] &quot;-0.05317&quot;    &quot;-0.6&quot;        &quot;-0.18&quot;       &quot;-0.15354504&quot; &quot;-0.566&quot;     
+## [6] &quot;-0.71069735&quot;
+## 
+##     -0.000333  -0.007233408         -0.01      -0.01096     -0.020525 
+##             1             1             1             2             1 
+##       -0.0225      -0.02304         -0.03    -0.0311256         -0.04 
+##             1             1             2             1             1 
+##        -0.048         -0.05      -0.05275      -0.05317         -0.06 
+##             1             2             1             1             3 
+##     -0.060007        -0.072   -0.07290122    -0.0734888     -0.075184 
+##             2             1             1             1             1 
+##         -0.08      -0.08424     -0.087714         -0.09      -0.09056 
+##             1             1             1             1             1 
+##    -0.1058904        -0.108         -0.11    -0.1116192     -0.111655 
+##             1             1             1             1             1 
+##    -0.1121648     -0.120032     -0.134568      -0.14092   -0.14429272 
+##             1             1             1             1             1 
+##      -0.15134   -0.15354504        -0.157         -0.16         -0.18 
+##             1             1             1             1             2 
+##       -0.1875         -0.19        -0.192         -0.21      -0.21098 
+##             1             1             1             1             1 
+##      -0.21261     -0.219119         -0.22         -0.23      -0.23238 
+##             1             1             1             1             1 
+##         -0.26      -0.26136        -0.266     -0.266555         -0.27 
+##             1             1             1             1             1 
+##          -0.3      -0.31838      -0.33283   -0.33400533      -0.34823 
+##             1             1             1             1             1 
+##         -0.35      -0.35684    -0.3717208         -0.43       -0.4749 
+##             1             1             1             1             1 
+##       -0.4887         -0.49      -0.53924         -0.56       -0.5602 
+##             1             1             1             1             1 
+##        -0.566      -0.57046    -0.5933844   -0.59341544          -0.6 
+##             1             1             1             1             1 
+##      -0.63612       -0.6593         -0.67   -0.71069735       -0.7128 
+##             1             1             1             1             1 
+## -0.7908848532 -0.7981976532       -0.8334         -0.89         -1.02 
+##             1             1             1             1             1 
+##        -1.125    -1.1968375  -1.216654003        -1.646         -1.93 
+##             1             1             1             1             1 
+##    -1.9412168      -2.66552          -999       7.1e-05       9.5e-05 
+##             1             1            12             2             1</code></pre>
+<p><strong>Observations</strong></p>
+<ul>
+<li><code>PRICE</code> is stored as <code>character</code>, but the data
+dictionary indicates it should be numeric.<br />
+</li>
+<li>The character set includes digits, decimal points, minus signs,
+<code>&quot;e&quot;</code> (scientific notation), and a single <code>&quot;O&quot;</code> at
+the start of one value (a likely typo for <code>&quot;0&quot;</code>).</li>
+<li>Rows containing:
+<ul>
+<li>A leading <code>&quot;O&quot;</code> in <code>PRICE</code> appear exactly once
+(a clear typographical error for a numeric value).<br />
+</li>
+<li><code>&quot;e&quot;</code> correspond to 3 rows in scientific notation.<br />
+</li>
+<li>A minus sign (<code>&quot;-&quot;</code>) appear in 115 rows, consisting of:
+<ul>
+<li>12 values equal to <code>&quot;-999&quot;</code>, which behave as sentinel
+codes rather than real prices.<br />
+</li>
+<li>3 negative scientific-notation values already covered above.<br />
+</li>
+<li>100 negative values that are plausible in magnitude but have the
+wrong sign (e.g., <code>&quot;-0.34&quot;</code>).</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>Decisions</strong></p>
+<ul>
+<li>Convert <code>PRICE</code> to a numeric field in a staged way:
+<ul>
+<li>Correct the single <code>&quot;O&quot;</code> <span class="math inline">\(\to\)</span> <code>&quot;0&quot;</code> typo before
+parsing.</li>
+<li>Parse numeric values (including scientific notation) into a helper
+numeric column.</li>
+<li>Treat <code>-999</code> as a sentinel code and convert it to
+<code>NA</code>.</li>
+</ul></li>
+<li>After converting to numeric, examine the <strong>distribution of
+negative prices</strong> compared to positive prices:
+<ul>
+<li>If negative values look like sign errors (same magnitude as
+plausible bids, including some with <code>BID_WON == TRUE</code>), we
+will flip their sign in the final cleaned field.</li>
+<li>Otherwise, we will leave them as-is or set them to
+<code>NA</code>.</li>
+</ul></li>
+</ul>
+</div>
+<div id="cleaning-4" class="section level3">
+<h3>Cleaning</h3>
+<p>We first correct obvious encoding issues, convert to
+<code>numeric</code>, and handle sentinel values.<br />
+We use a helper numeric column (<code>PRICE_num</code>) for intermediate
+steps.</p>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" tabindex="-1"></a><span class="co"># Fix leading &#39;O&#39; typo and parse to numeric (handles scientific notation)</span></span>
+<span id="cb81-2"><a href="#cb81-2" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb81-3"><a href="#cb81-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PRICE_str =</span> <span class="fu">str_replace</span>(PRICE, <span class="st">&quot;^O&quot;</span>, <span class="st">&quot;0&quot;</span>),</span>
+<span id="cb81-4"><a href="#cb81-4" tabindex="-1"></a>         <span class="at">PRICE_num =</span> <span class="fu">suppressWarnings</span>(<span class="fu">as.numeric</span>(PRICE_str)))</span>
+<span id="cb81-5"><a href="#cb81-5" tabindex="-1"></a></span>
+<span id="cb81-6"><a href="#cb81-6" tabindex="-1"></a><span class="co"># Count anomalies before adjustment</span></span>
+<span id="cb81-7"><a href="#cb81-7" tabindex="-1"></a>n_price_O        <span class="ot">&lt;-</span></span>
+<span id="cb81-8"><a href="#cb81-8" tabindex="-1"></a>  <span class="fu">sum</span>(<span class="fu">str_detect</span>(ad_clean<span class="sc">$</span>PRICE, <span class="st">&quot;^O&quot;</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb81-9"><a href="#cb81-9" tabindex="-1"></a>n_price_sentinel <span class="ot">&lt;-</span> <span class="fu">sum</span>(ad_clean<span class="sc">$</span>PRICE_num <span class="sc">==</span> <span class="sc">-</span><span class="dv">999</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb81-10"><a href="#cb81-10" tabindex="-1"></a>n_price_neg_vals <span class="ot">&lt;-</span></span>
+<span id="cb81-11"><a href="#cb81-11" tabindex="-1"></a>  <span class="fu">sum</span>(ad_clean<span class="sc">$</span>PRICE_num <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">&amp;</span></span>
+<span id="cb81-12"><a href="#cb81-12" tabindex="-1"></a>        ad_clean<span class="sc">$</span>PRICE_num <span class="sc">!=</span> <span class="sc">-</span><span class="dv">999</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb81-13"><a href="#cb81-13" tabindex="-1"></a></span>
+<span id="cb81-14"><a href="#cb81-14" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Rows with &#39;O&#39; to &#39;0&#39; typo fixed: &quot;</span>, n_price_O, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb81-15"><a href="#cb81-15" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Rows with sentinel -999:         &quot;</span>, n_price_sentinel, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb81-16"><a href="#cb81-16" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Rows with negative values:       &quot;</span>, n_price_neg_vals, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb81-17"><a href="#cb81-17" tabindex="-1"></a></span>
+<span id="cb81-18"><a href="#cb81-18" tabindex="-1"></a><span class="co"># Treat -999 as sentinel and set to NA in the helper numeric column</span></span>
+<span id="cb81-19"><a href="#cb81-19" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb81-20"><a href="#cb81-20" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PRICE_num =</span> <span class="fu">if_else</span>(PRICE_num <span class="sc">==</span> <span class="sc">-</span><span class="dv">999</span>, <span class="cn">NA_real_</span>, PRICE_num))</span></code></pre></div>
+<pre><code>## Rows with &#39;O&#39; to &#39;0&#39; typo fixed:  1 
+## Rows with sentinel -999:          12 
+## Rows with negative values:        99</code></pre>
+<p>We now examine the distribution of <code>numeric</code> prices
+(focusing on negative values) to justify how to handle them.</p>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" tabindex="-1"></a>neg_prices <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb83-2"><a href="#cb83-2" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(PRICE_num) <span class="sc">&amp;</span> PRICE_num <span class="sc">&lt;</span> <span class="dv">0</span>)</span>
+<span id="cb83-3"><a href="#cb83-3" tabindex="-1"></a></span>
+<span id="cb83-4"><a href="#cb83-4" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb83-5"><a href="#cb83-5" tabindex="-1"></a></span>
+<span id="cb83-6"><a href="#cb83-6" tabindex="-1"></a><span class="fu">hist</span>(</span>
+<span id="cb83-7"><a href="#cb83-7" tabindex="-1"></a>  <span class="fu">sample</span>(</span>
+<span id="cb83-8"><a href="#cb83-8" tabindex="-1"></a>    <span class="fu">na.omit</span>(ad_clean<span class="sc">$</span>PRICE_num),</span>
+<span id="cb83-9"><a href="#cb83-9" tabindex="-1"></a>    <span class="at">size    =</span> <span class="fu">min</span>(<span class="dv">1000</span>, <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(ad_clean<span class="sc">$</span>PRICE_num))),</span>
+<span id="cb83-10"><a href="#cb83-10" tabindex="-1"></a>    <span class="at">replace =</span> <span class="cn">FALSE</span></span>
+<span id="cb83-11"><a href="#cb83-11" tabindex="-1"></a>  ),</span>
+<span id="cb83-12"><a href="#cb83-12" tabindex="-1"></a>  <span class="at">main  =</span> <span class="st">&quot;Histogram of overall PRICE_num&quot;</span>,</span>
+<span id="cb83-13"><a href="#cb83-13" tabindex="-1"></a>  <span class="at">xlab  =</span> <span class="st">&quot;PRICE_num&quot;</span>,</span>
+<span id="cb83-14"><a href="#cb83-14" tabindex="-1"></a>  <span class="at">breaks =</span> <span class="dv">150</span>,</span>
+<span id="cb83-15"><a href="#cb83-15" tabindex="-1"></a>  <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">3</span>)</span>
+<span id="cb83-16"><a href="#cb83-16" tabindex="-1"></a>)</span>
+<span id="cb83-17"><a href="#cb83-17" tabindex="-1"></a></span>
+<span id="cb83-18"><a href="#cb83-18" tabindex="-1"></a><span class="fu">hist</span>(</span>
+<span id="cb83-19"><a href="#cb83-19" tabindex="-1"></a>  neg_prices<span class="sc">$</span>PRICE_num,</span>
+<span id="cb83-20"><a href="#cb83-20" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">&quot;Hist of Negative Prices&quot;</span>,</span>
+<span id="cb83-21"><a href="#cb83-21" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;Negative Prices&quot;</span>,</span>
+<span id="cb83-22"><a href="#cb83-22" tabindex="-1"></a>  <span class="at">breaks =</span> <span class="dv">50</span>,</span>
+<span id="cb83-23"><a href="#cb83-23" tabindex="-1"></a>  <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="sc">-</span><span class="dv">3</span>)</span>
+<span id="cb83-24"><a href="#cb83-24" tabindex="-1"></a>)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" width="624" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span></code></pre></div>
+<ul>
+<li>The magnitudes of negative prices are in the same general range as
+the positive bids.<br />
+</li>
+<li>This supports interpreting them as sign errors rather than truly
+negative CPM bids.</li>
+</ul>
+<p>We now define <code>PRICE_clean</code>:</p>
+<ul>
+<li>Sentinel and malformed values remain <code>NA</code>.<br />
+</li>
+<li>Negative numeric prices are flipped to positive (sign error
+correction).<br />
+</li>
+<li>All other values are kept as-is.<br />
+</li>
+<li>Helper columns are dropped.</li>
+</ul>
+<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb85-2"><a href="#cb85-2" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb85-3"><a href="#cb85-3" tabindex="-1"></a>    <span class="at">PRICE_clean =</span> <span class="fu">case_when</span>(</span>
+<span id="cb85-4"><a href="#cb85-4" tabindex="-1"></a>      <span class="fu">is.na</span>(PRICE_num) <span class="sc">~</span> <span class="cn">NA_real_</span>,   <span class="co"># malformed or sentinel</span></span>
+<span id="cb85-5"><a href="#cb85-5" tabindex="-1"></a>      PRICE_num <span class="sc">&lt;</span> <span class="dv">0</span>    <span class="sc">~</span> <span class="sc">-</span>PRICE_num, <span class="co"># interpret negatives as sign errors</span></span>
+<span id="cb85-6"><a href="#cb85-6" tabindex="-1"></a>      <span class="cn">TRUE</span>             <span class="sc">~</span> PRICE_num   <span class="co"># all other values unchanged</span></span>
+<span id="cb85-7"><a href="#cb85-7" tabindex="-1"></a>    )</span>
+<span id="cb85-8"><a href="#cb85-8" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb85-9"><a href="#cb85-9" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>PRICE_str, <span class="sc">-</span>PRICE_num)</span>
+<span id="cb85-10"><a href="#cb85-10" tabindex="-1"></a></span>
+<span id="cb85-11"><a href="#cb85-11" tabindex="-1"></a><span class="co"># Total rows where PRICE was altered in any way</span></span>
+<span id="cb85-12"><a href="#cb85-12" tabindex="-1"></a>n_price_affected <span class="ot">&lt;-</span> n_price_O <span class="sc">+</span> n_price_sentinel <span class="sc">+</span> n_price_neg_vals</span>
+<span id="cb85-13"><a href="#cb85-13" tabindex="-1"></a></span>
+<span id="cb85-14"><a href="#cb85-14" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Rows with PRICE typo/sentinel/negative sign adjusted: &quot;</span>,</span>
+<span id="cb85-15"><a href="#cb85-15" tabindex="-1"></a>    n_price_affected, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Rows with PRICE typo/sentinel/negative sign adjusted:  112</code></pre>
+<p>Log entry for pricing variable:</p>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb87-2"><a href="#cb87-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;PR1&quot;</span>,</span>
+<span id="cb87-3"><a href="#cb87-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;PRICE&quot;</span>,</span>
+<span id="cb87-4"><a href="#cb87-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;PRICE stored as character with a leading &#39;O&#39; typo, sentinel code -999, and 100 negative values of plausible magnitude.&quot;</span>,</span>
+<span id="cb87-5"><a href="#cb87-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Created numeric PRICE_clean; corrected leading &#39;O&#39; to &#39;0&#39;, parsed scientific notation, converted -999 to NA, and negated remaining negative prices to treat them as sign errors.&quot;</span>,</span>
+<span id="cb87-6"><a href="#cb87-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> n_price_affected</span>
+<span id="cb87-7"><a href="#cb87-7" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="summary-9" class="section level3">
+<h3>Summary</h3>
+<ul>
+<li><code>PRICE</code> was recorded as <code>character</code> and
+contained a mix of plain decimals, scientific notation, one obvious
+<code>&quot;O&quot;</code> <span class="math inline">\(\to\)</span>
+<code>&quot;0&quot;</code> typo, sentinel <code>-999</code> values, and negative
+prices with plausible magnitudes.<br />
+</li>
+<li>We created a cleaned numeric field <code>PRICE_clean</code> that:
+<ul>
+<li>Corrects the single <code>&quot;O&quot;</code> typo before parsing.<br />
+</li>
+<li>Parses scientific notation correctly.<br />
+</li>
+<li>Converts sentinel <code>-999</code> values to <code>NA</code>.<br />
+</li>
+<li>Treats remaining negative prices as sign errors and flips them to
+positive, based on their distribution and the presence of winning bids
+at those magnitudes.<br />
+</li>
+</ul></li>
+<li>No rows were dropped; invalid or unrecoverable price strings are
+represented as <code>NA</code> in <code>PRICE_clean</code>, preserving
+completeness while improving validity for downstream analysis.</li>
+</ul>
 <hr />
+</div>
 </div>
 <div id="latency-metric-response_time" class="section level2">
 <h2><strong>LATENCY METRIC:</strong> <code>RESPONSE_TIME</code></h2>
-<hr />
-</div>
-<div id="outcome-bid_won" class="section level2">
-<h2><strong>OUTCOME:</strong> <code>BID_WON</code></h2>
-<hr />
-<hr />
-</div>
-</div>
-<div id="variable" class="section level1">
-<h1><strong>VARIABLE</strong></h1>
-<div id="description-5" class="section level3">
+<div id="description-6" class="section level3">
 <h3>Description</h3>
 <ul>
 <li><code>VARIABLE</code>
@@ -3850,7 +4120,7 @@ fields.</li>
 </ul></li>
 </ul>
 </div>
-<div id="exploration-4" class="section level3">
+<div id="exploration-5" class="section level3">
 <h3>Exploration</h3>
 <p><strong>Observations</strong></p>
 <ul>
@@ -3865,26 +4135,94 @@ fields.</li>
 <li></li>
 </ul>
 </div>
-<div id="cleaning-4" class="section level3">
+<div id="cleaning-5" class="section level3">
 <h3>Cleaning</h3>
 <p>Log entries for time variables:</p>
-<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
-<span id="cb77-2"><a href="#cb77-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
-<span id="cb77-3"><a href="#cb77-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
-<span id="cb77-4"><a href="#cb77-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
-<span id="cb77-5"><a href="#cb77-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
-<span id="cb77-6"><a href="#cb77-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
-<span id="cb77-7"><a href="#cb77-7" tabindex="-1"></a>)</span>
-<span id="cb77-8"><a href="#cb77-8" tabindex="-1"></a></span>
-<span id="cb77-9"><a href="#cb77-9" tabindex="-1"></a><span class="fu">log_change</span>(</span>
-<span id="cb77-10"><a href="#cb77-10" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T2&quot;</span>,</span>
-<span id="cb77-11"><a href="#cb77-11" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;DATE_UTC&quot;</span>,</span>
-<span id="cb77-12"><a href="#cb77-12" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;DATE_UTC stored as character.&quot;</span>,</span>
-<span id="cb77-13"><a href="#cb77-13" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Converted to Date type.&quot;</span>,</span>
-<span id="cb77-14"><a href="#cb77-14" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
-<span id="cb77-15"><a href="#cb77-15" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb88-2"><a href="#cb88-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
+<span id="cb88-3"><a href="#cb88-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
+<span id="cb88-4"><a href="#cb88-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
+<span id="cb88-5"><a href="#cb88-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
+<span id="cb88-6"><a href="#cb88-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb88-7"><a href="#cb88-7" tabindex="-1"></a>)</span>
+<span id="cb88-8"><a href="#cb88-8" tabindex="-1"></a></span>
+<span id="cb88-9"><a href="#cb88-9" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb88-10"><a href="#cb88-10" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T2&quot;</span>,</span>
+<span id="cb88-11"><a href="#cb88-11" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;DATE_UTC&quot;</span>,</span>
+<span id="cb88-12"><a href="#cb88-12" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;DATE_UTC stored as character.&quot;</span>,</span>
+<span id="cb88-13"><a href="#cb88-13" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Converted to Date type.&quot;</span>,</span>
+<span id="cb88-14"><a href="#cb88-14" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb88-15"><a href="#cb88-15" tabindex="-1"></a>)</span></code></pre></div>
 </div>
-<div id="summary-9" class="section level3">
+<div id="summary-10" class="section level3">
+<h3>Summary</h3>
+<ul>
+<li></li>
+<li></li>
+</ul>
+<hr />
+</div>
+</div>
+<div id="outcome-bid_won" class="section level2">
+<h2><strong>OUTCOME:</strong> <code>BID_WON</code></h2>
+<div id="description-7" class="section level3">
+<h3>Description</h3>
+<ul>
+<li><code>VARIABLE</code>
+<ul>
+<li><strong>Type (dictionary):</strong> <code>TYPE</code><br />
+</li>
+<li><strong>Meaning:</strong></li>
+<li><strong>Expectation:</strong></li>
+<li><strong>Actual Type:</strong> <code>character</code></li>
+<li><strong>Missing:</strong> None</li>
+</ul></li>
+<li><code>VARIABLE</code>
+<ul>
+<li><strong>Type:</strong> <code>TYPE</code><br />
+</li>
+<li><strong>Meaning:</strong></li>
+<li><strong>Expectation:</strong></li>
+<li><strong>Actual:</strong> <code>character</code></li>
+<li><strong>Missing:</strong> None</li>
+</ul></li>
+</ul>
+</div>
+<div id="exploration-6" class="section level3">
+<h3>Exploration</h3>
+<p><strong>Observations</strong></p>
+<ul>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+<p><strong>Decisions:</strong></p>
+<ul>
+<li></li>
+<li></li>
+</ul>
+</div>
+<div id="cleaning-6" class="section level3">
+<h3>Cleaning</h3>
+<p>Log entries for time variables:</p>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb89-2"><a href="#cb89-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
+<span id="cb89-3"><a href="#cb89-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
+<span id="cb89-4"><a href="#cb89-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
+<span id="cb89-5"><a href="#cb89-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
+<span id="cb89-6"><a href="#cb89-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb89-7"><a href="#cb89-7" tabindex="-1"></a>)</span>
+<span id="cb89-8"><a href="#cb89-8" tabindex="-1"></a></span>
+<span id="cb89-9"><a href="#cb89-9" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb89-10"><a href="#cb89-10" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T2&quot;</span>,</span>
+<span id="cb89-11"><a href="#cb89-11" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;DATE_UTC&quot;</span>,</span>
+<span id="cb89-12"><a href="#cb89-12" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;DATE_UTC stored as character.&quot;</span>,</span>
+<span id="cb89-13"><a href="#cb89-13" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Converted to Date type.&quot;</span>,</span>
+<span id="cb89-14"><a href="#cb89-14" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb89-15"><a href="#cb89-15" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="summary-11" class="section level3">
 <h3>Summary</h3>
 <ul>
 <li></li>
@@ -3892,6 +4230,7 @@ fields.</li>
 </ul>
 <hr />
 <hr />
+</div>
 </div>
 </div>
 <div id="cleaned-dataset" class="section level1">
@@ -3920,13 +4259,13 @@ Each entry corresponds to a specific issue that was identified and the
 decision made to address it.</p>
 <div id="log" class="section level2">
 <h2>Log</h2>
-<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" tabindex="-1"></a>cleaning_log <span class="sc">%&gt;%</span></span>
-<span id="cb78-2"><a href="#cb78-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(step_id) <span class="sc">%&gt;%</span></span>
-<span id="cb78-3"><a href="#cb78-3" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
-<span id="cb78-4"><a href="#cb78-4" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Summary of Data-Cleaning Decisions&quot;</span>,</span>
-<span id="cb78-5"><a href="#cb78-5" tabindex="-1"></a>    <span class="at">align   =</span> <span class="st">&quot;l&quot;</span></span>
-<span id="cb78-6"><a href="#cb78-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb78-7"><a href="#cb78-7" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>, <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" tabindex="-1"></a>cleaning_log <span class="sc">%&gt;%</span></span>
+<span id="cb90-2"><a href="#cb90-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(step_id) <span class="sc">%&gt;%</span></span>
+<span id="cb90-3"><a href="#cb90-3" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb90-4"><a href="#cb90-4" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Summary of Data-Cleaning Decisions&quot;</span>,</span>
+<span id="cb90-5"><a href="#cb90-5" tabindex="-1"></a>    <span class="at">align   =</span> <span class="st">&quot;l&quot;</span></span>
+<span id="cb90-6"><a href="#cb90-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb90-7"><a href="#cb90-7" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>, <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>)</span></code></pre></div>
 <table class="table table-striped" style="color: black; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
 Summary of Data-Cleaning Decisions
@@ -4040,6 +4379,26 @@ Removed all rows belonging to auctions where n_won != 1.
 </tr>
 <tr>
 <td style="text-align:left;">
+PR1
+</td>
+<td style="text-align:left;">
+PRICE
+</td>
+<td style="text-align:left;">
+PRICE stored as character with a leading ‘O’ typo, sentinel code -999,
+and 100 negative values of plausible magnitude.
+</td>
+<td style="text-align:left;">
+Created numeric PRICE_clean; corrected leading ‘O’ to ‘0’, parsed
+scientific notation, converted -999 to NA, and negated remaining
+negative prices to treat them as sign errors.
+</td>
+<td style="text-align:left;">
+112
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 T1
 </td>
 <td style="text-align:left;">
@@ -4074,6 +4433,23 @@ Recover ‘NA’ dates using <code>DATE_UTC</code>; parsed to POSIXct (UTC).
 </tr>
 <tr>
 <td style="text-align:left;">
+T1
+</td>
+<td style="text-align:left;">
+TIMESTAMP
+</td>
+<td style="text-align:left;">
+Inconsistent TIMESTAMP formats, including ‘NA’ date tokens.
+</td>
+<td style="text-align:left;">
+Recover ‘NA’ dates using <code>DATE_UTC</code>; parsed to POSIXct (UTC).
+</td>
+<td style="text-align:left;">
+440705
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 T2
 </td>
 <td style="text-align:left;">
@@ -4087,6 +4463,23 @@ Converted to Date type.
 </td>
 <td style="text-align:left;">
 441535
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+T2
+</td>
+<td style="text-align:left;">
+DATE_UTC
+</td>
+<td style="text-align:left;">
+DATE_UTC stored as character.
+</td>
+<td style="text-align:left;">
+Converted to Date type.
+</td>
+<td style="text-align:left;">
+440705
 </td>
 </tr>
 <tr>
