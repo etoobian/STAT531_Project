@@ -137,9 +137,10 @@ This ensures correct working directory and project settings.
 Packages will normally auto-install when sourcing the scripts, but can also be installed manually:
 
 ```         
-required_packages <- c("arrow", "tibble",
-                       "dplyr", "stringr",
-                       "jsonlite", "tidyverse")
+required_packages <- c("arrow", "tibble", "tidyverse", "dplyr", "stringr", 
+                       "lubridate", "knitr", "kableExtra", "jsonlite", 
+                       "ggplot2", "summarytools", "GGally", 
+                       "FSelectorRcpp", "ggrepel", "modeest")
 
 install.packages(required_packages)
 ```
@@ -254,18 +255,26 @@ View(summary_tbl_raw)
 ad_clean <- clean_ad_data(ad_raw)
 ```
 
+**Note:** `clean_ad_data()` returns a cleaned tibble; 
+           it does not modify global variables.
+
 This function performs all cleaning steps, including:
 
-  - Reconstructing missing ZIP/CITY values
+  - Standardizing region codes (`DEVICE_GEO_REGION`)
+  - Correcting systematically shifted longitude values
+  - Preserving missing `ZIP`/`CITY` values
   - Correcting out-of-range geographic fields
-  - Cleaning malformed timestamps
+  - Cleaning malformed `TIMESTAMPS`
   - Repairing inconsistent field values
-  - Handling NAs
+  - Handling `NA`s
   - Removing duplicates
   - Enforcing consistent column types
   - Ensuring reproducible, well-structured final output
 
 ### Export the cleaned dataset (optional)
+
+**NOTE:** `clean_ad_data()` includes an argument `export = FALS`E (default). 
+           Set `export = TRUE` to write a parquet file automatically.
 
 ```
 export_ad_data(
@@ -389,6 +398,8 @@ This notebook serves as the narrative counterpart to `data_cleaning.R`.
 
 **Usage:**
 
+Functions and data are pulled into Rmd using:
+
 ```
 source("Project/scripts/data_io.R")
 
@@ -402,84 +413,3 @@ ad_clean <- load_ad_data(
   data_file   = "bids_data_clean_v1.parquet"
 )
 ```
-
----
-
-## `reports/` (Final Presentation)
-
-**Type:** Report / Slides
-
-**Purpose:** Final presentation summarizing cleaning, EDA, findings, and recommendations.
-
-**Location:** `Project/reports/`
-
-Example filenames:
-
-  - `final_presentation.pdf`
-  - `final_slideshow.`
-
-These files are generated manually or exported from R Markdown/Slides tools.
-
-
-
-<!-- NOTE TO TEAM:
-Add new scripts below using the template. -->
-
-Use this template exactly so our README stays cohesive:
-
-**Template for Adding a Script**
-
-Copy/paste and fill in:
-
-```
-### <script_name>.R 
-
-**Type:** script/notebook/report/etc
-
-**Purpose:** One-sentence description  
-
-**Location:** Project/scripts/<script_name>.R  
-
-**Functions Provided:**  
-  - func1() – what it does  
-  - func2() – what it does  
-
-**Example Usage:**  
-  # example usage commands here
-```
-------------------------------------------------------------------------
-
-
-**Where to put new files**
-
-| Type of File                           | Folder                    |
-| -------------------------------------- | ------------------------- |
-| Data cleaning / transformation scripts | `Project/scripts/`        |
-| Helpers / utilities                    | `Project/scripts/`        |
-| EDA notebooks                          | `Project/notebooks/`      |
-| Plots / visualizations                 | `Project/results/`        |
-| Processed datasets                     | `Project/data/processed/` |
-| Report sections                        | `Project/reports/`        |
-
-
-When adding a new script:
-
--   Place it in `Project/scripts/`
--   Use the **script index template** above to document it
--   Keep function names descriptive and consistent
--   Include example usage where possible
-
-# **Notes for Completion** (Will Be Removed Later)
-
-```{=html}
-<!-- NOTE TO TEAM:
-This section should NOT appear in the final deliverable.
-It is only guidance during development. -->
-```
-
--   Keep this README updated as scripts are added
--   Maintain consistent naming patterns
--   Keep examples short and copy/paste friendly
--   Do NOT add EDA results or report content here
--   Before final submission, we will prune placeholder notes
-
