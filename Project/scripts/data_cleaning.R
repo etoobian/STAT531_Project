@@ -4,172 +4,209 @@
 # ------------------------------------------------------------------
 # Purpose:
 #   - Load raw ad bidding data (via `load_ad_data()` from `data_io.R`)
-#   - Apply all team, agreed-upon cleaning steps
-#   - Leave a cleaned tibble in the environment (currently `ad_clean`)
-#   - Export cleaned data parquet file
-#
-# NOTES:
-#   - A future branch will refactor this into a reusable function:
-#       clean_ad_data <- function(ad_raw) { ... }
-#   - Code with three pound signs are for individual alterations to the data.
-#   - NA's are used in cases where data is otherwise irretrievable.
-#   - Any remaining NA's at the end of execution will be removed as they have been deemed irretrievable.
+#   - Apply all team-agreed cleaning steps (same Logic/Order as Rmd)
+#   - Leave a cleaned tibble in the environment (`ad_clean`)
+#   - Optionally export cleaned data parquet file via `export_ad_data`
 # ------------------------------------------------------------------
 
-# --------------------------------
-# Import additional dependencies 
-# --------------------------------
+# =====================================================================
+# clean_ad_data()
+# =====================================================================
 
-needed_pkgs <- c("stringr", "jsonlite", "dplyr", "tidyverse", "arrow")
-for (pkg in needed_pkgs) {
-  if (!requireNamespace(pkg, quietly = TRUE)) {
-    install.packages(pkg)
-  }
+clean_ad_data <- function(ad_raw) {
+  
+  suppressPackageStartupMessages({
+    library(dplyr)
+    library(tidyr)
+    library(stringr)
+    library(lubridate)
+  })
+  
+  message("Starting cleaning pipeline...")
+  
+  # ------------------------------------------------------------------
+  # GLOBAL: Remove exact duplicates
+  # ------------------------------------------------------------------
+  ad_clean <- ad_raw %>% distinct()
+  message(" - Exact duplicates removed.")
+  
+  # ------------------------------------------------------------------
+  # TIME VARIABLES ----------------------------------------------------
+  # ------------------------------------------------------------------
+  message(" - Cleaning TIMESTAMP and DATE_UTC...")
+  
+  ad_clean <- ad_clean %>%
+    mutate(
+      ts_date_raw = str_extract(TIMESTAMP, "^[^ ]+"),
+      ts_time_raw = str_extract(TIMESTAMP, "\\d{1,2}:\\d{1,2}:\\d{1,2}")
+    ) %>%
+    mutate(
+      TIMESTAMP_fixed = case_when(
+        ts_date_raw == "NA" &
+          !is.na(DATE_UTC) &
+          !is.na(ts_time_raw) ~ paste(DATE_UTC, ts_time_raw),
+        TRUE ~ TIMESTAMP
+      )
+    ) %>%
+    mutate(
+      TIMESTAMP_clean = parse_date_time(
+        TIMESTAMP_fixed,
+        orders = c("ymd HMS", "mdy HMS"),
+        tz = "UTC"
+      ),
+      DATE_UTC_clean = as.Date(DATE_UTC)
+    )
+  
+  # ------------------------------------------------------------------
+  # IDENTIFIERS -------------------------------------------------------
+  # ------------------------------------------------------------------
+  message(" - Cleaning AUCTION_ID / removing invalid auctions...")
+  
+  auction_win_summary <- ad_clean %>%
+    group_by(AUCTION_ID) %>%
+    summarise(
+      n_rows = n(),
+      n_won  = sum(BID_WON == "TRUE", na.rm = TRUE),
+      n_lost = sum(BID_WON == "FALSE", na.rm = TRUE),
+      .groups = "drop"
+    )
+  
+  invalid_ids <- auction_win_summary %>%
+    filter(n_won != 1) %>%
+    pull(AUCTION_ID)
+  
+  ad_clean <- ad_clean %>%
+    filter(!AUCTION_ID %in% invalid_ids) %>%
+    mutate(
+      AUCTION_ID_clean   = str_trim(AUCTION_ID),
+      PUBLISHER_ID_clean = str_trim(PUBLISHER_ID)
+    )
+  
+  # ------------------------------------------------------------------
+  # DEVICE_TYPE -------------------------------------------------------
+  # ------------------------------------------------------------------
+  message(" - Passing through DEVICE_TYPE...")
+  ad_clean <- ad_clean %>%
+    mutate(DEVICE_TYPE_clean = DEVICE_TYPE)
+  
+  # ------------------------------------------------------------------
+  # GEOLOCATION -------------------------------------------------------
+  # ------------------------------------------------------------------
+  message(" - Cleaning geolocation fields...")
+  
+  # REGION
+  ad_clean <- ad_clean %>%
+    mutate(
+      DEVICE_GEO_REGION_clean = case_when(
+        DEVICE_GEO_REGION %in% c("OR", "Or", "oregon", "xor") ~ "OR",
+        TRUE ~ NA_character_
+      )
+    )
+  
+  # CITY (keep as-is)
+  ad_clean <- ad_clean %>%
+    mutate(DEVICE_GEO_CITY_clean = DEVICE_GEO_CITY)
+  
+  # ZIP (sentinels only)
+  ad_clean <- ad_clean %>%
+    mutate(
+      DEVICE_GEO_ZIP_clean = case_when(
+        DEVICE_GEO_ZIP %in% c("-999") ~ NA_character_,
+        TRUE ~ DEVICE_GEO_ZIP
+      )
+    )
+  
+  # LAT & LONG (apply +10 correction)
+  ad_clean <- ad_clean %>%
+    mutate(
+      DEVICE_GEO_LAT_clean = DEVICE_GEO_LAT,
+      DEVICE_GEO_LONG_clean = case_when(
+        DEVICE_GEO_LONG < -125 | DEVICE_GEO_LONG > -116 ~ DEVICE_GEO_LONG + 10,
+        TRUE ~ DEVICE_GEO_LONG
+      )
+    )
+  
+  # ------------------------------------------------------------------
+  # AD SIZES ----------------------------------------------------------
+  # ------------------------------------------------------------------
+  message(" - Passing through ad size fields...")
+  
+  ad_clean <- ad_clean %>%
+    mutate(
+      REQUESTED_SIZES_clean = REQUESTED_SIZES,
+      SIZE_clean            = SIZE
+    )
+  
+  # ------------------------------------------------------------------
+  # PRICE -------------------------------------------------------------
+  # ------------------------------------------------------------------
+  message(" - Cleaning PRICE...")
+  
+  ad_clean <- ad_clean %>%
+    mutate(
+      PRICE_str = str_replace(PRICE, "^O", "0"),
+      PRICE_num = suppressWarnings(as.numeric(PRICE_str)),
+      PRICE_num = if_else(PRICE_num == -999, NA_real_, PRICE_num),
+      PRICE_clean = case_when(
+        is.na(PRICE_num) ~ NA_real_,
+        PRICE_num < 0    ~ -PRICE_num,
+        TRUE ~ PRICE_num
+      )
+    ) %>%
+    select(-PRICE_str, -PRICE_num)
+  
+  # ------------------------------------------------------------------
+  # RESPONSE_TIME -----------------------------------------------------
+  # ------------------------------------------------------------------
+  message(" - Cleaning RESPONSE_TIME...")
+  
+  ad_clean <- ad_clean %>%
+    mutate(
+      RESPONSE_TIME_clean = RESPONSE_TIME %>%
+        str_replace("^[^0-9]+", "") %>%
+        str_replace("[^0-9]+$", "") %>%
+        as.numeric()
+    )
+  
+  # ------------------------------------------------------------------
+  # BID_WON -----------------------------------------------------------
+  # ------------------------------------------------------------------
+  message(" - Cleaning BID_WON / removing multi-winner auctions...")
+  
+  auction_win_summary2 <- ad_clean %>%
+    group_by(AUCTION_ID) %>%
+    summarise(
+      n_won = sum(BID_WON %in% c("TRUE", "true"), na.rm = TRUE),
+      .groups = "drop"
+    )
+  
+  multiwin_ids <- auction_win_summary2 %>%
+    filter(n_won > 1) %>%
+    pull(AUCTION_ID)
+  
+  ad_clean <- ad_clean %>%
+    mutate(
+      BID_WON_clean = case_when(
+        BID_WON %in% c("TRUE", "true") ~ TRUE,
+        BID_WON %in% c("FALSE")        ~ FALSE,
+        TRUE ~ NA
+      )
+    ) %>%
+    filter(!AUCTION_ID %in% multiwin_ids)
+  
+  # ------------------------------------------------------------------
+  # ASSEMBLE FINAL CLEAN DATASET -------------------------------------
+  # ------------------------------------------------------------------
+  message(" - Assembling final dataset...")
+  
+  clean_cols <- names(ad_clean)[str_detect(names(ad_clean), "_clean$")]
+  
+  ad_clean <- ad_clean %>%
+    select(all_of(clean_cols))
+  
+  names(ad_clean) <- str_replace(names(ad_clean), "_clean$", "")
+  
+  message("Cleaning completed. Final rows: ", nrow(ad_clean))
+  
+  return(ad_clean)
 }
-
-library(stringr)
-library(jsonlite)
-library(dplyr)
-library(tidyverse)
-library(arrow)
-
-# ------------------------------------------------------------------
-# Load base raw data into cumulative_ad_data
-# ------------------------------------------------------------------
-source("Project/scripts/data_io.R")
-cumulative_ad_data <- load_ad_data(preview = FALSE)
-
-# ------------------------------------------------------------------
-#  FINAL DECISIONS REGARDING THE FATE OF ERRORS/INCONSISTENCIES
-# ------------------------------------------------------------------
-
-#  Template:
-#   - [KEY(S)] <DATATYPE(S)>
-#   + Decision
-#   + Code
-#   + Return Type
-
-message("\nStarted cleaning up NA values...")
-
-
-message("Cleaning DEVICE_GEO_ZIP [1]...")
-#   + NA values that exist in DEVICE_GEO_ZIP will be recovered using DEVICE_GEO_LAT and DEVICE_GEO_LONG.
-cumulative_ad_data <- ungroup(mutate(.data=group_by(.data=cumulative_ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_ZIP=if_else(is.na(DEVICE_GEO_ZIP), first(DEVICE_GEO_ZIP[!is.na(DEVICE_GEO_ZIP)]), DEVICE_GEO_ZIP)))
-message("Finished cleaning DEVICE_GEO_ZIP.")
-
-
-message("Cleaning DEVICE_GEO_CITY [1]...")
-#   + NA values that exist in DEVICE_GEO_CITY will be recovered using DEVICE_GEO_LAT and DEVICE_GEO_LONG
-cumulative_ad_data <- ungroup(mutate(.data=group_by(.data=cumulative_ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_CITY=if_else(is.na(DEVICE_GEO_CITY), first(DEVICE_GEO_CITY[!is.na(DEVICE_GEO_CITY)]), DEVICE_GEO_CITY)))
-message("Finished cleaning DEVICE_GEO_CITY.")
-
-
-message("\nFinished cleaning up NA values.")
-
-
-message("\nStarted cleaning of inconsistencies and errors...\n")
-
-
-#  Decision:
-message("Truncating duplicates...")
-#   + It has been confirmed that the duplicates are not natural.
-cumulative_ad_data <- unique(cumulative_ad_data)
-message("Finished truncating duplicates.")
-
-
-message("Cleaning PRICE [1]...")
-#   + After accounting for the all values that would result in NA when converting to numeric, PRICE shall now take on the numeric type.
-#     There existed only one instance where the value would need to be modified prior to conversion.
-idx <- which(substr(cumulative_ad_data$PRICE, 1, 1)=="O")
-cumulative_ad_data$PRICE[idx] <- sub("^O", "0", cumulative_ad_data$PRICE[idx])
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, PRICE=as.numeric(PRICE))
-rm(idx)
-message("Cleaning PRICE [2]...")
-#   + Removing hard set nonpositive nonzero values as there is no meaningful way of retrieving the original data.
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, PRICE=if_else(PRICE==-999, NA, PRICE))
-message("Cleaning PRICE [3]...")
-#   + Converting remaining nonpositive nonzero values to their positive counterparts. Shown viable through histograms.
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, PRICE=if_else(PRICE < 0, -PRICE, PRICE))
-message("Finished cleaning PRICE.")
-
-
-message("Cleaning DEVICE_GEO_ZIP [1]...")
-#   + DEVICE_GEO_ZIP shall take on the integer type for processing, then be converted back to character.
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, DEVICE_GEO_ZIP=as.integer(DEVICE_GEO_ZIP))
-message("Cleaning DEVICE_GEO_ZIP [2]...")
-#   + ZIPS with negative values (or values that exist below 9000 (doesn't exist)) are retrievable given by:
-#     print(summarize(.data=group_by(.data=ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG, DEVICE_GEO_CITY, DEVICE_GEO_ZIP), count=n()), n=320)
-#     where DEVICE_GEO_LONG and DEVICE_GEO_LAT can be utilized to match zip codes.
-#     Algorithm: Group by Lat, Long, if there exists a group that contains an invalid DEVICE_GEO_ZIP value, 
-#     along with a valid DEVICE_GEO_ZIP value, it will set the invalid DEVICE_GEO_ZIP value to that of the first valid DEVICE_GEO_ZIP value within the same group.
-cumulative_ad_data <- ungroup(mutate(.data=group_by(.data=cumulative_ad_data, DEVICE_GEO_LAT, DEVICE_GEO_LONG), DEVICE_GEO_ZIP=if_else(DEVICE_GEO_ZIP < 9000, first(DEVICE_GEO_ZIP[DEVICE_GEO_ZIP>9000]), DEVICE_GEO_ZIP)))
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, DEVICE_GEO_ZIP=as.character(DEVICE_GEO_ZIP))
-message("Finished cleaning DEVICE_GEO_ZIP.")
-
-
-message("Cleaning RESPONSE_TIME [1]...")
-#   + Reformating entries to have values given by the digits characters of the initial values, then converted such that RESPONSE_TIME shall now take on type integer.
-#     Utilizing regex: ^ = start of string, .*? = any characters, \\d = instance of a digit (extra \ to account for the fact that \ is a special character), 
-#     + = continue whatever match case until it no longer matches (in this case, match digits until next character isn't a digit).
-#     () = capturing group (what we want to capture),
-#     .* = discard rest of string.
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, RESPONSE_TIME = sub("^.*?(\\d+).*", "\\1", cumulative_ad_data$RESPONSE_TIME)) # Removes all but the numeric characters.
-message("Cleaning RESPONSE_TIME [2]...")
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, RESPONSE_TIME=as.integer(RESPONSE_TIME)) # Swaps the datatype over to integers.
-message("Finished cleaning RESPONSE_TIME.")
-
-
-message("Cleaning TIMESTAMP, DATE_UTC [1]...")
-#   + Providing a single format for which there will be better utilization later.
-#     Utilizing regex: "^.*\\s(\\S+)$" looks for the first non-whitespace string starting from the back.
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, TIMESTAMP = sub("^.*\\s(\\S+)$", "\\1", cumulative_ad_data$TIMESTAMP))
-message("Cleaning TIMESTAMP, DATE_UTC [2]...")
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, TIMESTAMP=as.POSIXct(paste(DATE_UTC, TIMESTAMP, sep=" "), format="%Y-%m-%d %H:%M:%S", tz="UTC"))
-message("Finished cleaning TIMESTAMP, DATE_UTC.")
-
-
-message("Cleaning REQUESTED_SIZE, SIZE [1]...")
-#   + Converting REQUESTED_SIZES back into an array of character vectors.
-#     It is good to note that the form in which REQUESTED_SIZES value takes is that of a JSON string.
-cumulative_ad_data <- ungroup(mutate(.data=rowwise(cumulative_ad_data), REQUESTED_SIZES=list(fromJSON(REQUESTED_SIZES))))
-message("Finished cleaning REQUESTED_SIZE, SIZE.")
-
-
-message("Cleaning DEVICE_GEO_LONG [1]...")
-#   + Modifying the invalid values in DEVICE_GEO_LONG. Utilizes DEVICE_GEO_LAT and modified DEVICE_GEO_LONG to search for existing DEVICE_GEO_LONG values.
-#   + Rounding is utilized in order to account for small floating-point error differences that are introduced when adding by 10.
-lat_of_has_over_long_val <- filter(.data=cumulative_ad_data, DEVICE_GEO_LONG < -130)$DEVICE_GEO_LAT
-filter(.data=summarize(.data=group_by(.data=filter(.data=cumulative_ad_data, DEVICE_GEO_LAT %in% lat_of_has_over_long_val), DEVICE_GEO_LAT, DEVICE_GEO_ZIP), n=n_distinct(DEVICE_GEO_LONG)), n>1)
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, DEVICE_GEO_LONG=if_else(DEVICE_GEO_LONG < -130, DEVICE_GEO_LONG + 10, DEVICE_GEO_LONG))
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, DEVICE_GEO_LONG = round(DEVICE_GEO_LONG, 10), DEVICE_GEO_LAT = round(DEVICE_GEO_LAT, 8))
-filter(.data=summarize(.data=group_by(.data=filter(.data=cumulative_ad_data, DEVICE_GEO_LAT %in% lat_of_has_over_long_val), DEVICE_GEO_LAT, DEVICE_GEO_ZIP), n=n_distinct(DEVICE_GEO_LONG)), n>1)
-rm(lat_of_has_over_long_val)
-message("Finished cleaning DEVICE_GEO_LONG.")
-
-
-message("Cleaning DEVICE_GEO_REGION [1]...")
-#   + Setting all values to OR.
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, DEVICE_GEO_REGION="OR")
-message("Finished cleaning DEVICE_GEO_REGION.")
-
-
-message("Cleaning BID_WON [1] ...")
-#   + BID_WON shall now take on the logical type.
-cumulative_ad_data <- mutate(.data=cumulative_ad_data, BID_WON=ifelse(tolower(BID_WON)=="true", TRUE, FALSE))
-message("Finished cleaning BID_WON.")
-
-
-message("\nFinished cleaning up inconsistencies and errors.")
-
-
-message("\nTruncating all remaining NA values...")
-cumulative_ad_data <- na.omit(cumulative_ad_data)
-message("\nFinished truncating all remaining NA values.")
-
-
-message("\nFinal check for duplicates...")
-cumulative_ad_data <- unique(cumulative_ad_data)
-message("\nFinished checking for duplicates.")
-
-
-message("\nFinished the cleaning procedure.")
