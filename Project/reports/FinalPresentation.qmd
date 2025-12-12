@@ -20,6 +20,7 @@ editor: visual
 - **Summary:** A collaborative workflow demonstrating data cleaning, reproducibility, and exploratory analysis on Oregon advertising auction data.
 
 ::: notes
+✅
 Professor's requirement: 
 - Project title 
 - Team members 
@@ -41,6 +42,7 @@ Professor's requirement:
 Previously known as **KTC (Kentucky Thighed Chicken)** before the team reformed.
 
 ::: notes
+✅
 Optional slide. Can add pic if we make one. (KTC Chicken?? New one??) Can be skipped if time is tight.
 :::
 
@@ -50,7 +52,7 @@ Optional slide. Can add pic if we make one. (KTC Chicken?? New one??) Can be ski
 
 ## Dataset Context
 
-- Parquet dataset of Oregon digital ad auctions
+- Parquet dataset of Oregon digital ad auctions:
     - A prebid server handles online ad auctions where bidders submit CPM bids.
     - Individual bidders may bid on multiple sizes
     - Each row represents **a bid within a prebid auction**.
@@ -60,21 +62,44 @@ Optional slide. Can add pic if we make one. (KTC Chicken?? New one??) Can be ski
     - Device Type
 
 ::: note
+✅
 Contains intentionally inserted data-quality issues
 :::
 
-## Guiding Questions (examples)
+## Guiding Questions
+    
+What findings can we deduce from:
 
+- Checking usage of individual device types by city?
+    
+To help us deduce to what extent does:
+
+- Device type impact response time?
+- Geographic location impact response time?
+- Response time impact the bid (price)?
+    - By extension, geographic location impact bid (price)?
+
+::: notes
+✅✅✅✅
 - What patterns appear across time, device type, and geography?
 - How does missingness or inconsistency affect analysis?
 - What behaviors or trends characterize Oregon's ad ecosystem?
+:::
 
-## Why These Questions Matter (examples)
+## Why These Questions Matter
 
+These questions will help us by:
+
+- Providing us insight to how geospatial data can be utilized to uncover potential issues regarding latency, which can improve overall bidding procedure.
+- How to accommodate different device types to ensure fair bidding procedures.
+- General understanding of how certain predictors influence each other will prove beneficial when looking to maximize bid prices and potentially reduce or standardize a maximum response time.
+
+::: notes
+✅✅✅✅
 - Ethical concerns around targeting and bias
 - Interpretability and decision-making
 - Understanding data reliability and uncertainty
-
+:::
 ::: notes
 Professor's requirement (Section 2): 
 - Basic data set context 
@@ -92,9 +117,9 @@ Will be covered by Khloud.
 
 ## Roles & Responsibilities
 
-- **Chris** — ED Analyst, Visualizer, Guiding Question Refinement
+- **Chris** — EDA, Visualizer, Guiding Question Refinement
 - **Takeshi** — Data Cleaner, Scribe, Presentation Editor.
-- **Esther** — GitHub/Project Coordinator, ED Analyst, Reproducibility Enforcer.
+- **Esther** — GitHub/Project Coordinator, Data Cleaner.
 - **Khloud** — Data Cleaner, Presentation Editor.
 
 ## Coordination Tools
@@ -107,6 +132,7 @@ Will be covered by Khloud.
 Through the combination of Github, Jira, and a rigid commit/PR routine outlined by checklists/workflows that we agreed upon ensured we ran into minimal issues with the completion of this project.
 
 ::: notes
+✅
 Professor's requirement (Section 2): 
 - The roles you assigned within the team and how you coordinated work: 
 – GitHub workflow (branches, pull requests, commits) 
@@ -125,9 +151,10 @@ Refer to Team Docs for greater depth of detail while presenting?
 - Text and Value Inconsistencies.
 - Implausible Values and Sentinels.
 - Missing Information.
-- Duplicates and Near-duplicates.
+- Duplicates and Keys.
 
 ::: notes
+✅
 Professor's Section 3.1 — Key Issues You Found. Goal: show variety and importance of issues before deep-diving.
 
 - Missingness patterns across multiple columns
@@ -141,6 +168,7 @@ Professor's Section 3.1 — Key Issues You Found. Goal: show variety and importa
 ------------------------------------------------------------------------
 
 ::: notes
+✅
 Will be covered by Takeshi.
 :::
 
@@ -170,7 +198,7 @@ Issues pertaining to certain columns, like PRICE, were crucial to remedy because
 
 - These columns are crucial for exploring the guiding questions.
 - Directly contradicted the data dictionary provided by the client.
-- 
+
 
 ## Cleaning Strategy
 
@@ -181,6 +209,7 @@ Issues pertaining to certain columns, like PRICE, were crucial to remedy because
 ------------------------------------------------------------------------
 
 ::: notes
+✅
 Will be covered by Khloud.
 :::
 
@@ -219,14 +248,15 @@ Similar to the prior issue, with some additions:
 ------------------------------------------------------------------------
 
 ::: notes
+✅
 Will be covered by Khloud.
 :::
 
-# Issue 3: <br>Missing Information
+# Issue 3: <br>Missing Values
 
 ## Description
 
-Missing information refers to fields recorded as NA or left blank across one or more rows and/or columns. Furthermore, there is a need to distinguish if these missing values are a feature of the dataset or bad data.
+Missing values refers to fields recorded as NA or left blank across one or more rows and/or columns. Furthermore, there is a need to distinguish if these missing values are a feature of the dataset or bad data.
 
 ## Examples 
 
@@ -254,32 +284,28 @@ These NA values can directly impact the analysis of certain columns, and in the 
 
 ---
 
-# Issue 4: <br>Duplicates and Near-Duplicates
+# Issue 4: <br>Duplicates and Keys
 
 ## Description
 
-Duplicate rows contain the exact same information for every single column. Near-duplicate rows contain the exact same information for key columns that pertain to future exploration.
-
-## Examples
-
-Example of Near-Duplicates (excluding geolocational metadata):
-
-- Grouping by AUCTION_ID, PUBLISHER_ID, RESPONSE_TIME, PRICE and SIZE results in duplicate rows.
+Duplicate rows contain the exact same information for every single column. Keys pertain to the ability to uniquely identify rows given the least amount of unique columns.
 
 ## Why It Matters
 
-Having duplicate/near-duplicate data:
+Having duplicate data inflates the amount of rows, which can skew results.
 
-- Inflates the amount of rows, which can skew results.
-- Puts to question the validity of final conclusions once analysis is performed.
+\
+
+It is intended for there to be a specific key given by the data dictionary, but is not present in the data.
 
 ## Cleaning Strategy (Fix Summary) 
 
-- Principle: Remove duplicates/acknowledge near-duplicates.
-- Implementation: Remove duplicates; identify near-duplicates through grouping on key fields; determine potential impact of near-duplicates.
+- Principle: Remove rows with identical values in each column.
+- Implementation: Remove duplicates.
 - Example: Remove Duplicates by Taking Uniqueness.
 
 ::: notes 
+✅
 Professor's Section 3.2 — Cleaning Strategy: 
 - What you observed 
 - Why it was a problem 
@@ -315,9 +341,9 @@ Repeat this pattern for all Issues if needed, or combine smaller issues on a sin
 - .../STAT531_Project/Project (root):
     - data/ (local, git-ignored)
     - scripts/ (modular R scripts)
-    - docs/ (Rmd and Quarto files)
-    - reports/ (saved plots)
-- Snake case naming convention utilized.
+    - notebooks/ (Rmd/knitted files)
+    - results/ (saved plots)
+- Snake case naming convention utilized (excluding team documents).
 - Modularity achieved through the distinction of tasks.
 
 ## Documentation Practices
@@ -327,7 +353,17 @@ Repeat this pattern for all Issues if needed, or combine smaller issues on a sin
 -   Commit history shows frequent contributions from all team members.
 -   Pull requestss used for review and discussion of content.
 
+## Team Documents
+
+- .../STAT531_Project/Project (root):
+    - GitWorkflow.md 
+    - PR_Checklist.md
+    - TeamCharter.md
+    - TeamCheckInEntries/ (check in folder)
+    - TeamCheckInTeamplate.md
+
 ::: notes
+✅
 Professor's Section 3.3 — Reproducibility and Workflow: 
 - Git usage (branches, PRs, conflicts) 
 - Script modularity and readability 
@@ -341,6 +377,14 @@ Professor's Section 3.3 — Reproducibility and Workflow:
 
 ## Overview Patterns (likely split into multiple slides or infor below)
 
+::: notes 
+PLOTS:
+- Distributions.
+- Key Relationships.
+- Missinginess profiles (from data_io.R)
+- Surprising patterns.
+:::
+
 ::::: columns
 ::: columns
 ### Figures (Placeholders)
@@ -349,7 +393,7 @@ Professor's Section 3.3 — Reproducibility and Workflow:
 -   Placeholder: Key relationship plot
 -   Placeholder: Missingness heatmap
 
-(Example: save as figs/eda_overview_distributions.png,
+(Example: save as reports/eda_overview_distributions.png,
 figs/eda_overview_relationships.png, figs/eda_missingness.png)
 :::
 
