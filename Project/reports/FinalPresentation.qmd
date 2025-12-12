@@ -377,6 +377,8 @@ Professor's Section 3.3 — Reproducibility and Workflow:
 
 ## Overview Patterns (likely split into multiple slides or infor below)
 
+![Test](/results/Latitude-1.png)
+
 ::: notes 
 PLOTS:
 - Distributions.
