@@ -94,14 +94,14 @@ This notebook documents the full data-cleaning workflow for the Oregon ad biddin
 
 We begin with a high-level look at the raw dataset.
 
-```{r overview-dims, message=FALSE, 'hold'=TRUE}
+```{r overview-dims, message=FALSE, results='hold'}
 # Dimensions
 n_rows <- nrow(ad_raw)
 n_cols <- ncol(ad_raw)
 
 dim_table <- tibble(
   Metric = c("Number of Rows", "Number of Columns"),
-             Value = c(n_rows, n_cols)
+             Value = c(n_rows, n_cols),
 )
 
 dim_table %>%
@@ -1734,8 +1734,8 @@ auction_win_summary <- ad_clean %>%
   group_by(AUCTION_ID) %>%
   summarise(
     n_rows = n(),
-    n_won  = sum(BID_WON == "TRUE",  na.rm = TRUE),
-    n_lost = sum(BID_WON == "FALSE", na.rm = TRUE),
+    n_won  = sum(BID_WON %in% c("TRUE", "true"),  na.rm = TRUE),
+    n_lost = sum(BID_WON %in% c("FALSE"),         na.rm = TRUE),
     .groups = "drop"
   )
 
@@ -1747,16 +1747,30 @@ cat("Auctions with >1 winning bid:  ", nrow(auctions_multiwin), "\n")
 cat("Auctions with 0 winning bids:  ", nrow(auctions_zerowin),  "\n")
 ```
 
+We see that converting both `"TRUE"` and `"true"` to `TRUE` results in **9 auctions with multiple winners**.
+
+We see how many rows this affects by inspecting associated `AUCTION_ID`'s:
+```{r multiwin-rowcheck}
+multiwin_ids <- auctions_multiwin$AUCTION_ID
+
+multiwin_rows <- ad_clean %>%
+  filter(AUCTION_ID %in% multiwin_ids) %>%
+  nrow()
+
+cat("Rows in multi-winner auctions: ", multiwin_rows, "\n")
+```
+
 **Observations**
 
   - `BID_WON` is stored as a character flag rather than a logical variable.
   - There are three distinct values for `BID_WON`: `"FALSE"`, `"TRUE"`, `"true"`
-  - We verified there is still **exactly one winner** per `AUCTION_ID`.
+  - We found there are **9 auctions** and **`r multiwin_rows` associated rows** which now violate the **exactly one winner** per `AUCTION_ID` criteria.
 
 **Decisions**
 
   - Convert `BID_WON` from a character flag into a proper logical variable `BID_WON_clean`.  
   - Map `"TRUE"` and `"true"` to `TRUE`, and `"FALSE"` to `FALSE`. 
+  - Since an auction must have *exactly one* winner and the number of affected rows is very small, we remove all auctions where `n_won != 1`.
 
 ### Cleaning
 
@@ -1776,6 +1790,19 @@ n_bid_won_na <- sum(is.na(ad_clean$BID_WON_clean))
 
 cat("Rows with NA in BID_WON_clean after recoding: ",
     n_bid_won_na, "\n")
+
+# Remove auctions that violate the "exactly one winner" rule
+invalid_ids_bw <- auctions_multiwin$AUCTION_ID
+
+n_bw_invalid_rows <- ad_clean %>%
+  filter(AUCTION_ID %in% invalid_ids_bw) %>%
+  nrow()
+
+ad_clean <- ad_clean %>%
+  filter(!AUCTION_ID %in% invalid_ids_bw)
+
+cat("Rows removed due to multi-winner auctions: ",
+    n_bw_invalid_rows, "\n")
 ```
 
 Log entry for outcome variable:
@@ -1788,14 +1815,22 @@ log_change(
   decision = "Standardized to logical BID_WON_clean by mapping TRUE/true to TRUE and FALSE to FALSE.",
   rows_affected = nrow(ad_clean)
 )
+
+log_change(
+  step_id = "BW2",
+  variable = "BID_WON",
+  issue = "Auctions with multiple winning bids after standardizing TRUE/true.",
+  decision = "Removed all rows belonging to the 9 multi-winner auctions.",
+  rows_affected = n_bw_invalid_rows
+)
 ```
 
 ### Summary
 
   - `BID_WON` is a key outcome flag but was stored as a character variable with three distinct encodings: `"FALSE"`, `"TRUE"`, and `"true"`.  
-  - We created `BID_WON_clean`, a logical TRUE/FALSE variable, by mapping these string encodings and reserving `NA` for any future unexpected labels.  
-  - A separate earlier step removed auctions with zero or multiple winners; this section only verified the “exactly one winner per auction” structure was preserved.
-   
+  - We created `BID_WON_clean`, a logical TRUE/FALSE variable, by mapping `"TRUE"`/`"true"` to `TRUE` and `"FALSE"` to `FALSE`, reserving `NA` for any unexpected future labels.  
+  - Using this unified winner flag, we identified a small set of auctions with more than one winner. These auctions violate the business rule of “exactly one winner per auction,” so all rows belonging to those auctions were removed from the cleaned dataset.
+
 ---
 
 ---
@@ -1867,8 +1902,8 @@ If re-run with further changes, bump the `version` string (e.g., `"clean_v2"`) o
 ```{r export-cleaned-data, eval=FALSE}
 export_path <- export_ad_data(
   df      = ad_clean,
-  version = "clean_v1"
-  # overwrite = FALSE  # set to TRUE only if intentionally replacing an existing file
+  version = "clean_v1",
+  overwrite = FALSE  # set to TRUE only if intentionally replacing an existing file
 )
 
 export_path

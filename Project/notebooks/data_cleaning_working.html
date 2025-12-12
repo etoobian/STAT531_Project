@@ -1760,7 +1760,7 @@ auction</li>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>dim_table <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
 <span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  <span class="at">Metric =</span> <span class="fu">c</span>(<span class="st">&quot;Number of Rows&quot;</span>, <span class="st">&quot;Number of Columns&quot;</span>),</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>             <span class="at">Value =</span> <span class="fu">c</span>(n_rows, n_cols)</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>             <span class="at">Value =</span> <span class="fu">c</span>(n_rows, n_cols),</span>
 <span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>)</span>
 <span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a></span>
 <span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>dim_table <span class="sc">%&gt;%</span></span>
@@ -4274,8 +4274,8 @@ won per auction:</p>
 <span id="cb98-2"><a href="#cb98-2" tabindex="-1"></a>  <span class="fu">group_by</span>(AUCTION_ID) <span class="sc">%&gt;%</span></span>
 <span id="cb98-3"><a href="#cb98-3" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
 <span id="cb98-4"><a href="#cb98-4" tabindex="-1"></a>    <span class="at">n_rows =</span> <span class="fu">n</span>(),</span>
-<span id="cb98-5"><a href="#cb98-5" tabindex="-1"></a>    <span class="at">n_won  =</span> <span class="fu">sum</span>(BID_WON <span class="sc">==</span> <span class="st">&quot;TRUE&quot;</span>,  <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb98-6"><a href="#cb98-6" tabindex="-1"></a>    <span class="at">n_lost =</span> <span class="fu">sum</span>(BID_WON <span class="sc">==</span> <span class="st">&quot;FALSE&quot;</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb98-5"><a href="#cb98-5" tabindex="-1"></a>    <span class="at">n_won  =</span> <span class="fu">sum</span>(BID_WON <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;TRUE&quot;</span>, <span class="st">&quot;true&quot;</span>),  <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb98-6"><a href="#cb98-6" tabindex="-1"></a>    <span class="at">n_lost =</span> <span class="fu">sum</span>(BID_WON <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;FALSE&quot;</span>),         <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
 <span id="cb98-7"><a href="#cb98-7" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
 <span id="cb98-8"><a href="#cb98-8" tabindex="-1"></a>  )</span>
 <span id="cb98-9"><a href="#cb98-9" tabindex="-1"></a></span>
@@ -4285,16 +4285,30 @@ won per auction:</p>
 <span id="cb98-13"><a href="#cb98-13" tabindex="-1"></a></span>
 <span id="cb98-14"><a href="#cb98-14" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Auctions with &gt;1 winning bid:  &quot;</span>, <span class="fu">nrow</span>(auctions_multiwin), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
 <span id="cb98-15"><a href="#cb98-15" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Auctions with 0 winning bids:  &quot;</span>, <span class="fu">nrow</span>(auctions_zerowin),  <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
-<pre><code>## Auctions with &gt;1 winning bid:   0 
+<pre><code>## Auctions with &gt;1 winning bid:   9 
 ## Auctions with 0 winning bids:   0</code></pre>
+<p>We see that converting both <code>&quot;TRUE&quot;</code> and
+<code>&quot;true&quot;</code> to <code>TRUE</code> results in <strong>9 auctions
+with multiple winners</strong>.</p>
+<p>We see how many rows this affects by inspecting associated
+<code>AUCTION_ID</code>’s:</p>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" tabindex="-1"></a>multiwin_ids <span class="ot">&lt;-</span> auctions_multiwin<span class="sc">$</span>AUCTION_ID</span>
+<span id="cb100-2"><a href="#cb100-2" tabindex="-1"></a></span>
+<span id="cb100-3"><a href="#cb100-3" tabindex="-1"></a>multiwin_rows <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb100-4"><a href="#cb100-4" tabindex="-1"></a>  <span class="fu">filter</span>(AUCTION_ID <span class="sc">%in%</span> multiwin_ids) <span class="sc">%&gt;%</span></span>
+<span id="cb100-5"><a href="#cb100-5" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
+<span id="cb100-6"><a href="#cb100-6" tabindex="-1"></a></span>
+<span id="cb100-7"><a href="#cb100-7" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Rows in multi-winner auctions: &quot;</span>, multiwin_rows, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Rows in multi-winner auctions:  54</code></pre>
 <p><strong>Observations</strong></p>
 <ul>
 <li><code>BID_WON</code> is stored as a character flag rather than a
 logical variable.</li>
 <li>There are three distinct values for <code>BID_WON</code>:
 <code>&quot;FALSE&quot;</code>, <code>&quot;TRUE&quot;</code>, <code>&quot;true&quot;</code></li>
-<li>We verified there is still <strong>exactly one winner</strong> per
-<code>AUCTION_ID</code>.</li>
+<li>We found there are <strong>9 auctions</strong> and <strong>54
+associated rows</strong> which now violate the <strong>exactly one
+winner</strong> per <code>AUCTION_ID</code> criteria.</li>
 </ul>
 <p><strong>Decisions</strong></p>
 <ul>
@@ -4303,33 +4317,58 @@ logical variable <code>BID_WON_clean</code>.<br />
 </li>
 <li>Map <code>&quot;TRUE&quot;</code> and <code>&quot;true&quot;</code> to
 <code>TRUE</code>, and <code>&quot;FALSE&quot;</code> to <code>FALSE</code>.</li>
+<li>Since an auction must have <em>exactly one</em> winner and the
+number of affected rows is very small, we remove all auctions where
+<code>n_won != 1</code>.</li>
 </ul>
 </div>
 <div id="cleaning-6" class="section level3">
 <h3>Cleaning</h3>
 <p>We re-code <code>BID_WON</code> from character to logical.</p>
-<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
-<span id="cb100-2"><a href="#cb100-2" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb100-3"><a href="#cb100-3" tabindex="-1"></a>    <span class="at">BID_WON_clean =</span> <span class="fu">case_when</span>(</span>
-<span id="cb100-4"><a href="#cb100-4" tabindex="-1"></a>      BID_WON <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;TRUE&quot;</span>, <span class="st">&quot;true&quot;</span>)   <span class="sc">~</span> <span class="cn">TRUE</span>,</span>
-<span id="cb100-5"><a href="#cb100-5" tabindex="-1"></a>      BID_WON <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;FALSE&quot;</span>)          <span class="sc">~</span> <span class="cn">FALSE</span>,</span>
-<span id="cb100-6"><a href="#cb100-6" tabindex="-1"></a>      <span class="cn">TRUE</span>                             <span class="sc">~</span> <span class="cn">NA</span></span>
-<span id="cb100-7"><a href="#cb100-7" tabindex="-1"></a>    )</span>
-<span id="cb100-8"><a href="#cb100-8" tabindex="-1"></a>  )</span>
-<span id="cb100-9"><a href="#cb100-9" tabindex="-1"></a></span>
-<span id="cb100-10"><a href="#cb100-10" tabindex="-1"></a>n_bid_won_na <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(ad_clean<span class="sc">$</span>BID_WON_clean))</span>
-<span id="cb100-11"><a href="#cb100-11" tabindex="-1"></a></span>
-<span id="cb100-12"><a href="#cb100-12" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Rows with NA in BID_WON_clean after recoding: &quot;</span>,</span>
-<span id="cb100-13"><a href="#cb100-13" tabindex="-1"></a>    n_bid_won_na, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
-<pre><code>## Rows with NA in BID_WON_clean after recoding:  0</code></pre>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb102-2"><a href="#cb102-2" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb102-3"><a href="#cb102-3" tabindex="-1"></a>    <span class="at">BID_WON_clean =</span> <span class="fu">case_when</span>(</span>
+<span id="cb102-4"><a href="#cb102-4" tabindex="-1"></a>      BID_WON <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;TRUE&quot;</span>, <span class="st">&quot;true&quot;</span>)   <span class="sc">~</span> <span class="cn">TRUE</span>,</span>
+<span id="cb102-5"><a href="#cb102-5" tabindex="-1"></a>      BID_WON <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;FALSE&quot;</span>)          <span class="sc">~</span> <span class="cn">FALSE</span>,</span>
+<span id="cb102-6"><a href="#cb102-6" tabindex="-1"></a>      <span class="cn">TRUE</span>                             <span class="sc">~</span> <span class="cn">NA</span></span>
+<span id="cb102-7"><a href="#cb102-7" tabindex="-1"></a>    )</span>
+<span id="cb102-8"><a href="#cb102-8" tabindex="-1"></a>  )</span>
+<span id="cb102-9"><a href="#cb102-9" tabindex="-1"></a></span>
+<span id="cb102-10"><a href="#cb102-10" tabindex="-1"></a>n_bid_won_na <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(ad_clean<span class="sc">$</span>BID_WON_clean))</span>
+<span id="cb102-11"><a href="#cb102-11" tabindex="-1"></a></span>
+<span id="cb102-12"><a href="#cb102-12" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Rows with NA in BID_WON_clean after recoding: &quot;</span>,</span>
+<span id="cb102-13"><a href="#cb102-13" tabindex="-1"></a>    n_bid_won_na, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb102-14"><a href="#cb102-14" tabindex="-1"></a></span>
+<span id="cb102-15"><a href="#cb102-15" tabindex="-1"></a><span class="co"># Remove auctions that violate the &quot;exactly one winner&quot; rule</span></span>
+<span id="cb102-16"><a href="#cb102-16" tabindex="-1"></a>invalid_ids_bw <span class="ot">&lt;-</span> auctions_multiwin<span class="sc">$</span>AUCTION_ID</span>
+<span id="cb102-17"><a href="#cb102-17" tabindex="-1"></a></span>
+<span id="cb102-18"><a href="#cb102-18" tabindex="-1"></a>n_bw_invalid_rows <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb102-19"><a href="#cb102-19" tabindex="-1"></a>  <span class="fu">filter</span>(AUCTION_ID <span class="sc">%in%</span> invalid_ids_bw) <span class="sc">%&gt;%</span></span>
+<span id="cb102-20"><a href="#cb102-20" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
+<span id="cb102-21"><a href="#cb102-21" tabindex="-1"></a></span>
+<span id="cb102-22"><a href="#cb102-22" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb102-23"><a href="#cb102-23" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>AUCTION_ID <span class="sc">%in%</span> invalid_ids_bw)</span>
+<span id="cb102-24"><a href="#cb102-24" tabindex="-1"></a></span>
+<span id="cb102-25"><a href="#cb102-25" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Rows removed due to multi-winner auctions: &quot;</span>,</span>
+<span id="cb102-26"><a href="#cb102-26" tabindex="-1"></a>    n_bw_invalid_rows, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Rows with NA in BID_WON_clean after recoding:  0 
+## Rows removed due to multi-winner auctions:  54</code></pre>
 <p>Log entry for outcome variable:</p>
-<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
-<span id="cb102-2"><a href="#cb102-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;BW1&quot;</span>,</span>
-<span id="cb102-3"><a href="#cb102-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;BID_WON&quot;</span>,</span>
-<span id="cb102-4"><a href="#cb102-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Outcome flag stored as character with three string encodings (&#39;TRUE&#39;, &#39;true&#39;, &#39;FALSE&#39;).&quot;</span>,</span>
-<span id="cb102-5"><a href="#cb102-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Standardized to logical BID_WON_clean by mapping TRUE/true to TRUE and FALSE to FALSE.&quot;</span>,</span>
-<span id="cb102-6"><a href="#cb102-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
-<span id="cb102-7"><a href="#cb102-7" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb104-2"><a href="#cb104-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;BW1&quot;</span>,</span>
+<span id="cb104-3"><a href="#cb104-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;BID_WON&quot;</span>,</span>
+<span id="cb104-4"><a href="#cb104-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Outcome flag stored as character with three string encodings (&#39;TRUE&#39;, &#39;true&#39;, &#39;FALSE&#39;).&quot;</span>,</span>
+<span id="cb104-5"><a href="#cb104-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Standardized to logical BID_WON_clean by mapping TRUE/true to TRUE and FALSE to FALSE.&quot;</span>,</span>
+<span id="cb104-6"><a href="#cb104-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb104-7"><a href="#cb104-7" tabindex="-1"></a>)</span>
+<span id="cb104-8"><a href="#cb104-8" tabindex="-1"></a></span>
+<span id="cb104-9"><a href="#cb104-9" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb104-10"><a href="#cb104-10" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;BW2&quot;</span>,</span>
+<span id="cb104-11"><a href="#cb104-11" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;BID_WON&quot;</span>,</span>
+<span id="cb104-12"><a href="#cb104-12" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Auctions with multiple winning bids after standardizing TRUE/true.&quot;</span>,</span>
+<span id="cb104-13"><a href="#cb104-13" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Removed all rows belonging to the 9 multi-winner auctions.&quot;</span>,</span>
+<span id="cb104-14"><a href="#cb104-14" tabindex="-1"></a>  <span class="at">rows_affected =</span> n_bw_invalid_rows</span>
+<span id="cb104-15"><a href="#cb104-15" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="summary-11" class="section level3">
 <h3>Summary</h3>
@@ -4339,12 +4378,14 @@ character variable with three distinct encodings: <code>&quot;FALSE&quot;</code>
 <code>&quot;TRUE&quot;</code>, and <code>&quot;true&quot;</code>.<br />
 </li>
 <li>We created <code>BID_WON_clean</code>, a logical TRUE/FALSE
-variable, by mapping these string encodings and reserving
-<code>NA</code> for any future unexpected labels.<br />
+variable, by mapping <code>&quot;TRUE&quot;</code>/<code>&quot;true&quot;</code> to
+<code>TRUE</code> and <code>&quot;FALSE&quot;</code> to <code>FALSE</code>,
+reserving <code>NA</code> for any unexpected future labels.<br />
 </li>
-<li>A separate earlier step removed auctions with zero or multiple
-winners; this section only verified the “exactly one winner per auction”
-structure was preserved.</li>
+<li>Using this unified winner flag, we identified a small set of
+auctions with more than one winner. These auctions violate the business
+rule of “exactly one winner per auction,” so all rows belonging to those
+auctions were removed from the cleaned dataset.</li>
 </ul>
 <hr />
 <hr />
@@ -4363,15 +4404,15 @@ in <code>&quot;_clean&quot;</code>), and<br />
 <li>Renaming them back to their original variable names by removing the
 <code>&quot;_clean&quot;</code> suffix.</li>
 </ul>
-<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" tabindex="-1"></a><span class="co"># Identify cleaned columns</span></span>
-<span id="cb103-2"><a href="#cb103-2" tabindex="-1"></a>all_cols   <span class="ot">&lt;-</span> <span class="fu">names</span>(ad_clean)</span>
-<span id="cb103-3"><a href="#cb103-3" tabindex="-1"></a>clean_cols <span class="ot">&lt;-</span> all_cols[<span class="fu">str_detect</span>(all_cols, <span class="st">&quot;_clean$&quot;</span>)]</span>
-<span id="cb103-4"><a href="#cb103-4" tabindex="-1"></a></span>
-<span id="cb103-5"><a href="#cb103-5" tabindex="-1"></a><span class="co"># Keep only cleaned columns and rename by stripping the &quot;_clean&quot; suffix</span></span>
-<span id="cb103-6"><a href="#cb103-6" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
-<span id="cb103-7"><a href="#cb103-7" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">all_of</span>(clean_cols))</span>
-<span id="cb103-8"><a href="#cb103-8" tabindex="-1"></a></span>
-<span id="cb103-9"><a href="#cb103-9" tabindex="-1"></a><span class="fu">names</span>(ad_clean) <span class="ot">&lt;-</span> <span class="fu">str_replace</span>(<span class="fu">names</span>(ad_clean), <span class="st">&quot;_clean$&quot;</span>, <span class="st">&quot;&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" tabindex="-1"></a><span class="co"># Identify cleaned columns</span></span>
+<span id="cb105-2"><a href="#cb105-2" tabindex="-1"></a>all_cols   <span class="ot">&lt;-</span> <span class="fu">names</span>(ad_clean)</span>
+<span id="cb105-3"><a href="#cb105-3" tabindex="-1"></a>clean_cols <span class="ot">&lt;-</span> all_cols[<span class="fu">str_detect</span>(all_cols, <span class="st">&quot;_clean$&quot;</span>)]</span>
+<span id="cb105-4"><a href="#cb105-4" tabindex="-1"></a></span>
+<span id="cb105-5"><a href="#cb105-5" tabindex="-1"></a><span class="co"># Keep only cleaned columns and rename by stripping the &quot;_clean&quot; suffix</span></span>
+<span id="cb105-6"><a href="#cb105-6" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb105-7"><a href="#cb105-7" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">all_of</span>(clean_cols))</span>
+<span id="cb105-8"><a href="#cb105-8" tabindex="-1"></a></span>
+<span id="cb105-9"><a href="#cb105-9" tabindex="-1"></a><span class="fu">names</span>(ad_clean) <span class="ot">&lt;-</span> <span class="fu">str_replace</span>(<span class="fu">names</span>(ad_clean), <span class="st">&quot;_clean$&quot;</span>, <span class="st">&quot;&quot;</span>)</span></code></pre></div>
 <p>At this point, <code>ad_clean</code> contains only the cleaned
 variables with their original dictionary names (e.g.,
 <code>TIMESTAMP</code>, <code>PRICE</code>, <code>BID_WON</code>).</p>
@@ -4388,45 +4429,45 @@ variables with their original dictionary names (e.g.,
 <li>Verification that no new full-row duplicates were introduced during
 cleaning.</li>
 </ul>
-<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" tabindex="-1"></a><span class="co"># Dimensions</span></span>
-<span id="cb104-2"><a href="#cb104-2" tabindex="-1"></a>n_rows_final <span class="ot">&lt;-</span> <span class="fu">nrow</span>(ad_clean)</span>
-<span id="cb104-3"><a href="#cb104-3" tabindex="-1"></a>n_cols_final <span class="ot">&lt;-</span> <span class="fu">ncol</span>(ad_clean)</span>
-<span id="cb104-4"><a href="#cb104-4" tabindex="-1"></a></span>
-<span id="cb104-5"><a href="#cb104-5" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Final number of rows:    &quot;</span>, n_rows_final, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb104-6"><a href="#cb104-6" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Final number of columns: &quot;</span>, n_cols_final, <span class="st">&quot;</span><span class="sc">\n\n</span><span class="st">&quot;</span>)</span>
-<span id="cb104-7"><a href="#cb104-7" tabindex="-1"></a></span>
-<span id="cb104-8"><a href="#cb104-8" tabindex="-1"></a><span class="co"># Per column Summary</span></span>
-<span id="cb104-9"><a href="#cb104-9" tabindex="-1"></a><span class="fu">summarize_ad_data</span>(ad_clean)</span>
-<span id="cb104-10"><a href="#cb104-10" tabindex="-1"></a></span>
-<span id="cb104-11"><a href="#cb104-11" tabindex="-1"></a><span class="co"># Check for full-row duplicates in the final cleaned dataset</span></span>
-<span id="cb104-12"><a href="#cb104-12" tabindex="-1"></a>n_distinct_final <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
-<span id="cb104-13"><a href="#cb104-13" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb104-14"><a href="#cb104-14" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
-<span id="cb104-15"><a href="#cb104-15" tabindex="-1"></a></span>
-<span id="cb104-16"><a href="#cb104-16" tabindex="-1"></a>n_dups_final <span class="ot">&lt;-</span> n_rows_final <span class="sc">-</span> n_distinct_final</span>
-<span id="cb104-17"><a href="#cb104-17" tabindex="-1"></a></span>
-<span id="cb104-18"><a href="#cb104-18" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">Exact duplicate rows in final dataset: &quot;</span>, n_dups_final, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
-<pre><code>## Final number of rows:     440705 
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" tabindex="-1"></a><span class="co"># Dimensions</span></span>
+<span id="cb106-2"><a href="#cb106-2" tabindex="-1"></a>n_rows_final <span class="ot">&lt;-</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb106-3"><a href="#cb106-3" tabindex="-1"></a>n_cols_final <span class="ot">&lt;-</span> <span class="fu">ncol</span>(ad_clean)</span>
+<span id="cb106-4"><a href="#cb106-4" tabindex="-1"></a></span>
+<span id="cb106-5"><a href="#cb106-5" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Final number of rows:    &quot;</span>, n_rows_final, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb106-6"><a href="#cb106-6" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Final number of columns: &quot;</span>, n_cols_final, <span class="st">&quot;</span><span class="sc">\n\n</span><span class="st">&quot;</span>)</span>
+<span id="cb106-7"><a href="#cb106-7" tabindex="-1"></a></span>
+<span id="cb106-8"><a href="#cb106-8" tabindex="-1"></a><span class="co"># Per column Summary</span></span>
+<span id="cb106-9"><a href="#cb106-9" tabindex="-1"></a><span class="fu">summarize_ad_data</span>(ad_clean)</span>
+<span id="cb106-10"><a href="#cb106-10" tabindex="-1"></a></span>
+<span id="cb106-11"><a href="#cb106-11" tabindex="-1"></a><span class="co"># Check for full-row duplicates in the final cleaned dataset</span></span>
+<span id="cb106-12"><a href="#cb106-12" tabindex="-1"></a>n_distinct_final <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb106-13"><a href="#cb106-13" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb106-14"><a href="#cb106-14" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
+<span id="cb106-15"><a href="#cb106-15" tabindex="-1"></a></span>
+<span id="cb106-16"><a href="#cb106-16" tabindex="-1"></a>n_dups_final <span class="ot">&lt;-</span> n_rows_final <span class="sc">-</span> n_distinct_final</span>
+<span id="cb106-17"><a href="#cb106-17" tabindex="-1"></a></span>
+<span id="cb106-18"><a href="#cb106-18" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">Exact duplicate rows in final dataset: &quot;</span>, n_dups_final, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Final number of rows:     440651 
 ## Final number of columns:  15 
 ## 
 ## # A tibble: 15 × 6
 ##    column            type      length n_missing n_non_missing n_unique
 ##    &lt;chr&gt;             &lt;chr&gt;      &lt;int&gt;     &lt;int&gt;         &lt;int&gt;    &lt;int&gt;
-##  1 TIMESTAMP         POSIXct   440705         0        440705    26950
-##  2 DATE_UTC          Date      440705         0        440705        2
-##  3 AUCTION_ID        character 440705         0        440705   120190
-##  4 PUBLISHER_ID      character 440705         0        440705       29
-##  5 DEVICE_TYPE       integer   440705         0        440705        5
-##  6 DEVICE_GEO_REGION character 440705         0        440705        1
-##  7 DEVICE_GEO_CITY   character 440705     21076        419629      203
-##  8 DEVICE_GEO_ZIP    character 440705     21094        419611      274
-##  9 DEVICE_GEO_LAT    numeric   440705         0        440705      269
-## 10 DEVICE_GEO_LONG   numeric   440705         0        440705      297
-## 11 REQUESTED_SIZES   character 440705         0        440705       92
-## 12 SIZE              character 440705         0        440705       38
-## 13 PRICE             numeric   440705        12        440693   111859
-## 14 RESPONSE_TIME     numeric   440705         0        440705     1241
-## 15 BID_WON           logical   440705         0        440705        2
+##  1 TIMESTAMP         POSIXct   440651         0        440651    26950
+##  2 DATE_UTC          Date      440651         0        440651        2
+##  3 AUCTION_ID        character 440651         0        440651   120181
+##  4 PUBLISHER_ID      character 440651         0        440651       29
+##  5 DEVICE_TYPE       integer   440651         0        440651        5
+##  6 DEVICE_GEO_REGION character 440651         0        440651        1
+##  7 DEVICE_GEO_CITY   character 440651     21076        419575      203
+##  8 DEVICE_GEO_ZIP    character 440651     21094        419557      274
+##  9 DEVICE_GEO_LAT    numeric   440651         0        440651      269
+## 10 DEVICE_GEO_LONG   numeric   440651         0        440651      297
+## 11 REQUESTED_SIZES   character 440651         0        440651       92
+## 12 SIZE              character 440651         0        440651       38
+## 13 PRICE             numeric   440651        12        440639   111848
+## 14 RESPONSE_TIME     numeric   440651         0        440651     1241
+## 15 BID_WON           logical   440651         0        440651        2
 ## 
 ## Exact duplicate rows in final dataset:  0</code></pre>
 <p>In this notebook run, <code>n_dups_final</code> reports whether any
@@ -4446,13 +4487,13 @@ The output is written to the default directory
 If re-run with further changes, bump the <code>version</code> string
 (e.g., <code>&quot;clean_v2&quot;</code>) or set
 <code>overwrite = TRUE</code>.</p>
-<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" tabindex="-1"></a>export_path <span class="ot">&lt;-</span> <span class="fu">export_ad_data</span>(</span>
-<span id="cb106-2"><a href="#cb106-2" tabindex="-1"></a>  <span class="at">df      =</span> ad_clean,</span>
-<span id="cb106-3"><a href="#cb106-3" tabindex="-1"></a>  <span class="at">version =</span> <span class="st">&quot;clean_v1&quot;</span></span>
-<span id="cb106-4"><a href="#cb106-4" tabindex="-1"></a>  <span class="co"># overwrite = FALSE  # set to TRUE only if intentionally replacing an existing file</span></span>
-<span id="cb106-5"><a href="#cb106-5" tabindex="-1"></a>)</span>
-<span id="cb106-6"><a href="#cb106-6" tabindex="-1"></a></span>
-<span id="cb106-7"><a href="#cb106-7" tabindex="-1"></a>export_path</span></code></pre></div>
+<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" tabindex="-1"></a>export_path <span class="ot">&lt;-</span> <span class="fu">export_ad_data</span>(</span>
+<span id="cb108-2"><a href="#cb108-2" tabindex="-1"></a>  <span class="at">df      =</span> ad_clean,</span>
+<span id="cb108-3"><a href="#cb108-3" tabindex="-1"></a>  <span class="at">version =</span> <span class="st">&quot;clean_v1&quot;</span></span>
+<span id="cb108-4"><a href="#cb108-4" tabindex="-1"></a>  <span class="co"># overwrite = FALSE  # set to TRUE only if intentionally replacing an existing file</span></span>
+<span id="cb108-5"><a href="#cb108-5" tabindex="-1"></a>)</span>
+<span id="cb108-6"><a href="#cb108-6" tabindex="-1"></a></span>
+<span id="cb108-7"><a href="#cb108-7" tabindex="-1"></a>export_path</span></code></pre></div>
 <hr />
 <hr />
 </div>
@@ -4465,13 +4506,13 @@ Each entry corresponds to a specific issue that was identified and the
 decision made to address it.</p>
 <div id="log" class="section level2">
 <h2>Log</h2>
-<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" tabindex="-1"></a>cleaning_log <span class="sc">%&gt;%</span></span>
-<span id="cb107-2"><a href="#cb107-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(step_id) <span class="sc">%&gt;%</span></span>
-<span id="cb107-3"><a href="#cb107-3" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
-<span id="cb107-4"><a href="#cb107-4" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Summary of Data-Cleaning Decisions&quot;</span>,</span>
-<span id="cb107-5"><a href="#cb107-5" tabindex="-1"></a>    <span class="at">align   =</span> <span class="st">&quot;l&quot;</span></span>
-<span id="cb107-6"><a href="#cb107-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb107-7"><a href="#cb107-7" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>, <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" tabindex="-1"></a>cleaning_log <span class="sc">%&gt;%</span></span>
+<span id="cb109-2"><a href="#cb109-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(step_id) <span class="sc">%&gt;%</span></span>
+<span id="cb109-3"><a href="#cb109-3" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb109-4"><a href="#cb109-4" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Summary of Data-Cleaning Decisions&quot;</span>,</span>
+<span id="cb109-5"><a href="#cb109-5" tabindex="-1"></a>    <span class="at">align   =</span> <span class="st">&quot;l&quot;</span></span>
+<span id="cb109-6"><a href="#cb109-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb109-7"><a href="#cb109-7" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>, <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>)</span></code></pre></div>
 <table class="table table-striped" style="color: black; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
 Summary of Data-Cleaning Decisions
@@ -4512,7 +4553,24 @@ Standardized to logical BID_WON_clean by mapping TRUE/true to TRUE and
 FALSE to FALSE.
 </td>
 <td style="text-align:left;">
-440705
+440651
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BW2
+</td>
+<td style="text-align:left;">
+BID_WON
+</td>
+<td style="text-align:left;">
+Auctions with multiple winning bids after standardizing TRUE/true.
+</td>
+<td style="text-align:left;">
+Removed all rows belonging to the 9 multi-winner auctions.
+</td>
+<td style="text-align:left;">
+54
 </td>
 </tr>
 <tr>
