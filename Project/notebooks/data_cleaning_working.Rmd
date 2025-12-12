@@ -1006,8 +1006,6 @@ zip_diag_tbl <- ad_clean %>%
       TRUE,
       FALSE
     )
-    
-    
   )
 
 # Summaries
@@ -1033,7 +1031,7 @@ zip_diag
   - There are **`r zip_diag$n_missing`** rows with `NA` ZIP values.
   - **`r zip_diag$n_bad_length`** rows have a length not equal to 5, **`r zip_diag$n_negative_start`** rows start with a negative sign, and **`r zip_diag$n_non_digit`** rows contain non-digit characters in the first five positions.
 
-We next investigate which ZIP values appear in these problematic rows:
+We next investigate which ZIP values appear in these 18 problematic rows:
 
 ```{r badrow-checks}
 bad_zip_rows <- zip_diag_tbl %>%
@@ -1047,6 +1045,23 @@ bad_zip_patterns <- bad_zip_rows %>%
 
 bad_zip_patterns
 ```
+
+We explore whether the `NA` values can be retrieved using Latitudinal and Longitudinal values:
+
+```{r zip-lat-long-check}
+zip_lat_long_check <- ad_clean %>%
+  group_by(DEVICE_GEO_LAT, DEVICE_GEO_LONG) %>%
+  summarise(
+    n_zip = n_distinct(DEVICE_GEO_ZIP[!is.na(DEVICE_GEO_ZIP)]),
+    .groups = "drop"
+  ) %>%
+  filter(n_zip > 1)
+
+# Number of lat/long pairs mapping to multiple ZIPs
+nrow(zip_lat_long_check)
+```
+
+We see that lat/long values can be associated with more than one zip code and therefore cannot be used to retrieve missing zip values.
 
 **Observations**
 
@@ -1104,114 +1119,204 @@ log_change(
   - No rows were removed during these data cleaning steps.
 
 
+### Exploration - `DEVICE_GEO_LAT` \&`DEVICE_GEO_LONG` 
 
+`DEVICE_GEO_LAT` and `DEVICE_GEO_LONG` are both stored as `numeric` and contain **no missing values**.
 
+We begin exploration by comparing observed values to Oregon’s approximate geographic bounds:
+  
+  - Latitude (Oregon approx.): **$42^\circ$ N to $46.15^\circ$ N**  
+  - Longitude (Oregon approx.): **$-124.3^\circ$ W to $-116.45^\circ$ W**
 
+```{r lat-long-summary, message=FALSE}
+# Added slight buffers to values
+latlong_summary <- ad_clean %>%
+  summarise(
+    n_rows          = n(),
+    min_lat         = min(DEVICE_GEO_LAT, na.rm = TRUE),
+    max_lat         = max(DEVICE_GEO_LAT, na.rm = TRUE),
+    n_lat_outside   = sum(DEVICE_GEO_LAT < 41    |
+                            DEVICE_GEO_LAT > 47,     na.rm = TRUE),
+    min_long        = min(DEVICE_GEO_LONG, na.rm = TRUE),
+    max_long        = max(DEVICE_GEO_LONG, na.rm = TRUE),
+    n_long_outside  = sum(DEVICE_GEO_LONG < -125 |
+                            DEVICE_GEO_LONG > -116, na.rm = TRUE)
+  )
 
+latlong_summary %>%
+  kable(caption = "Lat/long values compared to approximate Oregon bounds") %>%
+  kable_styling(full_width = FALSE,
+                bootstrap_options = c("striped"))
+```  
 
+  - **Latitude:** All latitude values fall within a plausible Oregon range.
+  - **Longitude:** Exactly 100 rows have **longitudes** outside Oregon’s bounds.
 
+To explore these out-of-bound rows, we investigate their corresponding **Zip** and **City** values. We first check to see how many of the 100 have `DEVICE_GEO_CITY` and `DEVICE_GEO_ZIP` data available:
 
+```{r bad-long-na-check}
+# Rows with longitude outside Oregon bounds
+bad_long <- ad_clean %>%
+  filter(DEVICE_GEO_LONG < -125 | DEVICE_GEO_LONG > -116)
 
+bad_long %>%
+  summarise(
+    n_bad         = n(),
+    n_zip_city_ok = sum(!is.na(DEVICE_GEO_ZIP_clean) &
+                          !is.na(DEVICE_GEO_CITY)),
+    n_zip_na      = sum(is.na(DEVICE_GEO_ZIP_clean)),
+    n_city_na     = sum(is.na(DEVICE_GEO_CITY))
+  )
+```
 
-### Exploration - `DEVICE_GEO_LAT` 
+We see that **98 of the 100** rows have `DEVICE_GEO_CITY` and `DEVICE_GEO_ZIP_clean` data available. We first address those rows.
+
+```{r zip-city-shift-check}
+# "Good" longitudes: within Oregon bounds
+good_long <- ad_clean %>%
+  filter(DEVICE_GEO_LONG >= -125, DEVICE_GEO_LONG <= -116)
+
+# Collapse "good" longitudes to one reference value per ZIP + CITY
+good_zipcity <- good_long %>%
+  filter(!is.na(DEVICE_GEO_ZIP_clean), !is.na(DEVICE_GEO_CITY)) %>%
+  group_by(DEVICE_GEO_ZIP_clean, DEVICE_GEO_CITY) %>%
+  summarise(ref_long = mean(DEVICE_GEO_LONG, na.rm = TRUE),
+            .groups  = "drop")
+
+# Join bad rows (w/ valid ZIP + CITY) to these reference values
+paired_zipcity <- bad_long %>%
+  filter(!is.na(DEVICE_GEO_ZIP_clean), !is.na(DEVICE_GEO_CITY)) %>%
+  left_join(good_zipcity,
+            by = c("DEVICE_GEO_ZIP_clean", "DEVICE_GEO_CITY")) %>%
+  mutate(diff_long = ref_long - DEVICE_GEO_LONG)
+
+# Summarize differences
+paired_zipcity %>%
+  summarise(
+    n_bad_with_match = sum(!is.na(ref_long)),
+    min_diff         = min(diff_long, na.rm = TRUE),
+    max_diff         = max(diff_long, na.rm = TRUE),
+    mean_diff        = mean(diff_long, na.rm = TRUE),
+    n_near_10        = sum(abs(diff_long - 10) < 0.1, na.rm = TRUE)
+  )
+```
+
+These results **show a 10 degree shift** for these 98 values.
+
+We now address the **2 values with `NA` for `DEVICE_GEO_CITY` and `DEVICE_GEO_ZIP_clean`**. 
+We compare these to other rows with the same `AUCTION_ID`:
+
+```{r auction-shift-check-clean, message=FALSE}
+# Identify bad rows with missing ZIP/CITY
+bad_missing_loc <- bad_long %>%
+  filter(is.na(DEVICE_GEO_ZIP_clean) | is.na(DEVICE_GEO_CITY))
+
+# Reference longitudes for each auction (from good rows)
+good_auction <- good_long %>%
+  group_by(AUCTION_ID) %>%
+  summarise(ref_long_auction = mean(DEVICE_GEO_LONG, na.rm = TRUE),
+            .groups = "drop")
+
+# Join & compute shift difference
+auction_shift_check <- bad_missing_loc %>%
+  left_join(good_auction, by = "AUCTION_ID") %>%
+  mutate(diff_long = ref_long_auction - DEVICE_GEO_LONG) %>%
+  select(AUCTION_ID,
+         DEVICE_GEO_LAT,
+         DEVICE_GEO_LONG,
+         ref_long_auction,
+         diff_long)
+
+auction_shift_check %>%
+  kable(caption = "Two NA-location rows with auction-based longitude comparison") %>%
+  kable_styling(full_width = FALSE,
+                bootstrap_options = c("striped"))
+```
+
+These results show these two rows are **shifted exactly 10 degrees** from the other longitude values of rows with the same respective `AUCTION_ID`, justifying a shift for these rows as well.
+
+We now verify that all of the `NA` rows will be within Oregon bounds if shifted by 10:
+
+```{r check-shift}
+# Verify shift will put "bad longitude" rows in bounds
+bad_long_shift_check <- bad_long %>%
+  mutate(long_shifted = DEVICE_GEO_LONG + 10) %>%
+  summarise(
+    n_rows                = n(),
+    min_long_orig         = min(DEVICE_GEO_LONG, na.rm = TRUE),
+    max_long_orig         = max(DEVICE_GEO_LONG, na.rm = TRUE),
+    min_long_shifted      = min(long_shifted, na.rm = TRUE),
+    max_long_shifted      = max(long_shifted, na.rm = TRUE),
+    n_shifted_in_bounds   = sum(long_shifted >= -125 &
+                                  long_shifted <= -116, na.rm = TRUE),
+    within_oregon_bounds  = (min(long_shifted, na.rm = TRUE) >= -125 & max(long_shifted, na.rm = TRUE) <= -116)
+  )
+
+bad_long_shift_check
+```
+
+We see that *all shifted values* fall within the Oregon range for longitude. 
 
 **Observations**
 
-  - 
-  - 
-  - 
-  - 
+  - `DEVICE_GEO_LAT`
+      - All values fall within Oregon’s plausible latitude range.
+      - No cleaning is necessary.
+  - `DEVICE_GEO_LONG`
+      - Exactly **100 rows** are out-of-range.
+      - ZIP + City comparisons (98 rows), Auction-level comparison (2 rows), and range verification all confirm a consistent 10 degree systematic shift.
+      
+**Decisions**
 
-**Decisions:**
+  - **Latitude**
+      - Leave unchanged.
+      - Create `DEVICE_GEO_LAT_clean` as a direct copy.
+  - **Longitude**
+      - Correct the **100 systematically shifted values** by adding 10.
+      - All other longitude values remain unchanged.
+      - Create a cleaned field: `DEVICE_GEO_LONG_clean`
 
-  - 
-  - 
+### Cleaning - `DEVICE_GEO_LONG` &`DEVICE_GEO_LONG` 
 
-### Cleaning - `DEVICE_GEO_LAT` 
-Log entries for time variables:
+```{r longitude-clean}
+ad_clean <- ad_clean %>%
+  mutate(
+    DEVICE_GEO_LAT_clean  = DEVICE_GEO_LAT,
+    DEVICE_GEO_LONG_clean = case_when(
+      DEVICE_GEO_LONG < -125 |
+        DEVICE_GEO_LONG > -116 ~ DEVICE_GEO_LONG + 10,
+      TRUE ~ DEVICE_GEO_LONG
+    )
+  )
 
-```{r lat-log}
+# Count rows corrected
+n_long_shifted <-
+  sum(ad_clean$DEVICE_GEO_LONG_clean != ad_clean$DEVICE_GEO_LONG)
+cat("Longitude values corrected (shifted by +10): ",
+    n_long_shifted,
+    "\n")
+```
+
+Log entry for longitudinal variable:
+
+```{r longitude-log}
 log_change(
-  step_id = "T1",
-  variable = "TIMESTAMP",
-  issue = "Inconsistent TIMESTAMP formats, including 'NA' date tokens.",
-  decision = "Recover 'NA' dates using `DATE_UTC`; parsed to POSIXct (UTC).",
-  rows_affected = nrow(ad_clean)
+  step_id = "GEO3",
+  variable = "DEVICE_GEO_LONG",
+  issue = "100 longitude values were systematically shifted outside Oregon bounds by ~10 degrees.",
+  decision = "Corrected all out-of-range longitude values by applying a +10 degree shift.",
+  rows_affected = n_long_shifted
 )
 ```
 
 ### Summary
 
-  - 
-  - 
-
-
-
-### Exploration - `DEVICE_GEO_LONG` 
-
-**Observations**
-
-  - 
-  - 
-  - 
-  - 
-
-**Decisions:**
-
-  - 
-  - 
-
-### Cleaning - `DEVICE_GEO_LONG` 
-Log entries for time variables:
-
-```{r example-log3}
-log_change(
-  step_id = "T1",
-  variable = "TIMESTAMP",
-  issue = "Inconsistent TIMESTAMP formats, including 'NA' date tokens.",
-  decision = "Recover 'NA' dates using `DATE_UTC`; parsed to POSIXct (UTC).",
-  rows_affected = nrow(ad_clean)
-)
-```
-
-### Summary
-
-  - 
-  - 
+  - `DEVICE_GEO_LAT` required no changes; all values were already valid.
+  - `DEVICE_GEO_LONG` contained 100 systematically shifted values, all offset by $+10^\circ$.
+  - Three independent analytical checks (ZIP + City matching, auction-level comparison, and range verification) confirmed the correction.
+  - A cleaned longitude variable (`DEVICE_GEO_LONG_clean`) now restores all observations to plausible Oregon coordinates.
+  - No rows were removed; only 100 longitude values were corrected. 
    
-   
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ---
 

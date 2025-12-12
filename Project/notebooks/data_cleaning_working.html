@@ -1649,16 +1649,13 @@ margin-left: 0 !important;
       <li><a href="#cleaning-device_geo_zip" id="toc-cleaning-device_geo_zip">Cleaning –
       <code>DEVICE_GEO_ZIP</code></a></li>
       <li><a href="#summary-5" id="toc-summary-5">Summary</a></li>
-      <li><a href="#exploration---device_geo_lat" id="toc-exploration---device_geo_lat">Exploration -
-      <code>DEVICE_GEO_LAT</code></a></li>
-      <li><a href="#cleaning---device_geo_lat" id="toc-cleaning---device_geo_lat">Cleaning -
-      <code>DEVICE_GEO_LAT</code></a></li>
+      <li><a href="#exploration---device_geo_lat-device_geo_long" id="toc-exploration---device_geo_lat-device_geo_long">Exploration
+      - <code>DEVICE_GEO_LAT</code>
+      &amp;<code>DEVICE_GEO_LONG</code></a></li>
+      <li><a href="#cleaning---device_geo_long-device_geo_long" id="toc-cleaning---device_geo_long-device_geo_long">Cleaning -
+      <code>DEVICE_GEO_LONG</code>
+      &amp;<code>DEVICE_GEO_LONG</code></a></li>
       <li><a href="#summary-6" id="toc-summary-6">Summary</a></li>
-      <li><a href="#exploration---device_geo_long" id="toc-exploration---device_geo_long">Exploration -
-      <code>DEVICE_GEO_LONG</code></a></li>
-      <li><a href="#cleaning---device_geo_long" id="toc-cleaning---device_geo_long">Cleaning -
-      <code>DEVICE_GEO_LONG</code></a></li>
-      <li><a href="#summary-7" id="toc-summary-7">Summary</a></li>
       </ul></li>
       <li><a href="#ad-sizes-requested_sizes-size" id="toc-ad-sizes-requested_sizes-size"><strong>AD SIZES:</strong>
       <code>REQUESTED_SIZES</code>, <code>SIZE</code></a></li>
@@ -1674,7 +1671,7 @@ margin-left: 0 !important;
       <li><a href="#description-4" id="toc-description-4">Description</a></li>
       <li><a href="#exploration-3" id="toc-exploration-3">Exploration</a></li>
       <li><a href="#cleaning-3" id="toc-cleaning-3">Cleaning</a></li>
-      <li><a href="#summary-8" id="toc-summary-8">Summary</a></li>
+      <li><a href="#summary-7" id="toc-summary-7">Summary</a></li>
       </ul></li>
       <li><a href="#cleaned-dataset" id="toc-cleaned-dataset"><strong>CLEANED DATASET</strong></a>
       <ul>
@@ -3118,27 +3115,25 @@ distinct ZIP values (non-NA), and now has 21,076 rows with
 <span id="cb54-24"><a href="#cb54-24" tabindex="-1"></a>      <span class="cn">TRUE</span>,</span>
 <span id="cb54-25"><a href="#cb54-25" tabindex="-1"></a>      <span class="cn">FALSE</span></span>
 <span id="cb54-26"><a href="#cb54-26" tabindex="-1"></a>    )</span>
-<span id="cb54-27"><a href="#cb54-27" tabindex="-1"></a>    </span>
-<span id="cb54-28"><a href="#cb54-28" tabindex="-1"></a>    </span>
-<span id="cb54-29"><a href="#cb54-29" tabindex="-1"></a>  )</span>
-<span id="cb54-30"><a href="#cb54-30" tabindex="-1"></a></span>
-<span id="cb54-31"><a href="#cb54-31" tabindex="-1"></a><span class="co"># Summaries</span></span>
-<span id="cb54-32"><a href="#cb54-32" tabindex="-1"></a>zip_diag <span class="ot">&lt;-</span> zip_diag_tbl <span class="sc">%&gt;%</span></span>
-<span id="cb54-33"><a href="#cb54-33" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb54-34"><a href="#cb54-34" tabindex="-1"></a>    <span class="at">n_total_rows =</span> <span class="fu">n</span>(),</span>
-<span id="cb54-35"><a href="#cb54-35" tabindex="-1"></a>    <span class="at">n_whitespace =</span> <span class="fu">sum</span>(has_ws, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb54-36"><a href="#cb54-36" tabindex="-1"></a>    <span class="at">n_bad_length =</span> <span class="fu">sum</span>(bad_length, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb54-37"><a href="#cb54-37" tabindex="-1"></a>    <span class="at">n_negative_start =</span> <span class="fu">sum</span>(starts_negative, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb54-38"><a href="#cb54-38" tabindex="-1"></a>    <span class="at">n_non_digit =</span> <span class="fu">sum</span>(<span class="sc">!</span>zip5_is_digits, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb54-39"><a href="#cb54-39" tabindex="-1"></a>    <span class="at">n_missing =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(DEVICE_GEO_ZIP)),</span>
-<span id="cb54-40"><a href="#cb54-40" tabindex="-1"></a>    </span>
-<span id="cb54-41"><a href="#cb54-41" tabindex="-1"></a>    <span class="co"># Oregon-range issues (only applies to true digit-strings)</span></span>
-<span id="cb54-42"><a href="#cb54-42" tabindex="-1"></a>    <span class="at">n_out_of_range   =</span> <span class="fu">sum</span>(out_of_or_range, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb54-43"><a href="#cb54-43" tabindex="-1"></a>    <span class="at">n_valid_oregon   =</span> <span class="fu">sum</span>(<span class="sc">!</span>out_of_or_range <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(zip5_int)),</span>
-<span id="cb54-44"><a href="#cb54-44" tabindex="-1"></a>    <span class="at">n_invalid_zip5   =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(zip5_int))   <span class="co"># includes non-digit, wrong length, etc.</span></span>
-<span id="cb54-45"><a href="#cb54-45" tabindex="-1"></a>  )</span>
-<span id="cb54-46"><a href="#cb54-46" tabindex="-1"></a></span>
-<span id="cb54-47"><a href="#cb54-47" tabindex="-1"></a>zip_diag</span></code></pre></div>
+<span id="cb54-27"><a href="#cb54-27" tabindex="-1"></a>  )</span>
+<span id="cb54-28"><a href="#cb54-28" tabindex="-1"></a></span>
+<span id="cb54-29"><a href="#cb54-29" tabindex="-1"></a><span class="co"># Summaries</span></span>
+<span id="cb54-30"><a href="#cb54-30" tabindex="-1"></a>zip_diag <span class="ot">&lt;-</span> zip_diag_tbl <span class="sc">%&gt;%</span></span>
+<span id="cb54-31"><a href="#cb54-31" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb54-32"><a href="#cb54-32" tabindex="-1"></a>    <span class="at">n_total_rows =</span> <span class="fu">n</span>(),</span>
+<span id="cb54-33"><a href="#cb54-33" tabindex="-1"></a>    <span class="at">n_whitespace =</span> <span class="fu">sum</span>(has_ws, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb54-34"><a href="#cb54-34" tabindex="-1"></a>    <span class="at">n_bad_length =</span> <span class="fu">sum</span>(bad_length, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb54-35"><a href="#cb54-35" tabindex="-1"></a>    <span class="at">n_negative_start =</span> <span class="fu">sum</span>(starts_negative, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb54-36"><a href="#cb54-36" tabindex="-1"></a>    <span class="at">n_non_digit =</span> <span class="fu">sum</span>(<span class="sc">!</span>zip5_is_digits, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb54-37"><a href="#cb54-37" tabindex="-1"></a>    <span class="at">n_missing =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(DEVICE_GEO_ZIP)),</span>
+<span id="cb54-38"><a href="#cb54-38" tabindex="-1"></a>    </span>
+<span id="cb54-39"><a href="#cb54-39" tabindex="-1"></a>    <span class="co"># Oregon-range issues (only applies to true digit-strings)</span></span>
+<span id="cb54-40"><a href="#cb54-40" tabindex="-1"></a>    <span class="at">n_out_of_range   =</span> <span class="fu">sum</span>(out_of_or_range, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb54-41"><a href="#cb54-41" tabindex="-1"></a>    <span class="at">n_valid_oregon   =</span> <span class="fu">sum</span>(<span class="sc">!</span>out_of_or_range <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(zip5_int)),</span>
+<span id="cb54-42"><a href="#cb54-42" tabindex="-1"></a>    <span class="at">n_invalid_zip5   =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(zip5_int))   <span class="co"># includes non-digit, wrong length, etc.</span></span>
+<span id="cb54-43"><a href="#cb54-43" tabindex="-1"></a>  )</span>
+<span id="cb54-44"><a href="#cb54-44" tabindex="-1"></a></span>
+<span id="cb54-45"><a href="#cb54-45" tabindex="-1"></a>zip_diag</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 9
 ##   n_total_rows n_whitespace n_bad_length n_negative_start n_non_digit n_missing
 ##          &lt;int&gt;        &lt;int&gt;        &lt;int&gt;            &lt;int&gt;       &lt;int&gt;     &lt;int&gt;
@@ -3155,7 +3150,7 @@ values.</li>
 <strong>18</strong> rows contain non-digit characters in the first five
 positions.</li>
 </ul>
-<p>We next investigate which ZIP values appear in these problematic
+<p>We next investigate which ZIP values appear in these 18 problematic
 rows:</p>
 <div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" tabindex="-1"></a>bad_zip_rows <span class="ot">&lt;-</span> zip_diag_tbl <span class="sc">%&gt;%</span></span>
 <span id="cb56-2"><a href="#cb56-2" tabindex="-1"></a>  <span class="fu">filter</span>(bad_length <span class="sc">|</span></span>
@@ -3171,6 +3166,21 @@ rows:</p>
 ##   zip_trim
 ##   &lt;chr&gt;   
 ## 1 -999</code></pre>
+<p>We explore whether the <code>NA</code> values can be retrieved using
+Latitudinal and Longitudinal values:</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" tabindex="-1"></a>zip_lat_long_check <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb58-2"><a href="#cb58-2" tabindex="-1"></a>  <span class="fu">group_by</span>(DEVICE_GEO_LAT, DEVICE_GEO_LONG) <span class="sc">%&gt;%</span></span>
+<span id="cb58-3"><a href="#cb58-3" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb58-4"><a href="#cb58-4" tabindex="-1"></a>    <span class="at">n_zip =</span> <span class="fu">n_distinct</span>(DEVICE_GEO_ZIP[<span class="sc">!</span><span class="fu">is.na</span>(DEVICE_GEO_ZIP)]),</span>
+<span id="cb58-5"><a href="#cb58-5" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb58-6"><a href="#cb58-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb58-7"><a href="#cb58-7" tabindex="-1"></a>  <span class="fu">filter</span>(n_zip <span class="sc">&gt;</span> <span class="dv">1</span>)</span>
+<span id="cb58-8"><a href="#cb58-8" tabindex="-1"></a></span>
+<span id="cb58-9"><a href="#cb58-9" tabindex="-1"></a><span class="co"># Number of lat/long pairs mapping to multiple ZIPs</span></span>
+<span id="cb58-10"><a href="#cb58-10" tabindex="-1"></a><span class="fu">nrow</span>(zip_lat_long_check)</span></code></pre></div>
+<pre><code>## [1] 4</code></pre>
+<p>We see that lat/long values can be associated with more than one zip
+code and therefore cannot be used to retrieve missing zip values.</p>
 <p><strong>Observations</strong></p>
 <ul>
 <li><code>DEVICE_GEO_ZIP</code> is stored as a character vector, as
@@ -3202,30 +3212,30 @@ would be speculative</li>
 </div>
 <div id="cleaning-device_geo_zip" class="section level3">
 <h3>Cleaning – <code>DEVICE_GEO_ZIP</code></h3>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" tabindex="-1"></a><span class="co"># Sentinel codes to treat as true missing</span></span>
-<span id="cb58-2"><a href="#cb58-2" tabindex="-1"></a>sentinels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;-999&quot;</span>)</span>
-<span id="cb58-3"><a href="#cb58-3" tabindex="-1"></a></span>
-<span id="cb58-4"><a href="#cb58-4" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
-<span id="cb58-5"><a href="#cb58-5" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb58-6"><a href="#cb58-6" tabindex="-1"></a>    <span class="at">DEVICE_GEO_ZIP_clean =</span> <span class="fu">case_when</span>(</span>
-<span id="cb58-7"><a href="#cb58-7" tabindex="-1"></a>      DEVICE_GEO_ZIP <span class="sc">%in%</span> sentinels <span class="sc">~</span> <span class="cn">NA_character_</span>,</span>
-<span id="cb58-8"><a href="#cb58-8" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> DEVICE_GEO_ZIP</span>
-<span id="cb58-9"><a href="#cb58-9" tabindex="-1"></a>    )</span>
-<span id="cb58-10"><a href="#cb58-10" tabindex="-1"></a>  )</span>
-<span id="cb58-11"><a href="#cb58-11" tabindex="-1"></a></span>
-<span id="cb58-12"><a href="#cb58-12" tabindex="-1"></a><span class="co"># Count rows changed</span></span>
-<span id="cb58-13"><a href="#cb58-13" tabindex="-1"></a>n_zip_changed <span class="ot">&lt;-</span> <span class="fu">sum</span>(ad_clean<span class="sc">$</span>DEVICE_GEO_ZIP <span class="sc">%in%</span> sentinels)</span>
-<span id="cb58-14"><a href="#cb58-14" tabindex="-1"></a></span>
-<span id="cb58-15"><a href="#cb58-15" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;ZIP rows changed due to sentinel removal: &quot;</span>, n_zip_changed, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" tabindex="-1"></a><span class="co"># Sentinel codes to treat as true missing</span></span>
+<span id="cb60-2"><a href="#cb60-2" tabindex="-1"></a>sentinels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;-999&quot;</span>)</span>
+<span id="cb60-3"><a href="#cb60-3" tabindex="-1"></a></span>
+<span id="cb60-4"><a href="#cb60-4" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb60-5"><a href="#cb60-5" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb60-6"><a href="#cb60-6" tabindex="-1"></a>    <span class="at">DEVICE_GEO_ZIP_clean =</span> <span class="fu">case_when</span>(</span>
+<span id="cb60-7"><a href="#cb60-7" tabindex="-1"></a>      DEVICE_GEO_ZIP <span class="sc">%in%</span> sentinels <span class="sc">~</span> <span class="cn">NA_character_</span>,</span>
+<span id="cb60-8"><a href="#cb60-8" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> DEVICE_GEO_ZIP</span>
+<span id="cb60-9"><a href="#cb60-9" tabindex="-1"></a>    )</span>
+<span id="cb60-10"><a href="#cb60-10" tabindex="-1"></a>  )</span>
+<span id="cb60-11"><a href="#cb60-11" tabindex="-1"></a></span>
+<span id="cb60-12"><a href="#cb60-12" tabindex="-1"></a><span class="co"># Count rows changed</span></span>
+<span id="cb60-13"><a href="#cb60-13" tabindex="-1"></a>n_zip_changed <span class="ot">&lt;-</span> <span class="fu">sum</span>(ad_clean<span class="sc">$</span>DEVICE_GEO_ZIP <span class="sc">%in%</span> sentinels)</span>
+<span id="cb60-14"><a href="#cb60-14" tabindex="-1"></a></span>
+<span id="cb60-15"><a href="#cb60-15" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;ZIP rows changed due to sentinel removal: &quot;</span>, n_zip_changed, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
 <pre><code>## ZIP rows changed due to sentinel removal:  18</code></pre>
 <p>Log entries for zip variable:</p>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
-<span id="cb60-2"><a href="#cb60-2" tabindex="-1"></a>  <span class="at">step_id       =</span> <span class="st">&quot;GEO2&quot;</span>,</span>
-<span id="cb60-3"><a href="#cb60-3" tabindex="-1"></a>  <span class="at">variable      =</span> <span class="st">&quot;DEVICE_GEO_ZIP&quot;</span>,</span>
-<span id="cb60-4"><a href="#cb60-4" tabindex="-1"></a>  <span class="at">issue         =</span> <span class="st">&quot;Sentinel ZIP value &#39;-999&#39; not a valid Oregon ZIP.&quot;</span>,</span>
-<span id="cb60-5"><a href="#cb60-5" tabindex="-1"></a>  <span class="at">decision      =</span> <span class="st">&quot;Converted sentinel ZIPs to NA; preserved all other ZIP values as-is.&quot;</span>,</span>
-<span id="cb60-6"><a href="#cb60-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> n_zip_changed</span>
-<span id="cb60-7"><a href="#cb60-7" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb62-2"><a href="#cb62-2" tabindex="-1"></a>  <span class="at">step_id       =</span> <span class="st">&quot;GEO2&quot;</span>,</span>
+<span id="cb62-3"><a href="#cb62-3" tabindex="-1"></a>  <span class="at">variable      =</span> <span class="st">&quot;DEVICE_GEO_ZIP&quot;</span>,</span>
+<span id="cb62-4"><a href="#cb62-4" tabindex="-1"></a>  <span class="at">issue         =</span> <span class="st">&quot;Sentinel ZIP value &#39;-999&#39; not a valid Oregon ZIP.&quot;</span>,</span>
+<span id="cb62-5"><a href="#cb62-5" tabindex="-1"></a>  <span class="at">decision      =</span> <span class="st">&quot;Converted sentinel ZIPs to NA; preserved all other ZIP values as-is.&quot;</span>,</span>
+<span id="cb62-6"><a href="#cb62-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> n_zip_changed</span>
+<span id="cb62-7"><a href="#cb62-7" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="summary-5" class="section level3">
 <h3>Summary</h3>
@@ -3247,70 +3257,343 @@ reconstructed</strong> to avoid speculative geolocation inference.<br />
 <li>No rows were removed during these data cleaning steps.</li>
 </ul>
 </div>
-<div id="exploration---device_geo_lat" class="section level3">
-<h3>Exploration - <code>DEVICE_GEO_LAT</code></h3>
+<div id="exploration---device_geo_lat-device_geo_long" class="section level3">
+<h3>Exploration - <code>DEVICE_GEO_LAT</code>
+&amp;<code>DEVICE_GEO_LONG</code></h3>
+<p><code>DEVICE_GEO_LAT</code> and <code>DEVICE_GEO_LONG</code> are both
+stored as <code>numeric</code> and contain <strong>no missing
+values</strong>.</p>
+<p>We begin exploration by comparing observed values to Oregon’s
+approximate geographic bounds:</p>
+<ul>
+<li>Latitude (Oregon approx.): <strong><span class="math inline">\(42^\circ\)</span> N to <span class="math inline">\(46.15^\circ\)</span> N</strong><br />
+</li>
+<li>Longitude (Oregon approx.): <strong><span class="math inline">\(-124.3^\circ\)</span> W to <span class="math inline">\(-116.45^\circ\)</span> W</strong></li>
+</ul>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" tabindex="-1"></a><span class="co"># Added slight buffers to values</span></span>
+<span id="cb63-2"><a href="#cb63-2" tabindex="-1"></a>latlong_summary <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb63-3"><a href="#cb63-3" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb63-4"><a href="#cb63-4" tabindex="-1"></a>    <span class="at">n_rows          =</span> <span class="fu">n</span>(),</span>
+<span id="cb63-5"><a href="#cb63-5" tabindex="-1"></a>    <span class="at">min_lat         =</span> <span class="fu">min</span>(DEVICE_GEO_LAT, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb63-6"><a href="#cb63-6" tabindex="-1"></a>    <span class="at">max_lat         =</span> <span class="fu">max</span>(DEVICE_GEO_LAT, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb63-7"><a href="#cb63-7" tabindex="-1"></a>    <span class="at">n_lat_outside   =</span> <span class="fu">sum</span>(DEVICE_GEO_LAT <span class="sc">&lt;</span> <span class="dv">41</span>    <span class="sc">|</span></span>
+<span id="cb63-8"><a href="#cb63-8" tabindex="-1"></a>                            DEVICE_GEO_LAT <span class="sc">&gt;</span> <span class="dv">47</span>,     <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb63-9"><a href="#cb63-9" tabindex="-1"></a>    <span class="at">min_long        =</span> <span class="fu">min</span>(DEVICE_GEO_LONG, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb63-10"><a href="#cb63-10" tabindex="-1"></a>    <span class="at">max_long        =</span> <span class="fu">max</span>(DEVICE_GEO_LONG, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb63-11"><a href="#cb63-11" tabindex="-1"></a>    <span class="at">n_long_outside  =</span> <span class="fu">sum</span>(DEVICE_GEO_LONG <span class="sc">&lt;</span> <span class="sc">-</span><span class="dv">125</span> <span class="sc">|</span></span>
+<span id="cb63-12"><a href="#cb63-12" tabindex="-1"></a>                            DEVICE_GEO_LONG <span class="sc">&gt;</span> <span class="sc">-</span><span class="dv">116</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb63-13"><a href="#cb63-13" tabindex="-1"></a>  )</span>
+<span id="cb63-14"><a href="#cb63-14" tabindex="-1"></a></span>
+<span id="cb63-15"><a href="#cb63-15" tabindex="-1"></a>latlong_summary <span class="sc">%&gt;%</span></span>
+<span id="cb63-16"><a href="#cb63-16" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">&quot;Lat/long values compared to approximate Oregon bounds&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb63-17"><a href="#cb63-17" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb63-18"><a href="#cb63-18" tabindex="-1"></a>                <span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">&quot;striped&quot;</span>))</span></code></pre></div>
+<table class="table table-striped" style="color: black; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Lat/long values compared to approximate Oregon bounds
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+n_rows
+</th>
+<th style="text-align:right;">
+min_lat
+</th>
+<th style="text-align:right;">
+max_lat
+</th>
+<th style="text-align:right;">
+n_lat_outside
+</th>
+<th style="text-align:right;">
+min_long
+</th>
+<th style="text-align:right;">
+max_long
+</th>
+<th style="text-align:right;">
+n_long_outside
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+440705
+</td>
+<td style="text-align:right;">
+42.055
+</td>
+<td style="text-align:right;">
+46.1879
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+-134.2243
+</td>
+<td style="text-align:right;">
+-116.8578
+</td>
+<td style="text-align:right;">
+100
+</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Latitude:</strong> All latitude values fall within a
+plausible Oregon range.</li>
+<li><strong>Longitude:</strong> Exactly 100 rows have
+<strong>longitudes</strong> outside Oregon’s bounds.</li>
+</ul>
+<p>To explore these out-of-bound rows, we investigate their
+corresponding <strong>Zip</strong> and <strong>City</strong> values. We
+first check to see how many of the 100 have <code>DEVICE_GEO_CITY</code>
+and <code>DEVICE_GEO_ZIP</code> data available:</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" tabindex="-1"></a><span class="co"># Rows with longitude outside Oregon bounds</span></span>
+<span id="cb64-2"><a href="#cb64-2" tabindex="-1"></a>bad_long <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb64-3"><a href="#cb64-3" tabindex="-1"></a>  <span class="fu">filter</span>(DEVICE_GEO_LONG <span class="sc">&lt;</span> <span class="sc">-</span><span class="dv">125</span> <span class="sc">|</span> DEVICE_GEO_LONG <span class="sc">&gt;</span> <span class="sc">-</span><span class="dv">116</span>)</span>
+<span id="cb64-4"><a href="#cb64-4" tabindex="-1"></a></span>
+<span id="cb64-5"><a href="#cb64-5" tabindex="-1"></a>bad_long <span class="sc">%&gt;%</span></span>
+<span id="cb64-6"><a href="#cb64-6" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb64-7"><a href="#cb64-7" tabindex="-1"></a>    <span class="at">n_bad         =</span> <span class="fu">n</span>(),</span>
+<span id="cb64-8"><a href="#cb64-8" tabindex="-1"></a>    <span class="at">n_zip_city_ok =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(DEVICE_GEO_ZIP_clean) <span class="sc">&amp;</span></span>
+<span id="cb64-9"><a href="#cb64-9" tabindex="-1"></a>                          <span class="sc">!</span><span class="fu">is.na</span>(DEVICE_GEO_CITY)),</span>
+<span id="cb64-10"><a href="#cb64-10" tabindex="-1"></a>    <span class="at">n_zip_na      =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(DEVICE_GEO_ZIP_clean)),</span>
+<span id="cb64-11"><a href="#cb64-11" tabindex="-1"></a>    <span class="at">n_city_na     =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(DEVICE_GEO_CITY))</span>
+<span id="cb64-12"><a href="#cb64-12" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 4
+##   n_bad n_zip_city_ok n_zip_na n_city_na
+##   &lt;int&gt;         &lt;int&gt;    &lt;int&gt;     &lt;int&gt;
+## 1   100            98        2         2</code></pre>
+<p>We see that <strong>98 of the 100</strong> rows have
+<code>DEVICE_GEO_CITY</code> and <code>DEVICE_GEO_ZIP_clean</code> data
+available. We first address those rows.</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" tabindex="-1"></a><span class="co"># &quot;Good&quot; longitudes: within Oregon bounds</span></span>
+<span id="cb66-2"><a href="#cb66-2" tabindex="-1"></a>good_long <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb66-3"><a href="#cb66-3" tabindex="-1"></a>  <span class="fu">filter</span>(DEVICE_GEO_LONG <span class="sc">&gt;=</span> <span class="sc">-</span><span class="dv">125</span>, DEVICE_GEO_LONG <span class="sc">&lt;=</span> <span class="sc">-</span><span class="dv">116</span>)</span>
+<span id="cb66-4"><a href="#cb66-4" tabindex="-1"></a></span>
+<span id="cb66-5"><a href="#cb66-5" tabindex="-1"></a><span class="co"># Collapse &quot;good&quot; longitudes to one reference value per ZIP + CITY</span></span>
+<span id="cb66-6"><a href="#cb66-6" tabindex="-1"></a>good_zipcity <span class="ot">&lt;-</span> good_long <span class="sc">%&gt;%</span></span>
+<span id="cb66-7"><a href="#cb66-7" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(DEVICE_GEO_ZIP_clean), <span class="sc">!</span><span class="fu">is.na</span>(DEVICE_GEO_CITY)) <span class="sc">%&gt;%</span></span>
+<span id="cb66-8"><a href="#cb66-8" tabindex="-1"></a>  <span class="fu">group_by</span>(DEVICE_GEO_ZIP_clean, DEVICE_GEO_CITY) <span class="sc">%&gt;%</span></span>
+<span id="cb66-9"><a href="#cb66-9" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">ref_long =</span> <span class="fu">mean</span>(DEVICE_GEO_LONG, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb66-10"><a href="#cb66-10" tabindex="-1"></a>            <span class="at">.groups  =</span> <span class="st">&quot;drop&quot;</span>)</span>
+<span id="cb66-11"><a href="#cb66-11" tabindex="-1"></a></span>
+<span id="cb66-12"><a href="#cb66-12" tabindex="-1"></a><span class="co"># Join bad rows (w/ valid ZIP + CITY) to these reference values</span></span>
+<span id="cb66-13"><a href="#cb66-13" tabindex="-1"></a>paired_zipcity <span class="ot">&lt;-</span> bad_long <span class="sc">%&gt;%</span></span>
+<span id="cb66-14"><a href="#cb66-14" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(DEVICE_GEO_ZIP_clean), <span class="sc">!</span><span class="fu">is.na</span>(DEVICE_GEO_CITY)) <span class="sc">%&gt;%</span></span>
+<span id="cb66-15"><a href="#cb66-15" tabindex="-1"></a>  <span class="fu">left_join</span>(good_zipcity,</span>
+<span id="cb66-16"><a href="#cb66-16" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;DEVICE_GEO_ZIP_clean&quot;</span>, <span class="st">&quot;DEVICE_GEO_CITY&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb66-17"><a href="#cb66-17" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diff_long =</span> ref_long <span class="sc">-</span> DEVICE_GEO_LONG)</span>
+<span id="cb66-18"><a href="#cb66-18" tabindex="-1"></a></span>
+<span id="cb66-19"><a href="#cb66-19" tabindex="-1"></a><span class="co"># Summarize differences</span></span>
+<span id="cb66-20"><a href="#cb66-20" tabindex="-1"></a>paired_zipcity <span class="sc">%&gt;%</span></span>
+<span id="cb66-21"><a href="#cb66-21" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb66-22"><a href="#cb66-22" tabindex="-1"></a>    <span class="at">n_bad_with_match =</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(ref_long)),</span>
+<span id="cb66-23"><a href="#cb66-23" tabindex="-1"></a>    <span class="at">min_diff         =</span> <span class="fu">min</span>(diff_long, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb66-24"><a href="#cb66-24" tabindex="-1"></a>    <span class="at">max_diff         =</span> <span class="fu">max</span>(diff_long, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb66-25"><a href="#cb66-25" tabindex="-1"></a>    <span class="at">mean_diff        =</span> <span class="fu">mean</span>(diff_long, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb66-26"><a href="#cb66-26" tabindex="-1"></a>    <span class="at">n_near_10        =</span> <span class="fu">sum</span>(<span class="fu">abs</span>(diff_long <span class="sc">-</span> <span class="dv">10</span>) <span class="sc">&lt;</span> <span class="fl">0.1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb66-27"><a href="#cb66-27" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 5
+##   n_bad_with_match min_diff max_diff mean_diff n_near_10
+##              &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;int&gt;
+## 1               98     10.0     10.0        10        98</code></pre>
+<p>These results <strong>show a 10 degree shift</strong> for these 98
+values.</p>
+<p>We now address the <strong>2 values with <code>NA</code> for
+<code>DEVICE_GEO_CITY</code> and
+<code>DEVICE_GEO_ZIP_clean</code></strong>. We compare these to other
+rows with the same <code>AUCTION_ID</code>:</p>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" tabindex="-1"></a><span class="co"># Identify bad rows with missing ZIP/CITY</span></span>
+<span id="cb68-2"><a href="#cb68-2" tabindex="-1"></a>bad_missing_loc <span class="ot">&lt;-</span> bad_long <span class="sc">%&gt;%</span></span>
+<span id="cb68-3"><a href="#cb68-3" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(DEVICE_GEO_ZIP_clean) <span class="sc">|</span> <span class="fu">is.na</span>(DEVICE_GEO_CITY))</span>
+<span id="cb68-4"><a href="#cb68-4" tabindex="-1"></a></span>
+<span id="cb68-5"><a href="#cb68-5" tabindex="-1"></a><span class="co"># Reference longitudes for each auction (from good rows)</span></span>
+<span id="cb68-6"><a href="#cb68-6" tabindex="-1"></a>good_auction <span class="ot">&lt;-</span> good_long <span class="sc">%&gt;%</span></span>
+<span id="cb68-7"><a href="#cb68-7" tabindex="-1"></a>  <span class="fu">group_by</span>(AUCTION_ID) <span class="sc">%&gt;%</span></span>
+<span id="cb68-8"><a href="#cb68-8" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">ref_long_auction =</span> <span class="fu">mean</span>(DEVICE_GEO_LONG, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb68-9"><a href="#cb68-9" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span>)</span>
+<span id="cb68-10"><a href="#cb68-10" tabindex="-1"></a></span>
+<span id="cb68-11"><a href="#cb68-11" tabindex="-1"></a><span class="co"># Join &amp; compute shift difference</span></span>
+<span id="cb68-12"><a href="#cb68-12" tabindex="-1"></a>auction_shift_check <span class="ot">&lt;-</span> bad_missing_loc <span class="sc">%&gt;%</span></span>
+<span id="cb68-13"><a href="#cb68-13" tabindex="-1"></a>  <span class="fu">left_join</span>(good_auction, <span class="at">by =</span> <span class="st">&quot;AUCTION_ID&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb68-14"><a href="#cb68-14" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diff_long =</span> ref_long_auction <span class="sc">-</span> DEVICE_GEO_LONG) <span class="sc">%&gt;%</span></span>
+<span id="cb68-15"><a href="#cb68-15" tabindex="-1"></a>  <span class="fu">select</span>(AUCTION_ID,</span>
+<span id="cb68-16"><a href="#cb68-16" tabindex="-1"></a>         DEVICE_GEO_LAT,</span>
+<span id="cb68-17"><a href="#cb68-17" tabindex="-1"></a>         DEVICE_GEO_LONG,</span>
+<span id="cb68-18"><a href="#cb68-18" tabindex="-1"></a>         ref_long_auction,</span>
+<span id="cb68-19"><a href="#cb68-19" tabindex="-1"></a>         diff_long)</span>
+<span id="cb68-20"><a href="#cb68-20" tabindex="-1"></a></span>
+<span id="cb68-21"><a href="#cb68-21" tabindex="-1"></a>auction_shift_check <span class="sc">%&gt;%</span></span>
+<span id="cb68-22"><a href="#cb68-22" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">&quot;Two NA-location rows with auction-based longitude comparison&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb68-23"><a href="#cb68-23" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb68-24"><a href="#cb68-24" tabindex="-1"></a>                <span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">&quot;striped&quot;</span>))</span></code></pre></div>
+<table class="table table-striped" style="color: black; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Two NA-location rows with auction-based longitude comparison
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+AUCTION_ID
+</th>
+<th style="text-align:right;">
+DEVICE_GEO_LAT
+</th>
+<th style="text-align:right;">
+DEVICE_GEO_LONG
+</th>
+<th style="text-align:right;">
+ref_long_auction
+</th>
+<th style="text-align:right;">
+diff_long
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2804b6da-9567-4438-8f6d-d4102edbe9b5
+</td>
+<td style="text-align:right;">
+45.5248
+</td>
+<td style="text-align:right;">
+-132.6789
+</td>
+<td style="text-align:right;">
+-122.6789
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+689b2bb3-8799-4f43-878b-f3786bbebc17
+</td>
+<td style="text-align:right;">
+45.5248
+</td>
+<td style="text-align:right;">
+-132.6789
+</td>
+<td style="text-align:right;">
+-122.6789
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+</tbody>
+</table>
+<p>These results show these two rows are <strong>shifted exactly 10
+degrees</strong> from the other longitude values of rows with the same
+respective <code>AUCTION_ID</code>, justifying a shift for these rows as
+well.</p>
+<p>We now verify that all of the <code>NA</code> rows will be within
+Oregon bounds if shifted by 10:</p>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" tabindex="-1"></a><span class="co"># Verify shift will put &quot;bad longitude&quot; rows in bounds</span></span>
+<span id="cb69-2"><a href="#cb69-2" tabindex="-1"></a>bad_long_shift_check <span class="ot">&lt;-</span> bad_long <span class="sc">%&gt;%</span></span>
+<span id="cb69-3"><a href="#cb69-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">long_shifted =</span> DEVICE_GEO_LONG <span class="sc">+</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb69-4"><a href="#cb69-4" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb69-5"><a href="#cb69-5" tabindex="-1"></a>    <span class="at">n_rows                =</span> <span class="fu">n</span>(),</span>
+<span id="cb69-6"><a href="#cb69-6" tabindex="-1"></a>    <span class="at">min_long_orig         =</span> <span class="fu">min</span>(DEVICE_GEO_LONG, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb69-7"><a href="#cb69-7" tabindex="-1"></a>    <span class="at">max_long_orig         =</span> <span class="fu">max</span>(DEVICE_GEO_LONG, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb69-8"><a href="#cb69-8" tabindex="-1"></a>    <span class="at">min_long_shifted      =</span> <span class="fu">min</span>(long_shifted, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb69-9"><a href="#cb69-9" tabindex="-1"></a>    <span class="at">max_long_shifted      =</span> <span class="fu">max</span>(long_shifted, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb69-10"><a href="#cb69-10" tabindex="-1"></a>    <span class="at">n_shifted_in_bounds   =</span> <span class="fu">sum</span>(long_shifted <span class="sc">&gt;=</span> <span class="sc">-</span><span class="dv">125</span> <span class="sc">&amp;</span></span>
+<span id="cb69-11"><a href="#cb69-11" tabindex="-1"></a>                                  long_shifted <span class="sc">&lt;=</span> <span class="sc">-</span><span class="dv">116</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb69-12"><a href="#cb69-12" tabindex="-1"></a>    <span class="at">within_oregon_bounds  =</span> (<span class="fu">min</span>(long_shifted, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">&gt;=</span> <span class="sc">-</span><span class="dv">125</span> <span class="sc">&amp;</span> <span class="fu">max</span>(long_shifted, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">&lt;=</span> <span class="sc">-</span><span class="dv">116</span>)</span>
+<span id="cb69-13"><a href="#cb69-13" tabindex="-1"></a>  )</span>
+<span id="cb69-14"><a href="#cb69-14" tabindex="-1"></a></span>
+<span id="cb69-15"><a href="#cb69-15" tabindex="-1"></a>bad_long_shift_check</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 7
+##   n_rows min_long_orig max_long_orig min_long_shifted max_long_shifted
+##    &lt;int&gt;         &lt;dbl&gt;         &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1    100         -134.         -130.            -124.            -120.
+## # ℹ 2 more variables: n_shifted_in_bounds &lt;int&gt;, within_oregon_bounds &lt;lgl&gt;</code></pre>
+<p>We see that <em>all shifted values</em> fall within the Oregon range
+for longitude.</p>
 <p><strong>Observations</strong></p>
 <ul>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
-</ul>
-<p><strong>Decisions:</strong></p>
+<li><code>DEVICE_GEO_LAT</code>
 <ul>
-<li></li>
-<li></li>
+<li>All values fall within Oregon’s plausible latitude range.</li>
+<li>No cleaning is necessary.</li>
+</ul></li>
+<li><code>DEVICE_GEO_LONG</code>
+<ul>
+<li>Exactly <strong>100 rows</strong> are out-of-range.</li>
+<li>ZIP + City comparisons (98 rows), Auction-level comparison (2 rows),
+and range verification all confirm a consistent 10 degree systematic
+shift.</li>
+</ul></li>
+</ul>
+<p><strong>Decisions</strong></p>
+<ul>
+<li><strong>Latitude</strong>
+<ul>
+<li>Leave unchanged.</li>
+<li>Create <code>DEVICE_GEO_LAT_clean</code> as a direct copy.</li>
+</ul></li>
+<li><strong>Longitude</strong>
+<ul>
+<li>Correct the <strong>100 systematically shifted values</strong> by
+adding 10.</li>
+<li>All other longitude values remain unchanged.</li>
+<li>Create a cleaned field: <code>DEVICE_GEO_LONG_clean</code></li>
+</ul></li>
 </ul>
 </div>
-<div id="cleaning---device_geo_lat" class="section level3">
-<h3>Cleaning - <code>DEVICE_GEO_LAT</code></h3>
-<p>Log entries for time variables:</p>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
-<span id="cb61-2"><a href="#cb61-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
-<span id="cb61-3"><a href="#cb61-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
-<span id="cb61-4"><a href="#cb61-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
-<span id="cb61-5"><a href="#cb61-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
-<span id="cb61-6"><a href="#cb61-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
-<span id="cb61-7"><a href="#cb61-7" tabindex="-1"></a>)</span></code></pre></div>
+<div id="cleaning---device_geo_long-device_geo_long" class="section level3">
+<h3>Cleaning - <code>DEVICE_GEO_LONG</code>
+&amp;<code>DEVICE_GEO_LONG</code></h3>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" tabindex="-1"></a>ad_clean <span class="ot">&lt;-</span> ad_clean <span class="sc">%&gt;%</span></span>
+<span id="cb71-2"><a href="#cb71-2" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb71-3"><a href="#cb71-3" tabindex="-1"></a>    <span class="at">DEVICE_GEO_LAT_clean  =</span> DEVICE_GEO_LAT,</span>
+<span id="cb71-4"><a href="#cb71-4" tabindex="-1"></a>    <span class="at">DEVICE_GEO_LONG_clean =</span> <span class="fu">case_when</span>(</span>
+<span id="cb71-5"><a href="#cb71-5" tabindex="-1"></a>      DEVICE_GEO_LONG <span class="sc">&lt;</span> <span class="sc">-</span><span class="dv">125</span> <span class="sc">|</span></span>
+<span id="cb71-6"><a href="#cb71-6" tabindex="-1"></a>        DEVICE_GEO_LONG <span class="sc">&gt;</span> <span class="sc">-</span><span class="dv">116</span> <span class="sc">~</span> DEVICE_GEO_LONG <span class="sc">+</span> <span class="dv">10</span>,</span>
+<span id="cb71-7"><a href="#cb71-7" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> DEVICE_GEO_LONG</span>
+<span id="cb71-8"><a href="#cb71-8" tabindex="-1"></a>    )</span>
+<span id="cb71-9"><a href="#cb71-9" tabindex="-1"></a>  )</span>
+<span id="cb71-10"><a href="#cb71-10" tabindex="-1"></a></span>
+<span id="cb71-11"><a href="#cb71-11" tabindex="-1"></a><span class="co"># Count rows corrected</span></span>
+<span id="cb71-12"><a href="#cb71-12" tabindex="-1"></a>n_long_shifted <span class="ot">&lt;-</span></span>
+<span id="cb71-13"><a href="#cb71-13" tabindex="-1"></a>  <span class="fu">sum</span>(ad_clean<span class="sc">$</span>DEVICE_GEO_LONG_clean <span class="sc">!=</span> ad_clean<span class="sc">$</span>DEVICE_GEO_LONG)</span>
+<span id="cb71-14"><a href="#cb71-14" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Longitude values corrected (shifted by +10): &quot;</span>,</span>
+<span id="cb71-15"><a href="#cb71-15" tabindex="-1"></a>    n_long_shifted,</span>
+<span id="cb71-16"><a href="#cb71-16" tabindex="-1"></a>    <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Longitude values corrected (shifted by +10):  100</code></pre>
+<p>Log entry for longitudinal variable:</p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb73-2"><a href="#cb73-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;GEO3&quot;</span>,</span>
+<span id="cb73-3"><a href="#cb73-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;DEVICE_GEO_LONG&quot;</span>,</span>
+<span id="cb73-4"><a href="#cb73-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;100 longitude values were systematically shifted outside Oregon bounds by ~10 degrees.&quot;</span>,</span>
+<span id="cb73-5"><a href="#cb73-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Corrected all out-of-range longitude values by applying a +10 degree shift.&quot;</span>,</span>
+<span id="cb73-6"><a href="#cb73-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> n_long_shifted</span>
+<span id="cb73-7"><a href="#cb73-7" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="summary-6" class="section level3">
 <h3>Summary</h3>
 <ul>
-<li></li>
-<li></li>
-</ul>
-</div>
-<div id="exploration---device_geo_long" class="section level3">
-<h3>Exploration - <code>DEVICE_GEO_LONG</code></h3>
-<p><strong>Observations</strong></p>
-<ul>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
-</ul>
-<p><strong>Decisions:</strong></p>
-<ul>
-<li></li>
-<li></li>
-</ul>
-</div>
-<div id="cleaning---device_geo_long" class="section level3">
-<h3>Cleaning - <code>DEVICE_GEO_LONG</code></h3>
-<p>Log entries for time variables:</p>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
-<span id="cb62-2"><a href="#cb62-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
-<span id="cb62-3"><a href="#cb62-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
-<span id="cb62-4"><a href="#cb62-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
-<span id="cb62-5"><a href="#cb62-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
-<span id="cb62-6"><a href="#cb62-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
-<span id="cb62-7"><a href="#cb62-7" tabindex="-1"></a>)</span></code></pre></div>
-</div>
-<div id="summary-7" class="section level3">
-<h3>Summary</h3>
-<ul>
-<li></li>
-<li></li>
+<li><code>DEVICE_GEO_LAT</code> required no changes; all values were
+already valid.</li>
+<li><code>DEVICE_GEO_LONG</code> contained 100 systematically shifted
+values, all offset by <span class="math inline">\(+10^\circ\)</span>.</li>
+<li>Three independent analytical checks (ZIP + City matching,
+auction-level comparison, and range verification) confirmed the
+correction.</li>
+<li>A cleaned longitude variable (<code>DEVICE_GEO_LONG_clean</code>)
+now restores all observations to plausible Oregon coordinates.</li>
+<li>No rows were removed; only 100 longitude values were corrected.</li>
 </ul>
 <hr />
 </div>
@@ -3377,23 +3660,23 @@ reconstructed</strong> to avoid speculative geolocation inference.<br />
 <div id="cleaning-3" class="section level3">
 <h3>Cleaning</h3>
 <p>Log entries for time variables:</p>
-<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
-<span id="cb63-2"><a href="#cb63-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
-<span id="cb63-3"><a href="#cb63-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
-<span id="cb63-4"><a href="#cb63-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
-<span id="cb63-5"><a href="#cb63-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
-<span id="cb63-6"><a href="#cb63-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
-<span id="cb63-7"><a href="#cb63-7" tabindex="-1"></a>)</span>
-<span id="cb63-8"><a href="#cb63-8" tabindex="-1"></a></span>
-<span id="cb63-9"><a href="#cb63-9" tabindex="-1"></a><span class="fu">log_change</span>(</span>
-<span id="cb63-10"><a href="#cb63-10" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T2&quot;</span>,</span>
-<span id="cb63-11"><a href="#cb63-11" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;DATE_UTC&quot;</span>,</span>
-<span id="cb63-12"><a href="#cb63-12" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;DATE_UTC stored as character.&quot;</span>,</span>
-<span id="cb63-13"><a href="#cb63-13" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Converted to Date type.&quot;</span>,</span>
-<span id="cb63-14"><a href="#cb63-14" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
-<span id="cb63-15"><a href="#cb63-15" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb74-2"><a href="#cb74-2" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T1&quot;</span>,</span>
+<span id="cb74-3"><a href="#cb74-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;TIMESTAMP&quot;</span>,</span>
+<span id="cb74-4"><a href="#cb74-4" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;Inconsistent TIMESTAMP formats, including &#39;NA&#39; date tokens.&quot;</span>,</span>
+<span id="cb74-5"><a href="#cb74-5" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Recover &#39;NA&#39; dates using `DATE_UTC`; parsed to POSIXct (UTC).&quot;</span>,</span>
+<span id="cb74-6"><a href="#cb74-6" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb74-7"><a href="#cb74-7" tabindex="-1"></a>)</span>
+<span id="cb74-8"><a href="#cb74-8" tabindex="-1"></a></span>
+<span id="cb74-9"><a href="#cb74-9" tabindex="-1"></a><span class="fu">log_change</span>(</span>
+<span id="cb74-10"><a href="#cb74-10" tabindex="-1"></a>  <span class="at">step_id =</span> <span class="st">&quot;T2&quot;</span>,</span>
+<span id="cb74-11"><a href="#cb74-11" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;DATE_UTC&quot;</span>,</span>
+<span id="cb74-12"><a href="#cb74-12" tabindex="-1"></a>  <span class="at">issue =</span> <span class="st">&quot;DATE_UTC stored as character.&quot;</span>,</span>
+<span id="cb74-13"><a href="#cb74-13" tabindex="-1"></a>  <span class="at">decision =</span> <span class="st">&quot;Converted to Date type.&quot;</span>,</span>
+<span id="cb74-14"><a href="#cb74-14" tabindex="-1"></a>  <span class="at">rows_affected =</span> <span class="fu">nrow</span>(ad_clean)</span>
+<span id="cb74-15"><a href="#cb74-15" tabindex="-1"></a>)</span></code></pre></div>
 </div>
-<div id="summary-8" class="section level3">
+<div id="summary-7" class="section level3">
 <h3>Summary</h3>
 <ul>
 <li></li>
@@ -3429,13 +3712,13 @@ Each entry corresponds to a specific issue that was identified and the
 decision made to address it.</p>
 <div id="log" class="section level2">
 <h2>Log</h2>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" tabindex="-1"></a>cleaning_log <span class="sc">%&gt;%</span></span>
-<span id="cb64-2"><a href="#cb64-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(step_id) <span class="sc">%&gt;%</span></span>
-<span id="cb64-3"><a href="#cb64-3" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
-<span id="cb64-4"><a href="#cb64-4" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Summary of Data-Cleaning Decisions&quot;</span>,</span>
-<span id="cb64-5"><a href="#cb64-5" tabindex="-1"></a>    <span class="at">align   =</span> <span class="st">&quot;l&quot;</span></span>
-<span id="cb64-6"><a href="#cb64-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb64-7"><a href="#cb64-7" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>, <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" tabindex="-1"></a>cleaning_log <span class="sc">%&gt;%</span></span>
+<span id="cb75-2"><a href="#cb75-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(step_id) <span class="sc">%&gt;%</span></span>
+<span id="cb75-3"><a href="#cb75-3" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb75-4"><a href="#cb75-4" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Summary of Data-Cleaning Decisions&quot;</span>,</span>
+<span id="cb75-5"><a href="#cb75-5" tabindex="-1"></a>    <span class="at">align   =</span> <span class="st">&quot;l&quot;</span></span>
+<span id="cb75-6"><a href="#cb75-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb75-7"><a href="#cb75-7" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>, <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>)</span></code></pre></div>
 <table class="table table-striped" style="color: black; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>
 Summary of Data-Cleaning Decisions
@@ -3513,6 +3796,25 @@ Converted sentinel ZIPs to NA; preserved all other ZIP values as-is.
 </tr>
 <tr>
 <td style="text-align:left;">
+GEO3
+</td>
+<td style="text-align:left;">
+DEVICE_GEO_LONG
+</td>
+<td style="text-align:left;">
+100 longitude values were systematically shifted outside Oregon bounds
+by ~10 degrees.
+</td>
+<td style="text-align:left;">
+Corrected all out-of-range longitude values by applying a +10 degree
+shift.
+</td>
+<td style="text-align:left;">
+100
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 I1
 </td>
 <td style="text-align:left;">
@@ -3543,40 +3845,6 @@ Recover ‘NA’ dates using <code>DATE_UTC</code>; parsed to POSIXct (UTC).
 </td>
 <td style="text-align:left;">
 441535
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-T1
-</td>
-<td style="text-align:left;">
-TIMESTAMP
-</td>
-<td style="text-align:left;">
-Inconsistent TIMESTAMP formats, including ‘NA’ date tokens.
-</td>
-<td style="text-align:left;">
-Recover ‘NA’ dates using <code>DATE_UTC</code>; parsed to POSIXct (UTC).
-</td>
-<td style="text-align:left;">
-440705
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-T1
-</td>
-<td style="text-align:left;">
-TIMESTAMP
-</td>
-<td style="text-align:left;">
-Inconsistent TIMESTAMP formats, including ‘NA’ date tokens.
-</td>
-<td style="text-align:left;">
-Recover ‘NA’ dates using <code>DATE_UTC</code>; parsed to POSIXct (UTC).
-</td>
-<td style="text-align:left;">
-440705
 </td>
 </tr>
 <tr>
