@@ -30,13 +30,9 @@ theme_set(theme_bw(base_size = 12))
 ```
 
 ```{r Data, echo = FALSE}
-source("Project/scripts/data_io.R")
-source("Project/scripts/data_cleaning.R")
-ad_clean <- clean_ad_data(load_ad_data())
-
-# source("C:/Users/chris/Downloads/final_data_cleaning.R") # Temporary for knit
-# ad_clean <- cumulative_ad_data # Temporary for knit
-
+source("../scripts/data_io.R")
+source("../scripts/data_cleaning.R")
+ad_clean <- clean_ad_data(load_ad_data(data_folder = "../data"))
 
 ```
 
@@ -787,38 +783,6 @@ ggplot(ad_clean, aes(x = ad_clean$DEVICE_TYPE, y = ad_clean$RESPONSE_TIME)) +
     )
 ```
 
-
-### Device Type and Timestamp
-
-This heatmap visualizes Device Type activity across the available time window. Categories with relatively low overall activity (Connected Device, Connected TV, and Mobile/Tablet) exhibit a consistent pattern throughout the period, although some gaps are visible in Connected Device category due to the small number of observations. The Tablet category also shows consistent activity, maintaining medium counts for most of the period with a slight spike between 3 and 4 pm. Activity for Personal Computer is similar to Tablet until around 6 pm, after which it increases substantially and remains higher through the end of the window at approximately 10 pm.
-
-```{r Device Type vs Timestamp, echo = FALSE, fig.width=12, fig.height=6}
-
-# Convert to PST
-pst_time <- as.POSIXct(ad_clean$TIMESTAMP, tz = "America/Los_Angeles")
-
-
-# # Heatmap of Device by Timestamp
-# ad_clean %>%
-#   mutate(time_bin = floor_date(pst_time, "20 minutes")) %>%
-#   count(DEVICE_TYPE, time_bin) %>%
-#   ggplot(aes(x = time_bin, y = DEVICE_TYPE, fill = n)) +
-#   geom_tile() +
-#   scale_x_datetime(
-#     date_labels = "%I:%M %p",   # 12-hour format with AM/PM
-#     date_breaks = "60 min",      # adjust as needed
-#     expand = c(0,0)
-#   ) +
-#   scale_fill_viridis_c() +
-#   labs(
-#     title = "Device Type Activity across Time",
-#     x = "Time (PST)",
-#     y = "Device Type",
-#     fill = "Count"
-#   ) +
-#   theme_minimal()
-
-```
 
 
 ## Categorical vs Categorical
